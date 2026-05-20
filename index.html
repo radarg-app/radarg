@@ -4814,7 +4814,7 @@ function buildChart(from,to){
         zoneBands:{},milestones:{},
       },
       scales:{
-        x:{ticks:{color:()=>isLM?'#6868a0':'#606080',font:{family:"'JetBrains Mono',monospace",size:10},maxRotation:45,autoSkip:false,callback:(v,i)=>i%step===0?labels[i]:''},grid:{color:()=>isLM?'rgba(0,0,0,.06)':'rgba(255,255,255,.04)'},border:{display:false}},
+        x:{type:'category',ticks:{color:()=>isLM?'#6868a0':'#606080',font:{family:"'JetBrains Mono',monospace",size:10},maxRotation:45,autoSkip:false,callback:(v,i)=>i%step===0?labels[i]:''},grid:{color:()=>isLM?'rgba(0,0,0,.06)':'rgba(255,255,255,.04)'},border:{display:false}},
         y:{min:0,max:100,ticks:{color:()=>isLM?'#6868a0':'#606080',font:{family:"'JetBrains Mono',monospace",size:10},stepSize:25,callback:v=>({0:'Miedo Ext.',25:'Miedo',50:'Neutral',75:'Codicia',100:'Cod. Ext.'}[v]||'')},grid:{color:()=>isLM?'rgba(0,0,0,.07)':'rgba(255,255,255,.05)'},border:{display:false}},
       },
       interaction:{mode:'index',intersect:false},
@@ -4849,7 +4849,13 @@ function updateSlider(){
   sliderFrom=f;sliderTo=to_;
   const pct=100/(TOTAL_MONTHS-1);
   $('rangeTrackFill').style.left=(f*pct)+'%'; $('rangeTrackFill').style.right=(100-to_*pct)+'%';
-  $('rl-from').textContent=window.MONTHLY.labels[f]; $('rl-to').textContent=window.MONTHLY.labels[to_];
+  const _cleanLbl = l => {
+    if(!l) return '';
+    if(l.length <= 10) return l;
+    try { const d=new Date(l); if(!isNaN(d)) return d.toLocaleDateString(LANG==='en'?'en-US':'es-AR',{month:'short',year:'numeric'}); } catch(e){}
+    return l.split(' ').slice(0,2).join(' ');
+  };
+  $('rl-from').textContent=_cleanLbl(window.MONTHLY.labels[f]); $('rl-to').textContent=_cleanLbl(window.MONTHLY.labels[to_]);
   document.querySelectorAll('.range-tick').forEach(tk=>{tk.classList.toggle('in-range',parseInt(tk.dataset.idx)>=f&&parseInt(tk.dataset.idx)<=to_);});
   const n=t-f+1,yrs=(n/12).toFixed(1).replace('.0','');
   if($('chartSub')) {
