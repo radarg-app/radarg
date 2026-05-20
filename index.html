@@ -67,14 +67,14 @@
 
 /* ── Light mode ──────────────────────────────────────────────── */
 body.lm {
-  --bg:    #f8f9fc;  --bg2:  #ffffff;  --bg3:  #f0f1f5;
-  --bg4:   #e4e5ec;  --bg5:  #d8d9e4;
-  --border: rgba(0,0,0,.07); --border2:rgba(0,0,0,.13); --border3:rgba(0,0,0,.22);
-  --text:#0d0d18; --text2:#44445c; --text3:#7070a0; --text4:#aaaacc;
-  --ac:#0284c7; --ac2:#0ea5e9; --ac3:rgba(2,132,199,.1); --acr:rgba(2,132,199,.04);
-  --fe:#dc2626; --f:#ea580c; --n:#ca8a04; --g:#16a34a; --ge:#15803d; --gold:#d97706;
-  --shadow: 0 1px 3px rgba(0,0,0,.08), 0 0 0 1px rgba(0,0,0,.05);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,.1), 0 0 0 1px rgba(0,0,0,.06);
+  --bg:    #f4f5f8;  --bg2:  #ffffff;  --bg3:  #ebedf2;
+  --bg4:   #dcdee8;  --bg5:  #cdd0de;
+  --border: rgba(0,0,0,.10); --border2:rgba(0,0,0,.18); --border3:rgba(0,0,0,.30);
+  --text:#0a0a14; --text2:#2a2a40; --text3:#484864; --text4:#696990;
+  --ac:#0271b0; --ac2:#0284c7; --ac3:rgba(2,113,176,.12); --acr:rgba(2,113,176,.05);
+  --fe:#b91c1c; --f:#c2410c; --n:#a16207; --g:#15803d; --ge:#166534; --gold:#b45309;
+  --shadow: 0 1px 4px rgba(0,0,0,.12), 0 0 0 1px rgba(0,0,0,.07);
+  --shadow-lg: 0 8px 28px rgba(0,0,0,.14), 0 0 0 1px rgba(0,0,0,.08);
 }
 body.lm header { background: rgba(248,249,252,.95); border-color: rgba(0,0,0,.08); }
 body.lm .ticker { background: #f0f1f5; border-color: rgba(0,0,0,.07); }
@@ -113,7 +113,83 @@ body.lm .suggest-textarea { background:#f8f9fc; color:#0d0d18; border-color:rgba
 body.lm footer { border-color: rgba(0,0,0,.07); }
 body.lm .foot-disc, body.lm .foot-tagline { color: #7070a0; }
 body.lm .foot-tag { color: #7070a0; border-color: rgba(0,0,0,.1); }
-body.lm .czl-name { color: #0d0d18; }
+body.lm .czl-name { color: #0a0a14; }
+body.lm .t-lbl { color: #484864; }
+body.lm .t-ts  { color: #484864; }
+body.lm .t-val { color: #0a0a14; }
+body.lm .sc-date { color: #484864; }
+body.lm .sc-ref-period { color: #484864; }
+body.lm .sc-refresh { color: #484864; }
+body.lm .ai-sub { color: #2a2a40; }
+body.lm .ai-text { color: #2a2a40; background:#f4f5f8; border-color:rgba(0,0,0,.12); }
+body.lm .ai-disclaimer { color: #484864; }
+body.lm .ctx-lbl { color: #484864; }
+body.lm .ctx-sub { color: #2a2a40; }
+body.lm .ctx-val { color: #0a0a14; }
+body.lm .sec-ttl { color: #484864; }
+body.lm .strip-weight { color: #484864; }
+body.lm .subidx-sec-weight { color: #484864; }
+body.lm .subidx-sec-question { color: #484864; }
+body.lm .subidx-sec-desc { color: #2a2a40; }
+body.lm .subidx-section { background:#ffffff; }
+body.lm .var-card { background:#f4f5f8; }
+body.lm .var-card-name { color: #484864; }
+body.lm .var-card-desc { color: #484864; }
+body.lm .var-card-src  { color: #484864; }
+body.lm .var-card-unavail-note { color: #b45309; }
+body.lm .chart-sub { color: #484864; }
+body.lm .czl-range { color: #484864; }
+body.lm .range-label-sep { color: #484864; }
+body.lm .range-tick { color: #696990; }
+body.lm .news-tag { opacity:.95; }
+body.lm .news-headline { color: #0a0a14; }
+body.lm .news-meta { color: #484864; }
+body.lm .news-card { background:#ffffff; }
+body.lm .hito-yr  { color: #484864; }
+body.lm .hito-txt { color: #2a2a40; }
+body.lm .hito-key { color: #2a2a40; }
+body.lm .meth-a { color: #2a2a40; }
+body.lm .meth-intro-desc { color: #2a2a40; }
+body.lm .pro-sub  { color: #2a2a40; }
+body.lm .pro-feat-desc { color: #2a2a40; }
+body.lm .pro-note { color: #484864; }
+body.lm .sponsors-sub { color: #2a2a40; }
+body.lm .benefit-item { color: #2a2a40; }
+body.lm .tier-feat { color: #2a2a40; }
+body.lm .tier-feat-x { color: #696990; opacity:.7; }
+body.lm .tier-tagline { color: #2a2a40; opacity:1; }
+body.lm .gift-sub { color: #2a2a40; }
+body.lm .gift-modal-sub { color: #2a2a40; }
+body.lm .gift-terms { color: #484864; }
+body.lm .suggest-p { color: #2a2a40; }
+body.lm .suggest-label { color: #484864; }
+body.lm .foot-disc { color: #484864; }
+body.lm .foot-tagline { color: #484864; }
+body.lm .foot-tag { color: #484864; }
+body.lm .foot-copy span { color: #696990; }
+body.lm .h-btn { color: #2a2a40; border-color:rgba(0,0,0,.18); }
+body.lm .h-btn:hover { color: #0a0a14; }
+body.lm .lang-btn { color: #2a2a40; border-color:rgba(0,0,0,.18); }
+body.lm .lang-btn.active { color: #0a0a14; }
+body.lm .hitos-toggle-btn { color: #2a2a40; border-color:rgba(0,0,0,.18); }
+body.lm .btn-sponsor { color: #2a2a40; border-color:rgba(0,0,0,.18); }
+body.lm .score-card { background:#ffffff; }
+body.lm .ai-panel  { background:#ffffff; }
+body.lm .suggest-shell { background:#f4f5f8; }
+body.lm .tier-card { background:#ffffff; }
+body.lm .modal-opt-desc { color: #2a2a40; }
+body.lm .modal-opt-name { color: #0a0a14; }
+body.lm .gauge-label-txt { color: #484864; }
+body.lm .gauge-scale-txt { color: #484864; }
+body.lm .chart-desc-txt  { color: #484864; }
+body.lm .slider-hint-txt { color: #484864; }
+body.lm .ai-date-txt     { color: #484864; }
+body.lm .news-ai-sub     { color: #484864; }
+body.lm .score-subtitle-txt { color: #484864; }
+body.lm .tier-note-txt   { color: #484864; }
+body.lm .gift-how-label  { color: #484864; }
+body.lm .gift-terms-txt  { color: #484864; }
+body.lm .gift-label-txt  { color: #484864; }
 body.lm .chart-zone-legend { background: #f0f1f5; border-color: rgba(0,0,0,.07); }
 body.lm .gtl-label { color: #0d0d18; }
 body.lm .gtl-period { color: #7070a0; }
@@ -1369,7 +1445,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
         <span class="live-dot" style="background:var(--ac);box-shadow:none"></span>
         <span data-i18n="score.sentiment">Sentimiento del mercado</span>
       </div>
-      <div style="font-size:11px;color:var(--text3);margin-bottom:.5rem;margin-top:-.5rem" data-i18n="score.subtitle">¿Cómo está el mercado argentino hoy?</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:.5rem;margin-top:-.5rem" class="score-subtitle-txt" data-i18n="score.subtitle">¿Cómo está el mercado argentino hoy?</div>
       <span class="sc-score" id="gScore">–</span>
       <span class="sc-label" id="gLbl">–</span>
       <span class="sc-date"  id="gDate">–</span>
@@ -1418,8 +1494,8 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
     <div class="gauge-card">
       <div style="text-align:center;padding:1rem 0 .25rem">
         <div style="font-size:26px;font-weight:800;letter-spacing:-.5px;color:var(--text);margin-bottom:6px" data-i18n="gauge.title">Índice de Sentimiento del Mercado</div>
-        <div style="font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--text3)" data-i18n="gauge.label">Argentina</div>
-        <div style="font-size:10px;color:var(--text3);margin-top:2px;font-family:'JetBrains Mono',monospace" data-i18n="gauge.scale">0 = pánico total · 50 = neutral · 100 = euforia</div>
+        <div style="font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--text3)" class="gauge-label-txt" data-i18n="gauge.label">Argentina</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px;font-family:'JetBrains Mono',monospace" class="gauge-scale-txt" data-i18n="gauge.scale">0 = pánico total · 50 = neutral · 100 = euforia</div>
       </div>
       <div class="gauge-canvas-wrap">
         <canvas id="mainGauge" style="display:block;width:100%" role="img"></canvas>
@@ -1438,7 +1514,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
         <div style="flex:1">
           <div class="ai-title" data-i18n="ai.economic">Situación Económica</div>
           <div class="ai-sub" data-i18n="ai.sub">Análisis automático en tiempo real</div>
-          <div style="font-size:9px;color:var(--text3);margin-top:2px" id="aiEconDate"></div>
+          <div style="font-size:9px;color:var(--text3);margin-top:2px" class="ai-date-txt" id="aiEconDate"></div>
         </div>
         <button onclick="refreshAI()" id="aiRefreshBtn" title="Actualizar" style="
           background:transparent; border:1px solid var(--border2); border-radius:6px;
@@ -1458,7 +1534,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
         <div style="flex:1">
           <div class="ai-title" data-i18n="ai.political">Situación Política</div>
           <div class="ai-sub" data-i18n="ai.sub.political">Basado en ICG UTDT y noticias de las últimas 48hs</div>
-          <div style="font-size:9px;color:var(--text3);margin-top:2px" id="aiPolDate"></div>
+          <div style="font-size:9px;color:var(--text3);margin-top:2px" class="ai-date-txt" id="aiPolDate"></div>
         </div>
       </div>
       <div class="ai-text loading" id="aiPol" data-i18n-loading="ai.loading">Analizando contexto político…</div>
@@ -1472,7 +1548,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
   <section>
     <div class="sec-hdr" style="margin-top:1rem">
       <span class="sec-ttl" id="newsSttl" data-i18n="sec.news">Noticias que mueven el índice</span>
-      <span style="font-size:11px;color:var(--text3);margin-left:.75rem;font-weight:400">Seleccionadas por IA · últimas 48hs</span>
+      <span style="font-size:11px;color:var(--text3);margin-left:.75rem;font-weight:400" class="news-ai-sub">Seleccionadas por IA · últimas 48hs</span>
       <div class="sec-line"></div>
       <span style="font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace" id="newsTs"></span>
     </div>
@@ -1552,7 +1628,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
         <div>
           <div class="chart-title" data-i18n="chart.title">RadARG — Sentimiento del mercado argentino</div>
           <div class="chart-sub" id="chartSub">Datos mensuales · Ene 2000 – May 2026</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:4px" data-i18n="chart.desc">0 = pánico · 100 = euforia. Históricamente, valores por encima de 75 precedieron correcciones importantes en activos argentinos.</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px" class="chart-desc-txt" data-i18n="chart.desc">0 = pánico · 100 = euforia. Históricamente, valores por encima de 75 precedieron correcciones importantes en activos argentinos.</div>
         </div>
       </div>
       <div class="chart-zone-legend">
@@ -1570,7 +1646,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
         <canvas id="histChart"></canvas>
       </div>
       <div class="range-wrap">
-        <div style="font-size:9px;color:var(--text3);text-align:center;margin-bottom:4px;font-family:'JetBrains Mono',monospace" data-i18n="chart.sliderHint">Arrastrá los extremos para ajustar el período</div>
+        <div style="font-size:9px;color:var(--text3);text-align:center;margin-bottom:4px;font-family:'JetBrains Mono',monospace" class="slider-hint-txt" data-i18n="chart.sliderHint">Arrastrá los extremos para ajustar el período</div>
         <div class="range-labels">
           <span class="range-label-from" id="rl-from">Ene 2000</span>
           <span class="range-label-sep" data-i18n="chart.range">RANGO</span>
@@ -1677,7 +1753,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
           <div class="tier-feat"><span class="tier-feat-x">–</span><span style="opacity:.4" data-i18n="tier.silver.x2">API de datos</span></div>
         </div>
         <button class="btn-tier btn-tier-silver" onclick="openTierModal('silver')">⚡ <span data-i18n="tier.silver.cta">Empezar 7 días gratis</span></button>
-        <div style="text-align:center;font-size:11px;color:var(--text3);margin-top:.25rem" data-i18n="tier.trial.note">Cancelás cuando querés · Sin compromiso</div>
+        <div style="text-align:center;font-size:11px;color:var(--text3);margin-top:.25rem" class="tier-note-txt" data-i18n="tier.trial.note">Cancelás cuando querés · Sin compromiso</div>
       </div>
 
       <!-- ORO -->
@@ -1699,7 +1775,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
           <div class="tier-feat"><span class="tier-feat-x">–</span><span style="opacity:.4" data-i18n="tier.gold.x1">API pública de datos</span></div>
         </div>
         <button class="btn-tier btn-tier-gold" onclick="openTierModal('gold')">🥇 <span data-i18n="tier.gold.cta">Acceder a Oro</span></button>
-        <div style="text-align:center;font-size:11px;color:var(--text3);margin-top:.25rem" data-i18n="tier.trial.note">Cancelás cuando querés · Sin compromiso</div>
+        <div style="text-align:center;font-size:11px;color:var(--text3);margin-top:.25rem" class="tier-note-txt" data-i18n="tier.trial.note">Cancelás cuando querés · Sin compromiso</div>
       </div>
 
       <!-- DIAMANTE -->
@@ -1721,12 +1797,12 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
           <div class="tier-feat"><span class="tier-feat-check">✓</span><span data-i18n="tier.diamond.f6">Acceso anticipado a todo — sin excepciones</span></div>
         </div>
         <button class="btn-tier btn-tier-diamond" onclick="openTierModal('diamond')">💎 <span data-i18n="tier.diamond.cta">Acceder a Diamante</span></button>
-        <div style="text-align:center;font-size:11px;color:var(--text3);margin-top:.25rem" data-i18n="tier.trial.note">Cancelás cuando querés · Sin compromiso</div>
+        <div style="text-align:center;font-size:11px;color:var(--text3);margin-top:.25rem" class="tier-note-txt" data-i18n="tier.trial.note">Cancelás cuando querés · Sin compromiso</div>
       </div>
 
     </div><!-- /tiers-grid -->
 
-    <p style="text-align:center;font-size:11px;color:var(--text3)" data-i18n="tier.security">🔒 Pagos seguros via Mercado Pago &amp; Stripe · Cancelá en cualquier momento · 7 días de garantía de devolución</p>
+    <p style="text-align:center;font-size:11px;color:var(--text3)" class="tier-note-txt" data-i18n="tier.security">🔒 Pagos seguros via Mercado Pago &amp; Stripe · Cancelá en cualquier momento · 7 días de garantía de devolución</p>
 
   </section>
 
@@ -1740,7 +1816,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
 
       <!-- How it works -->
       <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.875rem 1rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:.5rem">
-        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:.125rem" data-i18n="gift.modal.how">Cómo funciona</div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:.125rem" class="gift-how-label" data-i18n="gift.modal.how">Cómo funciona</div>
         <div style="display:flex;align-items:flex-start;gap:.5rem;font-size:12px;color:var(--text2)">
           <span style="color:var(--ac);flex-shrink:0">1.</span>
           <span data-i18n="gift.modal.step1">Ingresás tu correo acá abajo.</span>
@@ -1762,14 +1838,14 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
       </div>
 
       <div style="display:flex;flex-direction:column;gap:.625rem">
-        <label style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)" data-i18n="gift.modal.email.label">Tu correo electrónico</label>
+        <label style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)" class="gift-label-txt" data-i18n="gift.modal.email.label">Tu correo electrónico</label>
         <input type="email" placeholder="tu@email.com" id="giftEmail"
           style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:10px 12px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;outline:none;box-sizing:border-box;transition:border-color .15s"
           onfocus="this.style.borderColor='var(--ac)'" onblur="this.style.borderColor=''"
           data-i18n-placeholder="gift.modal.placeholder">
         <button class="btn-tier btn-tier-silver" onclick="submitGiftClaim()" data-i18n="gift.modal.cta">✦ Verificar mi sugerencia →</button>
       </div>
-      <div style="font-size:10px;color:var(--text3);margin-top:.75rem;text-align:center;line-height:1.6" data-i18n="gift.modal.terms">El cupón es de un solo uso y válido por 30 días desde su emisión. No acumulable con otras promociones.</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:.75rem;text-align:center;line-height:1.6" class="gift-terms-txt" data-i18n="gift.modal.terms">El cupón es de un solo uso y válido por 30 días desde su emisión. No acumulable con otras promociones.</div>
     </div>
   </div>
 
@@ -2212,7 +2288,8 @@ const T = {
     // Hitos toggle
     'hitos.hide':'Ocultar hitos',
     // Chart tooltip
-    'chart.score':'Score','chart.mervalToggle':'Merval USD',
+    'chart.score':'Score','chart.sliderHint':'Drag the ends to adjust the period',
+    'chart.mervalToggle':'Merval USD',
     // AI refresh title
     'ai.refresh':'Actualizar análisis',
     // AI fallback
@@ -2233,6 +2310,18 @@ const T = {
     'nav.indicators':'Indicators','nav.historic':'Historical','nav.tiers':'Tiers','nav.methodology':'Methodology',
     'header.share':'Share',
     'score.sentiment':'Market sentiment',
+    'donate.modal.sub':'If this index helps you, any contribution helps keep it active and free.',
+    'gift.modal.email.label':'Your email address',
+    'gift.modal.step3':'If so, you will receive an email with a single-use coupon to activate 1 month of Silver at no cost.',
+    'ticker.act':'Upd.',
+    'tier.modal.coupon':'Coupon',
+    'tier.modal.coupon.optional':'(optional)',
+    'gift.modal.how':'How it works',
+    'gift.modal.step1':'Enter your email below.',
+    'gift.modal.step2':'Our team reviews if you made valuable contributions implemented in RadARG.',
+    'gift.modal.step3':'If so, you will receive a single-use coupon to activate 1 month of Silver at no cost.',
+    'gift.modal.note':'Our team always notifies those who made valuable contributions. If your suggestion was implemented, we have or will let you know soon.',
+    'gift.modal.email.label':'Your email address',
     'gauge.label':'Argentina','gauge.title':'Fear & Greed Index','score.1w':'1 week ago','score.1m':'1 month ago',
     'score.3m':'3 months ago','score.1y':'1 year ago','score.updating':'Updating…',
     'ai.title':'AI Interpretation','ai.sub':'Automatic real-time analysis',
@@ -2405,7 +2494,8 @@ const T = {
     // Hitos toggle
     'hitos.hide':'Hide milestones',
     // Chart tooltip
-    'chart.score':'Score','chart.mervalToggle':'Merval USD',
+    'chart.score':'Score','chart.sliderHint':'Drag the ends to adjust the period',
+    'chart.mervalToggle':'Merval USD',
     // AI refresh title
     'ai.refresh':'Refresh analysis',
     // AI fallback
