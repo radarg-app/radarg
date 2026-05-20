@@ -4776,9 +4776,8 @@ function closeSuggestPopup(){
 // In production this would come from a news API or RSS parser
 /* ── Noticias inyectadas por el GAS (se actualiza automáticamente) ── */
 // RADARG_DATA_START
-window.INJECTED_DATA = null;
+window.INJECTED_DATA = {"embi_bps":543,"tna_pf":19.85,"ipc_mensual":2.6,"reservas_mM":46062,"merval_usd":1862,"base_monetaria_var":-1.6,"reservas_netas_mM":25334,"gd35_yield":6.67,"soja_usd":1206.5,"icg_utdt":2.02,"rem_12m":24.2,"rem_1m":2.3,"prima_electoral_bps":419,"ipc_nucleo":2.88,"tcrm_idx":79.77,"compras_bcra_mM":138,"emae_var_mensual":3.89,"ripte_var_real":2.4,"recaudacion_var_real":26.2,"merval_vol_30d":0,"adefa_var_mensual":0,"al30_precio":63.13,"al30_var":-0.35,"gd30_precio":64.24,"gd30_var":-1.15,"gd35_precio":78.95,"gd35_var":-0.5,"amplitud_up":7,"amplitud_dn":12,"amplitud_fl":1,"amplitud_total":20,"amplitud_score":40,"sentimiento_noticias":65,"ai_analisis_es":"La economía argentina muestra señales mixtas pero con cierta estabilidad relativa: la brecha cambiaria en apenas 1.1% refleja un esquema de flotación administrada que por ahora contiene tensiones, mientras las reservas en USD 46.100 millones dan margen operativo al BCRA. Sin embargo, el riesgo país en 543 bps y una inflación mensual de 2.6% indican que la normalización está incompleta, con una TNA de 19.85% que sigue siendo el ancla de corto plazo para los pesos.\n\nEl clima político condiciona la confianza: el ICG-UTDT en 2.02/5 revela que la ciudadanía percibe una gestión de gobierno débil, lo que genera incertidumbre sobre la sostenibilidad política de las reformas en curso. Con las elecciones legislativas de medio término en el horizonte inmediato, cualquier ruido político puede trasladarse rápidamente a variables financieras, aunque el Merval en USD 1.862 sugiere que el mercado aún descuenta un escenario de continuidad sin disrupciones mayores.","ai_analisis_en":"Argentina's FX gap has compressed to just 1.1%, reflecting the peso's relative stability under the crawling peg regime, while gross reserves stand at USD 46.1B following the IMF disbursements earlier this year. Monthly CPI at 2.6% remains elevated but continues its gradual deceleration from 2024 peaks, and the Merval at USD 1,862 signals cautious optimism among equity investors. Country risk at 543bps, though improved from prior highs, still prices in meaningful sovereign stress.\n\nMilei's administration maintains its fiscal surplus commitment heading into the midterm electoral cycle, which anchors financial confidence but faces growing social pressure as the ICG-UTDT consumer confidence reading of 2.02/5 reveals persistent household pessimism. The October legislative elections are beginning to shape market positioning, with investors watching whether La Libertad Avanza consolidates congressional support to advance structural reforms. A stronger midterm result would likely compress coun","ai_fecha":"Tue May 19 2026 22:22:00 GMT-0300 (Argentina Standard Time)","ai_score":59};
 // RADARG_DATA_END
-
 // RADARG_NEWS_START
 const INJECTED_NEWS = null;
 // RADARG_NEWS_END
@@ -4977,47 +4976,6 @@ async function loadSheetSubDatos() {
     const n = parseFloat(String(v).replace(',','.'));
     if(!isNaN(n)) fn(n);
   };
-
-  // ── Apply INJECTED_DATA (written by GAS, works from file://) ──
-  if(window.INJECTED_DATA) {
-    var _d = window.INJECTED_DATA;
-    var _f = function(k){ return _d[k] !== undefined && _d[k] !== null ? _d[k] : null; };
-    if(_f('embi_bps')!==null)             LIVE.embi.bps = _f('embi_bps');
-    if(_f('tna_pf')!==null)               LIVE.tasaReal.tna = _f('tna_pf');
-    if(_f('ipc_mensual')!==null)          LIVE.tasaReal.ipc = _f('ipc_mensual');
-    if(_f('reservas_mM')!==null)          { LIVE.reservas.raw = _f('reservas_mM'); }
-    if(_f('merval_usd')!==null)           { LIVE.merval.raw = _f('merval_usd'); }
-    if(_f('soja_usd')!==null)             LIVE.soja = _f('soja_usd');
-    if(_f('icg_utdt')!==null)             LIVE.icg = _f('icg_utdt');
-    if(_f('rem_12m')!==null)              LIVE._rem12m = _f('rem_12m');
-    if(_f('rem_1m')!==null)               LIVE._rem1m = _f('rem_1m');
-    if(_f('gd35_yield')!==null)           LIVE._gd35Yield = _f('gd35_yield');
-    if(_f('reservas_netas_mM')!==null)    LIVE._reservasNetas = _f('reservas_netas_mM');
-    if(_f('base_monetaria_var')!==null)   LIVE._baseMonetariaVar = _f('base_monetaria_var');
-    if(_f('prima_electoral_bps')!==null)  LIVE._primaElectoral = _f('prima_electoral_bps');
-    if(_f('ipc_nucleo')!==null)           LIVE._ipcNucleo = _f('ipc_nucleo');
-    if(_f('tcrm_idx')!==null)             LIVE._tcrm = _f('tcrm_idx');
-    if(_f('compras_bcra_mM')!==null)      LIVE._comprasBCRA = _f('compras_bcra_mM');
-    if(_f('emae_var_mensual')!==null)     LIVE._emaeVar = _f('emae_var_mensual');
-    if(_f('ripte_var_real')!==null)       LIVE._ripteVar = _f('ripte_var_real');
-    if(_f('recaudacion_var_real')!==null) LIVE._recaudVar = _f('recaudacion_var_real');
-    if(_f('merval_vol_30d')!==null)       LIVE._mervalVol = _f('merval_vol_30d');
-    if(_f('adefa_var_mensual')!==null)    LIVE._adefaVar = _f('adefa_var_mensual');
-    if(_f('consumo_masivo_var')!==null)   LIVE._consumoMasivo = _f('consumo_masivo_var');
-    if(_f('consumo_durable_var')!==null)  LIVE._consumoDurable = _f('consumo_durable_var');
-    if(_f('consumo_financiero_var')!==null) LIVE._consumoFinan = _f('consumo_financiero_var');
-    if(_f('consumo_servicios_var')!==null)  LIVE._consumoServ = _f('consumo_servicios_var');
-    if(_f('amplitud_score')!==null)       LIVE._amplitudScore = _f('amplitud_score');
-    if(_f('sentimiento_noticias')!==null) LIVE._sentimientoNoticias = _f('sentimiento_noticias');
-    if(_f('ai_analisis_es')!==null)       LIVE._ai_analisis_es = String(_f('ai_analisis_es'));
-    if(_f('ai_analisis_en')!==null)       LIVE._ai_analisis_en = String(_f('ai_analisis_en'));
-    if(_f('ai_fecha')!==null)             LIVE._ai_fecha = String(_f('ai_fecha'));
-    if(_f('ai_score')!==null)             LIVE._ai_score = _f('ai_score');
-    // Bonos
-    var _al30 = _f('al30_precio'); if(_al30) { LIVE._al30Precio = _al30; }
-    var _gd30 = _f('gd30_precio'); if(_gd30) { LIVE._gd30Precio = _gd30; }
-    console.log('[INJECTED_DATA] Datos inyectados por GAS:', Object.keys(_d).length, 'campos');
-  }
 
   override('embi_bps', v => {
     if(!isNaN(v)&&v>0) {
