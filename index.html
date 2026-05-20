@@ -1698,10 +1698,10 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
         <div class="czl-item"><div class="czl-color" style="background:#eab308"></div><div><div class="czl-name" data-i18n="zone.n">Neutral</div><div class="czl-range">45–55</div></div></div>
         <div class="czl-item"><div class="czl-color" style="background:#22c55e"></div><div><div class="czl-name" data-i18n="zone.g">Codicia</div><div class="czl-range">56–74</div></div></div>
         <div class="czl-item"><div class="czl-color" style="background:#16a34a"></div><div><div class="czl-name" data-i18n="zone.ge">Codicia Extrema</div><div class="czl-range">75–100</div></div></div>
-        <label class="merval-switch-wrap" title="Mostrar/ocultar Merval USD en el gráfico" onclick="toggleMerval()">
+        <label class="merval-switch-wrap" title="Mostrar/ocultar Merval USD en el gráfico" for="mervalToggle">
           <span data-i18n="chart.mervalToggle" style="color:#f59e0b">📈 Merval USD</span>
           <div class="merval-switch">
-            <input type="checkbox" id="mervalToggle" readonly>
+            <input type="checkbox" id="mervalToggle" onchange="toggleMerval()">
             <div class="merval-switch-track"></div>
             <div class="merval-switch-thumb"></div>
           </div>
@@ -4741,9 +4741,8 @@ const milestonesPlugin={
 
 let mervalVisible = false;
 function toggleMerval() {
-  mervalVisible = !mervalVisible;
   const chk = document.getElementById('mervalToggle');
-  if(chk) chk.checked = mervalVisible;
+  mervalVisible = chk ? chk.checked : !mervalVisible;
   buildChart(sliderFrom, sliderTo);
 }
 
@@ -5238,11 +5237,14 @@ async function loadDataJSON() {
       console.log('[data.json] Noticias:', window._sheetNoticias.length);
     }
 
-    // Apply historico
-    if(d._historico && d._historico.labels && d._historico.labels.length) {
+    // Apply historico — solo si tiene datos reales (no sobreescribir con array vacío)
+    if(d._historico && d._historico.labels && d._historico.labels.length > 0
+       && d._historico.scores && d._historico.scores.length > 0) {
       window.MONTHLY.labels = d._historico.labels;
       window.MONTHLY.scores = d._historico.scores;
       console.log('[data.json] Histórico:', d._historico.labels.length, 'meses');
+    } else {
+      console.log('[data.json] Histórico vacío — conservando datos hardcodeados (' + window.MONTHLY.labels.length + ' meses)');
     }
 
     return true;
