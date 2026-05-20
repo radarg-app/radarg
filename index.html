@@ -5039,11 +5039,11 @@ function applyInjectedData() {
   if(!window.INJECTED_DATA) return;
   var _d = window.INJECTED_DATA;
   var _f = function(k){ return (_d[k] !== undefined && _d[k] !== null) ? _d[k] : null; };
-  if(_f('embi_bps')!==null)              LIVE.embi.bps = _f('embi_bps');
+  if(_f('embi_bps')!==null)   { var _v=_f('embi_bps'); LIVE.embi.bps=_v; LIVE.embi.score=embiToScore(_v); LIVE.embi.raw=_v+' bps'; LIVE.embi.src='data.json'; LIVE.embi.live=true; }
   if(_f('tna_pf')!==null)                LIVE.tasaReal.tna = _f('tna_pf');
   if(_f('ipc_mensual')!==null)           LIVE.tasaReal.ipc = _f('ipc_mensual');
-  if(_f('reservas_mM')!==null)           LIVE.reservas.raw = _f('reservas_mM');
-  if(_f('merval_usd')!==null)            LIVE.merval.raw = _f('merval_usd');
+  if(_f('reservas_mM')!==null) { var _mM=_f('reservas_mM'); var _disp=_mM>=1000?'USD '+(_mM/1000).toFixed(1)+'MM':'USD '+Math.round(_mM)+'M'; LIVE.reservas={mM:_mM,score:reservasToScore(_mM),raw:_disp+' brutas',src:'data.json',live:true}; }
+  if(_f('merval_usd')!==null)  { var _mv=_f('merval_usd'); LIVE.merval.usd=_mv; LIVE.merval.score=mervalToScore(_mv); LIVE.merval.raw='USD '+Math.round(_mv).toLocaleString('es-AR'); LIVE.merval.src='data.json'; LIVE.merval.live=true; }
   if(_f('soja_usd')!==null)              LIVE.soja = _f('soja_usd');
   if(_f('icg_utdt')!==null)              LIVE.icg = _f('icg_utdt');
   if(_f('rem_12m')!==null)               LIVE._rem12m = _f('rem_12m');
