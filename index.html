@@ -3156,11 +3156,22 @@ function computeSubIndices(bs) {
         : (spreadAL30!=null ? `Proxy AL30/GD30: +${spreadAL30.toFixed(1)}%` : ''),
       desc: es?'Spread entre rendimientos de bonos pre y post-electorales (2027). Mide el miedo del mercado a un cambio de política económica post-elecciones.'
              :'Spread between pre and post-election bond yields (2027). Measures market fear of an economic policy change after the elections.' },
-    { name: es?'ICG + Sentim. Noticias':'ICG + News Sentiment',
-      w:10, score: LIVE.politico.score, src:'UTDT + Claude AI', live: LIVE.politico.live,
-      raw: LIVE.icg!=null ? `ICG ${LIVE.icg.toFixed(2)}/5` : '',
-      desc: es?'Compuesto de la confianza en el gobierno (ICG UTDT, mensual) y el sentimiento de noticias económico-políticas de las últimas 48hs (IA).'
-             :'Composite of government confidence (ICG UTDT, monthly) and economic-political news sentiment of the last 48h (AI).' },
+    { name: es?'Confianza en el Gobierno (ICG)':'Gov. Confidence (ICG)',
+      w:6, score: LIVE.icg!=null ? intScore((LIVE.icg/5)*100) : 40,
+      src: LIVE.icg!=null ? 'UTDT (mensual)' : 'UTDT',
+      live: LIVE.icg!=null, mensual: true,
+      raw: LIVE.icg!=null ? `${LIVE.icg.toFixed(2)}/5 (${intScore((LIVE.icg/5)*100)}/100)` : '',
+      desc: es?'Índice de Confianza en el Gobierno de la UTDT. Encuesta mensual que mide la aprobación de la gestión. Históricamente, caídas sostenidas del ICG preceden deterioros del clima financiero y complican la renovación del apoyo político al ajuste fiscal.'
+             :'UTDT Government Confidence Index. Monthly survey measuring approval of the administration. Historically, sustained ICG declines precede financial climate deterioration and complicate political support for fiscal adjustment.' },
+    { name: es?'Sentimiento de Noticias (IA)':'News Sentiment (AI)',
+      w:4, score: LIVE._sentimiento_noticias!=null ? intScore(Number(LIVE._sentimiento_noticias)) : 50,
+      src: LIVE._sentimiento_noticias!=null ? 'Claude AI · últimas 48h' : 'Claude AI',
+      live: LIVE._sentimiento_noticias!=null,
+      unavailable: LIVE._sentimiento_noticias==null,
+      raw: LIVE._sentimiento_noticias!=null ? `${Math.round(LIVE._sentimiento_noticias)}/100` : '',
+      unavailNote: LIVE._sentimiento_noticias==null ? (es?'Se actualiza cada 2h con el GAS.':'Updated every 2h by the GAS.') : '',
+      desc: es?'Análisis de sentimiento de las principales noticias económicas y políticas de las últimas 48 horas, realizado por Claude (Anthropic). Un score alto indica un flujo de noticias positivo para el mercado; uno bajo refleja noticias de riesgo o incertidumbre. Se actualiza automáticamente cada 2 horas vía Google Apps Script.'
+             :'Sentiment analysis of the main economic and political news from the last 48 hours, performed by Claude (Anthropic). A high score indicates a positive news flow for the market; a low score reflects risk or uncertainty news. Updated automatically every 2 hours via Google Apps Script.' },
     { name: es?'Volatilidad Merval (30d)':'Merval Volatility (30d)',
       w:13, score: LIVE._mervalVol!=null ? volScore(LIVE._mervalVol) : 50,
       src: LIVE._mervalVol!=null ? 'IOL' : NA,
