@@ -4896,9 +4896,9 @@ function updateSlider(){
   $('rangeTrackFill').style.left=(f*pct)+'%'; $('rangeTrackFill').style.right=(100-to_*pct)+'%';
   const _cleanLbl = l => {
     if(!l) return '';
-    if(l.length <= 10) return l;
-    try { const d=new Date(l); if(!isNaN(d)) return d.toLocaleDateString(LANG==='en'?'en-US':'es-AR',{month:'short',year:'numeric'}); } catch(e){}
-    return l.split(' ').slice(0,2).join(' ');
+    // Labels are already formatted ("Ene 2000", "May 2026") — just return as-is
+    // Never parse as Date to avoid timezone/locale formatting issues
+    return String(l).split(' ').slice(0,2).join(' ');
   };
   $('rl-from').textContent=_cleanLbl(window.MONTHLY.labels[f]); $('rl-to').textContent=_cleanLbl(window.MONTHLY.labels[to_]);
   document.querySelectorAll('.range-tick').forEach(tk=>{tk.classList.toggle('in-range',parseInt(tk.dataset.idx)>=f&&parseInt(tk.dataset.idx)<=to_);});
@@ -4909,11 +4909,7 @@ function updateSlider(){
     // Clean label: just "May 2026" not full date string
     const cleanLbl = l => {
       if(!l) return '';
-      // If it's already short (e.g. "Ene 2000"), return as-is
-      if(l.length <= 10) return l;
-      // Try to parse and format
-      try { const d=new Date(l); if(!isNaN(d)) return d.toLocaleDateString(LANG==='en'?'en-US':'es-AR',{month:'short',year:'numeric'}); } catch(e){}
-      return l.split(' ').slice(0,2).join(' ');
+      return String(l).split(' ').slice(0,2).join(' ');
     };
     $('chartSub').textContent=`${LANG==='en'?'Monthly data':'Datos mensuales'} · ${cleanLbl(lf)} – ${cleanLbl(lt)} · ${n} ${LANG==='en'?'months':'meses'}${n>=12?` (${yrs} ${LANG==='en'?'yr':'años'})`:''}`;
   }
