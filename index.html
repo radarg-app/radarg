@@ -5258,14 +5258,23 @@ async function loadSheetSubDatos() {
   if(sheetIcg   !== null) LIVE.icg   = sheetIcg;
   if(sheetPrima !== null) LIVE.prima = sheetPrima;
   if(sheetIcg !== null) {
-    const icgScore = intScore((LIVE.icg/5)*100);
+    const icgScore  = intScore((LIVE.icg/5)*100);
+    const newsRaw   = LIVE._sentimiento_noticias;
+    const newsScore = (newsRaw !== undefined && newsRaw !== null && !isNaN(newsRaw))
+      ? intScore(Number(newsRaw)) : null;
+    const composite = newsScore !== null
+      ? intScore(icgScore * 0.5 + newsScore * 0.5)
+      : icgScore;
     LIVE.politico = {
-      score:   icgScore,
-      raw:     `ICG ${LIVE.icg.toFixed(2)}/5`,
-      src:     'UTDT / ArgentinaDatos',
+      score:   composite,
+      raw:     newsScore !== null
+        ? `ICG ${LIVE.icg.toFixed(2)}/5 (${icgScore}/100) · Noticias ${newsScore}/100`
+        : `ICG ${LIVE.icg.toFixed(2)}/5 (${icgScore}/100)`,
+      src:     newsScore !== null ? 'UTDT + IA noticias' : 'UTDT / ArgentinaDatos',
       live:    true,
-      mensual: true,
+      mensual: newsScore === null,
     };
+    console.log('[Sheet] Politico:', LIVE.politico.raw, '→ score', composite);
   }
 
   console.log('[Sheet] Sub-datos loaded:', Object.keys(map).length, 'values');
