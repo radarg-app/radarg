@@ -2964,12 +2964,16 @@ function computeSubIndices(bs) {
   const seg2 = [
     { name: es?'Reservas Netas BCRA':'BCRA Net Reserves',
       w:22, score: reservasNetasScore(resNetas ?? LIVE.reservas.mM), src:'BCRA', live: resNetas!=null||LIVE.reservas.live,
-      raw: resNetas!=null ? `USD ${Math.round(resNetas/1000).toFixed(1)}bn netas` : (LIVE.reservas.raw||''),
+      raw: (()=>{
+        const brutas = LIVE.reservas.mM ? `brutas USD ${(LIVE.reservas.mM/1000).toFixed(1)}bn` : '';
+        const netas  = resNetas!=null ? `netas USD ${(resNetas/1000).toFixed(1)}bn` : '';
+        return [netas, brutas].filter(Boolean).join(' · ') || (LIVE.reservas.raw||'');
+      })(),
       desc: es?'Reservas netas (brutas menos pasivos). Son los dólares realmente disponibles para defender el tipo de cambio o pagar deuda.'
              :'Net reserves (gross minus liabilities). The dollars actually available to defend the exchange rate or pay debt.' },
     { name: es?'Brecha Cambiaria (MEP/Oficial)':'FX Gap (MEP/Official)',
       w:15, score: brechaScore, src:'dolarapi.com', live: true,
-      raw: S.brecha!=null ? `${fmtPeso(S.blue)} blue · brecha ${fmtPct(S.brecha)}` : '',
+      raw: S.brecha!=null ? `Oficial ${fmtPeso(S.oficial)} · Blue ${fmtPeso(S.blue)} · Brecha ${fmtPct(S.brecha)}` : '',
       desc: es?'Diferencia entre el MEP y el oficial. Brecha cercana a cero es inédita históricamente y señala consolidación del esquema cambiario.'
              :'Gap between MEP and official rate. Near-zero gap is historically unprecedented and signals FX scheme consolidation.' },
     { name: es?'Compras BCRA en MLC':'BCRA FX Purchases',
@@ -3075,11 +3079,7 @@ function computeSubIndices(bs) {
       unavailNote: adefaV==null ? (es?'Dato mensual ADEFA. En desarrollo.':'Monthly ADEFA figure. In development.') : '',
       desc: es?'Variación mensual de ventas de autos. Proxy de consumo de bienes durables, que es el primer sector en caer en recesiones y el primero en recuperarse.'
              :'Monthly car sales change. Proxy for durable goods consumption, the first sector to fall in recessions and the first to recover.' },
-    { name: es?'Ventas Supermercados (real)':'Supermarket Sales (real)',
-      w:8, score: 50, src: NA, live: false, unavailable: true,
-      unavailNote: es?'Dato mensual INDEC. Proxy de consumo masivo. En desarrollo.' : 'Monthly INDEC figure. Mass consumption proxy. In development.',
-      desc: es?'Variación real mensual de ventas en supermercados. Captura el consumo cotidiano del ciudadano promedio, directamente vinculado con salario real e inflación.'
-             :'Real monthly supermarket sales change. Captures everyday consumption of the average citizen, directly linked to real wages and inflation.' },
+
   ];
 
   // ── SEGMENTO 4: Fiscal y Deuda Soberana (15%) ────────────
@@ -3105,7 +3105,7 @@ function computeSubIndices(bs) {
              :'Real change in tax revenue. Measures both the economic cycle and fiscal compliance. Sustained real decline signals fiscal deterioration.' },
     { name: es?'Curva Soberana (GD30/GD35)':'Sovereign Curve (GD30/GD35)',
       w:15, score: gd35YieldScore(gd35Y), src:'IOL', live: gd35Y!=null,
-      raw: gd35Y!=null ? `GD35 TIR: ${gd35Y.toFixed(2)}%` : '',
+      raw: gd35Y!=null ? `GD35 TIR: ${gd35Y.toFixed(2)}%${LIVE._gd35Precio ? ' · precio USD '+LIVE._gd35Precio.toFixed(2) : ''}` : '',
       desc: es?'Pendiente de la curva soberana usando el rendimiento del GD35. Una curva invertida o muy empinada señala expectativas de stress fiscal en el mediano plazo.'
              :'Slope of the sovereign curve using GD35 yield. An inverted or very steep curve signals medium-term fiscal stress expectations.' },
     { name: es?'Cumplimiento Metas FMI':'IMF Target Compliance',
@@ -3126,28 +3126,34 @@ function computeSubIndices(bs) {
   const seg5 = [
     { name: es?'Riesgo País (EMBI)':'Country Risk (EMBI)',
       w:22, score: LIVE.embi.score, src:'ArgentinaDatos', live: LIVE.embi.live,
-      raw: LIVE.embi.bps ? `${LIVE.embi.bps} bps` : '',
+      raw: LIVE.embi.bps ? `${LIVE.embi.bps} bps · score ${LIVE.embi.score}/100` : '',
       desc: es?'Spread de la deuda soberana argentina sobre los Treasuries de EEUU. El indicador de riesgo más seguido mediáticamente. Comprimió de ~850 bps en 2025 a ~525 bps hoy.'
              :'Spread of Argentine sovereign debt over US Treasuries. The most media-followed risk indicator. Compressed from ~850 bps in 2025 to ~525 bps today.' },
     { name: es?'Merval USD (vs media 52s)':'Merval USD (vs 52w avg)',
       w:18, score: LIVE.merval.score, src:'IOL/Yahoo', live: LIVE.merval.live,
-      raw: LIVE.merval.raw||'',
+      raw: LIVE.merval.usd ? `USD ${Math.round(LIVE.merval.usd).toLocaleString('es-AR')}` + (LIVE.merval.score!=null ? ` · score ${LIVE.merval.score}/100`:'') : (LIVE.merval.raw||''),
       desc: es?'El Merval en dólares CCL captura el apetito de riesgo en renta variable local. Máximos históricos en USD señalan codicia extrema del mercado financiero.'
              :'Merval in CCL dollars captures local equity risk appetite. Historical USD highs signal extreme financial market greed.' },
     { name: es?'Rendimiento GD35 (TIR)':'GD35 Yield (YTM)',
       w:15, score: gd35YieldScore(gd35Y), src:'IOL', live: gd35Y!=null,
-      raw: gd35Y!=null ? `TIR: ${gd35Y.toFixed(2)}% anual` : '',
+      raw: gd35Y!=null ? `TIR: ${gd35Y.toFixed(2)}%${LIVE._gd35Precio ? ' · USD '+LIVE._gd35Precio.toFixed(2) : ''}${LIVE._gd35Var ? ' ('+( LIVE._gd35Var>0?'+':'')+LIVE._gd35Var.toFixed(2)+'% hoy)' : ''}` : '',
       desc: es?'Rendimiento del GD35 (bono soberano a 10 años, ley NY). Mide el costo de acceso a los mercados internacionales de capital a largo plazo.'
              :'GD35 yield (10-year sovereign bond, NY law). Measures the cost of long-term access to international capital markets.' },
     { name: es?'Amplitud Merval (semanal)':'Merval Breadth (weekly)',
       w:12, score: LIVE.amplitud.score, src:'IOL', live: LIVE.amplitud.live,
-      raw: LIVE.amplitud.raw||'',
+      raw: (()=>{
+        const up=LIVE._amplitudUp, dn=LIVE._amplitudDn, fl=LIVE._amplitudFl, tot=LIVE._amplitudTotal;
+        if(up!=null && dn!=null) return `${up}↑ ${fl??''}${fl!=null?' planas ':' '}${dn}↓ de ${tot??((up||0)+(dn||0)+(fl||0))} acciones`;
+        return LIVE.amplitud.raw||'';
+      })(),
       desc: es?'% de acciones del panel con variación semanal positiva. Amplitud alta (>70%) confirma un rally genuino; amplitud baja con índice en alza señala movimiento frágil.'
              :'% of panel stocks with positive weekly change. High breadth (>70%) confirms genuine rally; low breadth with rising index signals fragile move.' },
     { name: es?'Prima Electoral (AO28-AO27)':'Electoral Premium (AO28-AO27)',
       w:10, score: primaElectoralScore(), src: primaElect!=null ? 'IOL (AO27/AO28)' : 'IOL (proxy)',
       live: true,
-      raw: primaElect!=null ? `${primaElect} bps spread post-electoral` : (spreadAL30!=null ? `Proxy spread AL30/GD30: +${spreadAL30.toFixed(1)}%` : ''),
+      raw: primaElect!=null
+        ? `AO28-AO27: ${primaElect>0?'+':''}${primaElect} bps · ${primaElect<100?'prima baja':'prima alta'}`
+        : (spreadAL30!=null ? `Proxy AL30/GD30: +${spreadAL30.toFixed(1)}%` : ''),
       desc: es?'Spread entre rendimientos de bonos pre y post-electorales (2027). Mide el miedo del mercado a un cambio de política económica post-elecciones.'
              :'Spread between pre and post-election bond yields (2027). Measures market fear of an economic policy change after the elections.' },
     { name: es?'ICG + Sentim. Noticias':'ICG + News Sentiment',
@@ -3665,9 +3671,13 @@ async function fetchPolitico() {
   const liveResumen = LANG === 'en'
     ? (LIVE._sentimiento_resumen_en || '')
     : (LIVE._sentimiento_resumen_es || '');
+  const icgNumScore = icgScore;
+  const newsDisplay = newsScore !== null ? `${newsScore}/100` : null;
   LIVE.politico={
     score:    compositeScore,
-    raw:      `${icgRaw}${newsRaw}`,
+    raw:      newsScore !== null
+      ? `ICG ${LIVE.icg!=null?LIVE.icg.toFixed(2):'n/d'}/5 (${icgNumScore}/100) · Noticias ${newsDisplay}`
+      : `ICG ${LIVE.icg!=null?LIVE.icg.toFixed(2):'n/d'}/5 (${icgNumScore}/100)`,
     rawExtra: liveResumen,
     src:      newsScore !== null ? 'UTDT + IA noticias' : 'UTDT (IA scraping)',
     live:     icgRaw !== 'ICG n/d' || newsScore !== null,
@@ -4992,7 +5002,7 @@ async function loadDataJSON() {
     if(f('amplitud_score')!==null)        LIVE._amplitudScore = f('amplitud_score');
     if(f('amplitud_up')!==null)           LIVE._amplitudUp = f('amplitud_up');
     if(f('amplitud_dn')!==null)           LIVE._amplitudDn = f('amplitud_dn');
-    if(f('sentimiento_noticias')!==null)  LIVE._sentimientoNoticias = f('sentimiento_noticias');
+    if(f('sentimiento_noticias')!==null)  LIVE._sentimiento_noticias = f('sentimiento_noticias');
     if(f('ai_analisis_es')!==null)        LIVE._ai_analisis_es = String(f('ai_analisis_es'));
     if(f('ai_analisis_en')!==null)        LIVE._ai_analisis_en = String(f('ai_analisis_en'));
     if(f('ai_fecha')!==null)              LIVE._ai_fecha = String(f('ai_fecha'));
@@ -5002,6 +5012,11 @@ async function loadDataJSON() {
     if(f('al30_var')!==null)              LIVE._al30Var = f('al30_var');
     if(f('gd30_var')!==null)              LIVE._gd30Var = f('gd30_var');
     if(f('gd35_precio')!==null)           LIVE._gd35Precio = f('gd35_precio');
+    if(f('gd35_var')!==null)              LIVE._gd35Var = f('gd35_var');
+    if(f('spread_al30_gd30')!==null)      { LIVE._spread_al30_gd30 = f('spread_al30_gd30'); LIVE.prima = f('spread_al30_gd30'); }
+    if(f('amplitud_fl')!==null)           LIVE._amplitudFl = f('amplitud_fl');
+    if(f('amplitud_total')!==null)        LIVE._amplitudTotal = f('amplitud_total');
+    if(f('rem_1m')!==null)                { LIVE.tasaReal.rem1m = f('rem_1m'); LIVE.tasaReal._sheetREM1 = f('rem_1m'); }
 
     // Apply noticias
     if(d._noticias && d._noticias.length) {
@@ -5065,13 +5080,21 @@ function applyInjectedData() {
   if(_f('consumo_financiero_var')!==null)LIVE._consumoFinan = _f('consumo_financiero_var');
   if(_f('consumo_servicios_var')!==null) LIVE._consumoServ = _f('consumo_servicios_var');
   if(_f('amplitud_score')!==null)        LIVE._amplitudScore = _f('amplitud_score');
-  if(_f('sentimiento_noticias')!==null)  LIVE._sentimientoNoticias = _f('sentimiento_noticias');
+  if(_f('sentimiento_noticias')!==null)  LIVE._sentimiento_noticias = _f('sentimiento_noticias');
   if(_f('ai_analisis_es')!==null)        LIVE._ai_analisis_es = String(_f('ai_analisis_es'));
   if(_f('ai_analisis_en')!==null)        LIVE._ai_analisis_en = String(_f('ai_analisis_en'));
   if(_f('ai_fecha')!==null)              LIVE._ai_fecha = String(_f('ai_fecha'));
   if(_f('ai_score')!==null)              LIVE._ai_score = _f('ai_score');
   if(_f('al30_precio')!==null)           LIVE._al30Precio = _f('al30_precio');
   if(_f('gd30_precio')!==null)           LIVE._gd30Precio = _f('gd30_precio');
+  if(_f('gd35_precio')!==null)           LIVE._gd35Precio = _f('gd35_precio');
+  if(_f('gd35_var')!==null)              LIVE._gd35Var = _f('gd35_var');
+  if(_f('al30_var')!==null)              LIVE._al30Var = _f('al30_var');
+  if(_f('gd30_var')!==null)              LIVE._gd30Var = _f('gd30_var');
+  if(_f('spread_al30_gd30')!==null)      { LIVE._spread_al30_gd30 = _f('spread_al30_gd30'); LIVE.prima = _f('spread_al30_gd30'); }
+  if(_f('amplitud_fl')!==null)           LIVE._amplitudFl = _f('amplitud_fl');
+  if(_f('amplitud_total')!==null)        LIVE._amplitudTotal = _f('amplitud_total');
+  if(_f('rem_1m')!==null)                { LIVE.tasaReal.rem1m = _f('rem_1m'); LIVE.tasaReal._sheetREM1 = _f('rem_1m'); }
   console.log('[INJECTED_DATA] Applied', Object.keys(_d).length, 'fields ✅');
 }
 
