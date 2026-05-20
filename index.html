@@ -4557,29 +4557,30 @@ function buildChart(from,to){
   const step=tickStep(labels.length);
   const isLM=document.body.classList.contains('lm');
   if(histInst)histInst.destroy();
+
+  // Build Merval normalised series (0-100 scale) for current window
+  const mervalRaw = labels.map(lbl => MERVAL_MAP[lbl] ?? null);
+  const mervalVals = mervalRaw.filter(v => v !== null);
+  const mervalMin = mervalVals.length ? Math.min(...mervalVals) : 0;
+  const mervalMax = mervalVals.length ? Math.max(...mervalVals) : 1;
+  const mervalNorm = mervalRaw.map(v => v === null ? null :
+    Math.round((v - mervalMin) / (mervalMax - mervalMin) * 100));
+  const mervalDatasets = mervalVisible ? [{
+    label: 'Merval USD',
+    data: mervalNorm,
+    borderColor: '#f59e0b',
+    borderWidth: 1.5,
+    borderDash: [4,3],
+    pointRadius: 0,
+    pointHoverRadius: 5,
+    pointBackgroundColor: '#f59e0b',
+    fill: false,
+    tension: .35,
+    yAxisID: 'y',
+  }] : [];
+
   histInst=new Chart($('histChart'),{
     type:'line',
-    // Build Merval normalised series (0-100 scale) for current window
-    const mervalRaw = labels.map(lbl => MERVAL_MAP[lbl] ?? null);
-    const mervalVals = mervalRaw.filter(v => v !== null);
-    const mervalMin = mervalVals.length ? Math.min(...mervalVals) : 0;
-    const mervalMax = mervalVals.length ? Math.max(...mervalVals) : 1;
-    const mervalNorm = mervalRaw.map(v => v === null ? null :
-      Math.round((v - mervalMin) / (mervalMax - mervalMin) * 100));
-    // Right axis: actual USD values (only ticks at min/max/mid)
-    const mervalDatasets = mervalVisible ? [{
-      label: 'Merval USD',
-      data: mervalNorm,
-      borderColor: '#f59e0b',
-      borderWidth: 1.5,
-      borderDash: [4,3],
-      pointRadius: 0,
-      pointHoverRadius: 5,
-      pointBackgroundColor: '#f59e0b',
-      fill: false,
-      tension: .35,
-      yAxisID: 'y',
-    }] : [];
     data:{labels,datasets:[{
       data:scores,borderColor:'#0ea5e9',borderWidth:2,
       yAxisID:'y',
@@ -4776,8 +4777,9 @@ function closeSuggestPopup(){
 // In production this would come from a news API or RSS parser
 /* ── Noticias inyectadas por el GAS (se actualiza automáticamente) ── */
 // RADARG_DATA_START
-window.INJECTED_DATA = {"embi_bps":543,"tna_pf":19.85,"ipc_mensual":2.6,"reservas_mM":46062,"merval_usd":1862,"base_monetaria_var":-1.6,"reservas_netas_mM":25334,"gd35_yield":6.67,"soja_usd":1207,"icg_utdt":2.02,"rem_12m":24.2,"rem_1m":2.3,"prima_electoral_bps":419,"ipc_nucleo":2.88,"tcrm_idx":79.77,"compras_bcra_mM":138,"emae_var_mensual":3.89,"ripte_var_real":2.4,"recaudacion_var_real":26.2,"merval_vol_30d":0,"adefa_var_mensual":0,"al30_precio":63.13,"al30_var":-0.35,"gd30_precio":64.24,"gd30_var":-1.15,"gd35_precio":78.95,"gd35_var":-0.5,"amplitud_up":7,"amplitud_dn":12,"amplitud_fl":1,"amplitud_total":20,"amplitud_score":40,"sentimiento_noticias":65,"ai_analisis_es":"La economía argentina muestra señales mixtas pero con anclas relativamente firmes: la brecha cambiaria de apenas 1.1% refleja el sostenimiento del esquema de bandas, mientras el riesgo país en 543 bps y reservas de USD 46.100 millones indican una estabilización frágil aunque real. La inflación mensual de 2.6% y una TNA de 19.85% mantienen tasas reales positivas, y el Merval en USD 1.862 sugiere que el mercado aún premia la continuidad del programa, aunque el trigo de soja a USD 1.207/tn aporta algo de alivio externo.\n\nEl clima político condiciona todo: con un ICG-UTDT de apenas 2.02/5, la confianza en el gobierno es estructuralmente baja, lo que limita el margen de error ante cualquier shock. La agenda electoral de 2025 todavía digiere sus resultados y la coalición oficialista enfrenta tensiones que podrían comprometer la disciplina fiscal necesaria para sostener el programa con el FMI. El RadARG en 59/100 resume bien este momento: no hay crisis, pero tampoco hay convicción.","ai_analisis_en":"Argentina's economy shows stabilizing signals heading into mid-2026, with the FX gap compressed to just 1.1% following the April shift to a managed float band, and gross reserves holding at USD 46.1B. Monthly inflation of 2.6% remains above target but reflects a sustained deceleration from 2024 peaks, while the TNA at 19.85% signals the BCRA is cautiously easing monetary conditions. Country risk at 543bps and a Merval at USD 1,862 suggest markets are pricing in progress but not yet rewarding Argentina with investment-grade confidence.\n\nThe Milei administration maintains legislative momentum but governs with a fractured coalition, limiting the pace of structural reforms ahead of October midterms. Consumer confidence at 2.02/5 per the ICG-UTDT reveals that households remain deeply skeptical, tempering private consumption and domestic investment despite macro improvements. The political calendar is injecting noise into asset pricing, with soybean prices at USD 1,207/mt providing a critica","ai_fecha":"Tue May 19 2026 22:42:00 GMT-0300 (Argentina Standard Time)","ai_score":59};
+window.INJECTED_DATA = {"embi_bps":543,"tna_pf":19.85,"ipc_mensual":2.6,"reservas_mM":46062,"merval_usd":1862,"base_monetaria_var":-1.6,"reservas_netas_mM":25334,"gd35_yield":6.67,"soja_usd":1206.25,"icg_utdt":2.02,"rem_12m":24.2,"rem_1m":2.3,"prima_electoral_bps":419,"ipc_nucleo":2.88,"tcrm_idx":79.77,"compras_bcra_mM":138,"emae_var_mensual":3.89,"ripte_var_real":2.4,"recaudacion_var_real":26.2,"merval_vol_30d":0,"adefa_var_mensual":0,"al30_precio":63.13,"al30_var":-0.35,"gd30_precio":64.24,"gd30_var":-1.15,"gd35_precio":78.95,"gd35_var":-0.5,"amplitud_up":7,"amplitud_dn":12,"amplitud_fl":1,"amplitud_total":20,"amplitud_score":40,"sentimiento_noticias":65,"ai_analisis_es":"La economía argentina muestra señales mixtas pero con cierta estabilidad relativa. La brecha cambiaria en 1.1% refleja un mercado unificado funcionando, mientras el riesgo país en 543 bps sigue elevado aunque lejos de niveles de crisis. Las reservas en USD 46.100 millones dan respaldo al esquema, pero la inflación de 2.6% mensual —equivalente a más del 35% anualizado— sigue siendo el talón de Aquiles del programa.\n\nEl clima político muestra tensiones que frenan la consolidación de la confianza: el ICG-UTDT de 2.02/5 evidencia una confianza institucional muy baja, lo que limita el optimismo estructural pese a los avances macroeconómicos. El Merval en USD 1.862 refleja apetito selectivo de mercado, pero la sostenibilidad depende de que el Gobierno mantenga el ancla fiscal y evite ruido político que sacuda las expectativas de cara al segundo semestre.","ai_analisis_en":"Argentina's economy shows stabilizing signals heading into mid-2026, with the FX gap compressed to a historically low 1.1% following the April crawling peg adjustment and partial capital controls liberalization. Monthly CPI at 2.6% remains above target but reflects a significant deceleration from 2024 peaks, while gross reserves at USD 46.1B provide a meaningful buffer against external shocks. Country risk at 543bps and a Merval USD of 1862 suggest cautious but real investor appetite, with soybean prices at USD 1206/mt offering critical agro-export support to the fiscal consolidation path.\n\nThe political climate under Milei's administration remains defined by ideological consistency but growing social friction, with the ICG-UTDT consumer confidence index at a tepid 2.02/5 signaling that households are not yet translating macroeconomic improvement into behavioral optimism. Midterm elections approaching in October 2026 are injecting noise into congressional negotiations, raising uncertai","ai_fecha":"Tue May 19 2026 22:45:00 GMT-0300 (Argentina Standard Time)","ai_score":59};
 // RADARG_DATA_END
+
 // RADARG_NEWS_START
 const INJECTED_NEWS = null;
 // RADARG_NEWS_END
@@ -4951,6 +4953,47 @@ async function loadSheetFallbacks() {
 }
 
 /* ── Load sub_datos → update LIVE with manual overrides ─────── */
+/* ── Apply GAS-injected data (replaces Sheet fetch when available) ── */
+function applyInjectedData() {
+  if(!window.INJECTED_DATA) return;
+  var _d = window.INJECTED_DATA;
+  var _f = function(k){ return (_d[k] !== undefined && _d[k] !== null) ? _d[k] : null; };
+  if(_f('embi_bps')!==null)              LIVE.embi.bps = _f('embi_bps');
+  if(_f('tna_pf')!==null)                LIVE.tasaReal.tna = _f('tna_pf');
+  if(_f('ipc_mensual')!==null)           LIVE.tasaReal.ipc = _f('ipc_mensual');
+  if(_f('reservas_mM')!==null)           LIVE.reservas.raw = _f('reservas_mM');
+  if(_f('merval_usd')!==null)            LIVE.merval.raw = _f('merval_usd');
+  if(_f('soja_usd')!==null)              LIVE.soja = _f('soja_usd');
+  if(_f('icg_utdt')!==null)              LIVE.icg = _f('icg_utdt');
+  if(_f('rem_12m')!==null)               LIVE._rem12m = _f('rem_12m');
+  if(_f('rem_1m')!==null)                LIVE._rem1m = _f('rem_1m');
+  if(_f('gd35_yield')!==null)            LIVE._gd35Yield = _f('gd35_yield');
+  if(_f('reservas_netas_mM')!==null)     LIVE._reservasNetas = _f('reservas_netas_mM');
+  if(_f('base_monetaria_var')!==null)    LIVE._baseMonetariaVar = _f('base_monetaria_var');
+  if(_f('prima_electoral_bps')!==null)   LIVE._primaElectoral = _f('prima_electoral_bps');
+  if(_f('ipc_nucleo')!==null)            LIVE._ipcNucleo = _f('ipc_nucleo');
+  if(_f('tcrm_idx')!==null)              LIVE._tcrm = _f('tcrm_idx');
+  if(_f('compras_bcra_mM')!==null)       LIVE._comprasBCRA = _f('compras_bcra_mM');
+  if(_f('emae_var_mensual')!==null)      LIVE._emaeVar = _f('emae_var_mensual');
+  if(_f('ripte_var_real')!==null)        LIVE._ripteVar = _f('ripte_var_real');
+  if(_f('recaudacion_var_real')!==null)  LIVE._recaudVar = _f('recaudacion_var_real');
+  if(_f('merval_vol_30d')!==null)        LIVE._mervalVol = _f('merval_vol_30d');
+  if(_f('adefa_var_mensual')!==null)     LIVE._adefaVar = _f('adefa_var_mensual');
+  if(_f('consumo_masivo_var')!==null)    LIVE._consumoMasivo = _f('consumo_masivo_var');
+  if(_f('consumo_durable_var')!==null)   LIVE._consumoDurable = _f('consumo_durable_var');
+  if(_f('consumo_financiero_var')!==null)LIVE._consumoFinan = _f('consumo_financiero_var');
+  if(_f('consumo_servicios_var')!==null) LIVE._consumoServ = _f('consumo_servicios_var');
+  if(_f('amplitud_score')!==null)        LIVE._amplitudScore = _f('amplitud_score');
+  if(_f('sentimiento_noticias')!==null)  LIVE._sentimientoNoticias = _f('sentimiento_noticias');
+  if(_f('ai_analisis_es')!==null)        LIVE._ai_analisis_es = String(_f('ai_analisis_es'));
+  if(_f('ai_analisis_en')!==null)        LIVE._ai_analisis_en = String(_f('ai_analisis_en'));
+  if(_f('ai_fecha')!==null)              LIVE._ai_fecha = String(_f('ai_fecha'));
+  if(_f('ai_score')!==null)              LIVE._ai_score = _f('ai_score');
+  if(_f('al30_precio')!==null)           LIVE._al30Precio = _f('al30_precio');
+  if(_f('gd30_precio')!==null)           LIVE._gd30Precio = _f('gd30_precio');
+  console.log('[INJECTED_DATA] Applied', Object.keys(_d).length, 'fields ✅');
+}
+
 async function loadSheetSubDatos() {
   const rows = await sheetFetch('sub_datos');
   if(!rows) { console.warn('[Sheet] sub_datos: no rows returned'); return; }
@@ -4977,7 +5020,11 @@ async function loadSheetSubDatos() {
     if(!isNaN(n)) fn(n);
   };
 
-  override('embi_bps', v => {
+  // ── Apply INJECTED_DATA (written by GAS, works from file://) ──
+  if(window.INJECTED_DATA) {
+    applyInjectedData();
+    return; // skip Sheet fetch if we have injected data
+  } v => {
     if(!isNaN(v)&&v>0) {
       LIVE.embi.bps   = v;
       LIVE.embi.score = embiToScore(v);
@@ -5240,6 +5287,11 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 async function init(){
   checkLocalFileWarning();
+  // ── Apply GAS-injected data immediately (works from file:// and GitHub Pages) ──
+  if(window.INJECTED_DATA && Object.keys(window.INJECTED_DATA).length > 5) {
+    console.log('[INJECTED_DATA] Applying', Object.keys(window.INJECTED_DATA).length, 'fields before render');
+    applyInjectedData();
+  }
   // Set placeholders and dynamic text on load
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{const k=el.dataset.i18nPlaceholder;if(T[LANG][k])el.placeholder=T[LANG][k];});
   render();       // instant render with built-in fallbacks
