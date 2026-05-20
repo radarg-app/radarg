@@ -19,7 +19,7 @@
     npx serve .
     Luego abrí la URL que muestra
 -->
-<meta name="description" content="RadARG mide en tiempo real el sentimiento del mercado financiero argentino. 9 indicadores, historia desde 2000, interpretación con IA.">
+<meta name="description" content="RadARG mide en tiempo real el sentimiento del mercado financiero argentino. 5 dimensiones, 30+ indicadores, historia desde 2000, interpretación con IA.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -360,7 +360,9 @@ main { position:relative; z-index:1; max-width:1440px; margin:0 auto; padding:2r
 .ctx-strip {
   display:grid; grid-template-columns:repeat(4,1fr);
   gap:.75rem; margin-bottom:2rem;
+  overflow-x:auto; scrollbar-width:none;
 }
+.ctx-strip::-webkit-scrollbar{display:none}
 @media(max-width:900px){.ctx-strip{grid-template-columns:repeat(2,1fr)}}
 .ctx-card {
   background:var(--bg2); border:1px solid var(--border);
@@ -475,7 +477,7 @@ body.lm .subidx-sec-bar { background:rgba(0,0,0,.1); }
 .var-card-score-row { display:flex; align-items:center; gap:.375rem; margin-bottom:3px; }
 .var-card-score { font-size:30px; font-weight:800; letter-spacing:-1px; line-height:1; }
 .ind-badge { font-size:8.5px; font-weight:700; padding:2px 6px; border-radius:3px; letter-spacing:.04em; text-transform:uppercase; flex-shrink:0; align-self:center; }
-.var-card-raw { font-size:9.5px; font-weight:600; line-height:1.4; margin-bottom:2px; font-family:'JetBrains Mono',monospace; }
+.var-card-raw { font-size:10.5px; font-weight:600; line-height:1.4; margin-bottom:2px; font-family:'JetBrains Mono',monospace; }
 .var-card-desc { font-size:9.5px; color:var(--text3); line-height:1.5; margin-bottom:3px; }
 .var-card-unavail-note { font-size:9px; color:#f59e0b; line-height:1.5; margin-bottom:3px; font-style:italic; }
 .var-card-bar { height:2px; background:rgba(255,255,255,.07); border-radius:1px; overflow:hidden; margin:4px 0 3px; }
@@ -1328,7 +1330,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
   <nav><ul>
     <li><a href="#indicadores" data-i18n="nav.indicators">Indicadores</a></li>
     <li><a href="#historico"   data-i18n="nav.historic">Histórico</a></li>
-    <li><a href="#pro"         data-i18n="nav.pro">Pro</a></li>
+    <li><a href="#tiers"       data-i18n="nav.tiers">Tiers</a></li>
     <li><a href="#metodologia" data-i18n="nav.methodology">Metodología</a></li>
   </ul></nav>
   <div class="h-right">
@@ -1339,7 +1341,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
     </div>
     <button class="h-btn" onclick="shareScore()">↑ <span data-i18n="header.share">Compartir</span></button>
     <button class="h-btn" onclick="toggleMode()" id="modeBtn">🌙</button>
-    <button class="h-btn h-btn-primary" onclick="openTierModal('silver')">✦ <span data-i18n="nav.tier">Tier</span></button>
+    <button class="h-btn h-btn-primary" onclick="openTierModal('silver')">✦ <span data-i18n="nav.tier">Tiers</span></button>
   </div>
 </header>
 
@@ -1417,7 +1419,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
       <div style="text-align:center;padding:1rem 0 .25rem">
         <div style="font-size:26px;font-weight:800;letter-spacing:-.5px;color:var(--text);margin-bottom:6px" data-i18n="gauge.title">Índice de Sentimiento del Mercado</div>
         <div style="font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--text3)" data-i18n="gauge.label">Argentina</div>
-        <div style="font-size:10px;color:var(--text3);margin-top:2px;font-family:'JetBrains Mono',monospace" data-i18n="gauge.scale">0 = Miedo Extremo · 100 = Codicia Extrema</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px;font-family:'JetBrains Mono',monospace" data-i18n="gauge.scale">0 = pánico total · 50 = neutral · 100 = euforia</div>
       </div>
       <div class="gauge-canvas-wrap">
         <canvas id="mainGauge" style="display:block;width:100%" role="img"></canvas>
@@ -1455,7 +1457,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
         <div class="ai-icon" style="background:linear-gradient(135deg,#7c3aed,#0ea5e9)">🏛️</div>
         <div style="flex:1">
           <div class="ai-title" data-i18n="ai.political">Situación Política</div>
-          <div class="ai-sub" data-i18n="ai.sub">Análisis automático en tiempo real</div>
+          <div class="ai-sub" data-i18n="ai.sub.political">Basado en ICG UTDT y noticias de las últimas 48hs</div>
           <div style="font-size:9px;color:var(--text3);margin-top:2px" id="aiPolDate"></div>
         </div>
       </div>
@@ -1550,7 +1552,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
         <div>
           <div class="chart-title" data-i18n="chart.title">RadARG — Sentimiento del mercado argentino</div>
           <div class="chart-sub" id="chartSub">Datos mensuales · Ene 2000 – May 2026</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:4px" data-i18n="chart.desc">El índice va de 0 (miedo extremo) a 100 (codicia extrema). Valores altos indican apetito de riesgo; valores bajos, aversión al riesgo.</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px" data-i18n="chart.desc">0 = pánico · 100 = euforia. Históricamente, valores por encima de 75 precedieron correcciones importantes en activos argentinos.</div>
         </div>
       </div>
       <div class="chart-zone-legend">
@@ -1559,9 +1561,9 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
         <div class="czl-item"><div class="czl-color" style="background:#eab308"></div><div><div class="czl-name" data-i18n="zone.n">Neutral</div><div class="czl-range">45–55</div></div></div>
         <div class="czl-item"><div class="czl-color" style="background:#22c55e"></div><div><div class="czl-name" data-i18n="zone.g">Codicia</div><div class="czl-range">56–74</div></div></div>
         <div class="czl-item"><div class="czl-color" style="background:#16a34a"></div><div><div class="czl-name" data-i18n="zone.ge">Codicia Extrema</div><div class="czl-range">75–100</div></div></div>
-        <button id="mervalToggle" onclick="toggleMerval()" class="merval-toggle-btn" title="Mostrar/ocultar Merval USD (normalizado 0-100)">
-          <span style="display:inline-block;width:14px;height:2px;background:#f59e0b;border-radius:1px;margin-right:5px;vertical-align:middle;border-bottom:2px dashed #f59e0b;height:0"></span>
-          <span data-i18n="chart.mervalToggle">+ Merval USD (relativo)</span>
+        <button id="mervalToggle" onclick="toggleMerval()" class="merval-toggle-btn" title="Mostrar/ocultar Merval USD en el gráfico">
+          <span style="color:#f59e0b;margin-right:4px;font-size:12px">📈</span>
+          <span data-i18n="chart.mervalToggle">Merval USD</span>
         </button>
       </div>
       <div class="chart-wrap">
@@ -1600,9 +1602,9 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
   </section>
 
   <!-- PRO / ALERTS -->
-  <section id="pro">
+  <section id="tiers">
     <div class="sec-hdr">
-      <span class="sec-ttl" data-i18n="sec.pro">RadARG Pro</span>
+      <span class="sec-ttl" data-i18n="sec.tiers">Tiers</span>
       <div class="sec-line"></div>
     </div>
 
@@ -1647,7 +1649,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
           <div class="tier-feat"><span class="tier-feat-x">–</span><span style="opacity:.4" data-i18n="tier.bronze.x2">Resumidor IA personalizado</span></div>
           <div class="tier-feat"><span class="tier-feat-x">–</span><span style="opacity:.4" data-i18n="tier.bronze.x3">API de datos</span></div>
         </div>
-        <button class="btn-tier btn-tier-bronze" onclick="openModal()">☕ <span data-i18n="tier.bronze.cta">Apoyar el proyecto</span></button>
+        <button class="btn-tier btn-tier-bronze" onclick="openModal()">🔍 <span data-i18n="tier.bronze.cta">Explorar RadARG</span></button>
       </div>
 
       <!-- PLATA -->
@@ -1765,7 +1767,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
           style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:10px 12px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;outline:none;box-sizing:border-box;transition:border-color .15s"
           onfocus="this.style.borderColor='var(--ac)'" onblur="this.style.borderColor=''"
           data-i18n-placeholder="gift.modal.placeholder">
-        <button class="btn-tier btn-tier-silver" onclick="submitGiftClaim()" data-i18n="gift.modal.cta">✦ Enviar solicitud</button>
+        <button class="btn-tier btn-tier-silver" onclick="submitGiftClaim()" data-i18n="gift.modal.cta">✦ Verificar mi sugerencia →</button>
       </div>
       <div style="font-size:10px;color:var(--text3);margin-top:.75rem;text-align:center;line-height:1.6" data-i18n="gift.modal.terms">El cupón es de un solo uso y válido por 30 días desde su emisión. No acumulable con otras promociones.</div>
     </div>
@@ -1779,7 +1781,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
     </div>
     <div class="sponsors-card">
       <div class="sponsors-eyebrow" data-i18n="sponsors.eyebrow">Aparecé en RadARG</div>
-      <div class="sponsors-title" data-i18n="sponsors.title">Tu marca, frente al mercado argentino</div>
+      <div class="sponsors-title" data-i18n="sponsors.title">Llegá a inversores, traders y analistas que siguen el mercado diariamente</div>
       <p class="sponsors-sub" data-i18n="sponsors.sub">RadARG es visitado por inversores, traders, analistas y empresarios que siguen el mercado financiero. Llegá a una audiencia altamente calificada.</p>
       <a class="btn-sponsor" href="mailto:contacto@radarg.com">📩 <span data-i18n="sponsors.cta">Quiero publicitar</span></a>
       <div class="sponsors-benefits">
@@ -1968,7 +1970,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
 <div class="modal-overlay" id="proModal" onclick="if(event.target===this)closeProModal()">
   <div class="modal" style="max-width:600px">
     <button class="modal-close" onclick="closeProModal()">✕</button>
-    <h3 style="font-size:18px;margin-bottom:.25rem">✦ RadARG <span data-i18n="nav.tier">Tier</span></h3>
+    <h3 style="font-size:18px;margin-bottom:.25rem">✦ <span data-i18n="nav.tier">Tiers</span></h3>
     <p class="modal-sub" style="margin-bottom:1rem">Elegí tu nivel. Cancelás cuando querés, sin preguntas.</p>
     <div class="pro-modal-plans">
       <div class="pro-plan" onclick="selectPlan(this,'bronze')" data-plan="bronze">
@@ -2027,16 +2029,17 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
 /* ── i18n ──────────────────────────────────────────────────── */
 const T = {
   es: {
-    'nav.indicators':'Indicadores','nav.historic':'Histórico','nav.pro':'Pro','nav.methodology':'Metodología',
+    'nav.indicators':'Indicadores','nav.historic':'Histórico','nav.tiers':'Tiers','nav.methodology':'Metodología',
     'header.share':'Compartir',
     'score.sentiment':'Sentimiento del mercado',
     'gauge.label':'Argentina','gauge.title':'Índice de Sentimiento del Mercado','score.1w':'Hace 1 semana','score.1m':'Hace 1 mes',
     'score.3m':'Hace 3 meses','score.1y':'Hace 1 año','score.updating':'Actualizando…',
     'ai.title':'Interpretación IA','ai.sub':'Análisis automático en tiempo real',
     'ai.economic':'Situación Económica','ai.political':'Situación Política',
+    'ai.sub.political':'Basado en ICG UTDT y noticias de las últimas 48hs',
     'ai.loading':'Analizando…','ai.disclaimer':'Generado con IA. No constituye asesoramiento financiero.',
     'sec.indicators':'5 Dimensiones del Índice','sec.historic':'Evolución Histórica',
-    'sec.milestones':'Hitos Históricos','sec.pro':'RadARG Pro','sec.sponsors':'Sponsors',
+    'sec.milestones':'Hitos Históricos','sec.tiers':'Tiers','sec.sponsors':'Sponsors',
     'sec.meth.general':'Para todos','sec.meth.tech':'Para especialistas',
     'sec.suggest':'Sugerencias',
     'suggest.eyebrow':'Comunidad RadARG',
@@ -2075,7 +2078,7 @@ const T = {
     'tier.bronze.f3':'Gráfico histórico 2000–hoy','tier.bronze.f4':'Análisis IA del momento',
     'tier.bronze.f5':'Noticias relevantes del día',
     'tier.bronze.x1':'Newsletter semanal','tier.bronze.x2':'Resumidor IA personalizado','tier.bronze.x3':'Ponderador de índice',
-    'tier.bronze.cta':'Apoyar el proyecto',
+    'tier.bronze.cta':'Explorar RadARG',
     // Silver
     'tier.silver.name':'Plata','tier.silver.tagline':'Para quienes quieren ir un paso adelante del mercado con análisis concreto cada semana.',
     'tier.silver.f1':'Todo lo de Bronce','tier.silver.f2':'Newsletter semanal cada lunes',
@@ -2099,7 +2102,7 @@ const T = {
     'tier.diamond.f5':'Webhooks para alertas programáticas',
     'tier.diamond.f6':'Acceso anticipado a todo, sin excepciones',
     'tier.diamond.cta':'Acceder a Diamante',
-    'nav.tier':'Tier',
+    'nav.tier':'Tiers',
     'tier.gold.x1':'API pública de datos',
     'tier.diamond.name':'Diamante',
     'tier.diamond.tagline':'Acceso total, API incluida. Para instituciones, traders y quienes construyen sobre RadARG.',
@@ -2115,7 +2118,7 @@ const T = {
     'gift.cta':'Activar acceso',
     'gift.modal.title':'Verificá tu sugerencia',
     'gift.modal.cta':'✦ Enviar solicitud',
-    'nav.tier':'Tier',
+    'nav.tier':'Tiers',
     // Gift
     'gift.title':'Acceso al Tier Plata por 1 mes',
     'gift.sub':'¿Tenés una idea para mejorar RadARG? Si la implementamos, te regalamos 1 mes de Plata.',
@@ -2133,7 +2136,7 @@ const T = {
     'tier.bronze.name':'Bronce','tier.bronze.tagline':'El índice completo, sin barreras. Todo lo que necesitás para empezar.',
     'tier.bronze.f1':'Índice RadARG en tiempo real','tier.bronze.f2':'5 dimensiones del índice con descripciones','tier.bronze.f3':'Gráfico histórico 2000–hoy','tier.bronze.f4':'Análisis IA del momento','tier.bronze.f5':'Noticias relevantes del día',
     'tier.bronze.x1':'Newsletter semanal','tier.bronze.x2':'Resumidor IA personalizado','tier.bronze.x3':'Ponderador de índice',
-    'tier.bronze.cta':'Apoyar el proyecto',
+    'tier.bronze.cta':'Explorar RadARG',
     'tier.silver.name':'Plata','tier.silver.tagline':'Para quienes quieren ir un paso adelante del mercado con análisis concreto cada semana.',
     'tier.silver.f1':'Todo lo de Bronce','tier.silver.f2':'Newsletter semanal cada lunes','tier.silver.f3':'Resumidor IA: contexto de la semana','tier.silver.f4':'Alertas ante cambios bruscos','tier.silver.f5':'Acceso anticipado a nuevas funciones',
     'tier.silver.x1':'Ponderador de índice personalizado','tier.silver.x2':'Indicadores macro ampliados',
@@ -2156,7 +2159,7 @@ const T = {
     'gift.cta':'Activar acceso',
     'gift.modal.title':'Verificá tu sugerencia',
     'gift.modal.cta':'✦ Enviar solicitud',
-    'nav.tier':'Tier',
+    'nav.tier':'Tiers',
     'gift.title':'Acceso al Tier Plata por 1 mes','gift.sub':'¿Tenés una idea para mejorar RadARG? Si la implementamos, te regalamos 1 mes de Plata.','gift.cta':'Activar acceso',
     'gift.modal.title':'Verificá tu sugerencia','gift.modal.sub':'Dejanos tu correo y nuestro equipo verifica si tu sugerencia fue implementada. Si fue así, recibís un cupón de un solo uso por 1 mes de Tier Plata.',
     'gift.modal.placeholder':'tu@email.com','gift.modal.cta':'✦ Enviar solicitud',
@@ -2170,7 +2173,7 @@ const T = {
     'tier.modal.coupon':'Cupón',
     'tier.modal.coupon.optional':'(opcional)',
     'pro.cta':'Suscribirse a Pro','pro.support':'Apoyar gratis','pro.note':'Pagos seguros via Mercado Pago · Cancelá en cualquier momento',
-    'sponsors.eyebrow':'Aparecé en RadARG','sponsors.title':'Tu marca, frente al mercado argentino',
+    'sponsors.eyebrow':'Aparecé en RadARG','sponsors.title':'Llegá a inversores, traders y analistas que siguen el mercado diariamente',
     'sponsors.sub':'RadARG es visitado por inversores, traders y analistas. Llegá a una audiencia calificada.',
     'sponsors.cta':'Quiero publicitar',
     'sponsors.b1':'Audiencia: inversores y analistas','sponsors.b2':'Logo en la página principal','sponsors.b3':'Link directo a tu sitio',
@@ -2227,16 +2230,17 @@ const T = {
     'ticker.act':'Act.',
   },
   en: {
-    'nav.indicators':'Indicators','nav.historic':'Historical','nav.pro':'Pro','nav.methodology':'Methodology',
+    'nav.indicators':'Indicators','nav.historic':'Historical','nav.tiers':'Tiers','nav.methodology':'Methodology',
     'header.share':'Share',
     'score.sentiment':'Market sentiment',
     'gauge.label':'Argentina','gauge.title':'Fear & Greed Index','score.1w':'1 week ago','score.1m':'1 month ago',
     'score.3m':'3 months ago','score.1y':'1 year ago','score.updating':'Updating…',
     'ai.title':'AI Interpretation','ai.sub':'Automatic real-time analysis',
     'ai.economic':'Economic Situation','ai.political':'Political Situation',
+    'ai.sub.political':'Based on ICG UTDT and news from the last 48h',
     'ai.loading':'Analyzing…','ai.disclaimer':'AI-generated. Not financial advice.',
     'sec.indicators':'5 Index Dimensions','sec.historic':'Historical Evolution',
-    'sec.milestones':'Historical Milestones','sec.pro':'RadARG Pro','sec.sponsors':'Sponsors',
+    'sec.milestones':'Historical Milestones','sec.tiers':'Tiers','sec.sponsors':'Sponsors',
     'sec.meth.general':'For everyone','sec.meth.tech':'For specialists',
     'sec.suggest':'Suggestions',
     'suggest.eyebrow':'RadARG Community',
@@ -2275,7 +2279,7 @@ const T = {
     'tier.bronze.f3':'Historical chart 2000–today','tier.bronze.f4':'AI analysis of the moment',
     'tier.bronze.f5':'Relevant news of the day',
     'tier.bronze.x1':'Weekly newsletter','tier.bronze.x2':'Personalized AI summarizer','tier.bronze.x3':'Index weighting tool',
-    'tier.bronze.cta':'Support the project',
+    'tier.bronze.cta':'Explore RadARG',
     // Silver EN
     'tier.silver.name':'Silver','tier.silver.tagline':'For those who want to stay one step ahead of the market with concrete weekly analysis.',
     'tier.silver.f1':'Everything in Bronze','tier.silver.f2':'Weekly newsletter every Monday',
@@ -2299,7 +2303,7 @@ const T = {
     'tier.diamond.f5':'Webhooks for programmatic alerts',
     'tier.diamond.f6':'Early access to everything, no exceptions',
     'tier.diamond.cta':'Access Diamond',
-    'nav.tier':'Tier',
+    'nav.tier':'Tiers',
     'tier.gold.x1':'Public data API',
     'tier.diamond.name':'Diamond',
     'tier.diamond.tagline':'Full access, API included. For institutions, traders, and those building on RadARG.',
@@ -2315,7 +2319,7 @@ const T = {
     'gift.cta':'Activate access',
     'gift.modal.title':'Verify your suggestion',
     'gift.modal.cta':'✦ Send request',
-    'nav.tier':'Tier',
+    'nav.tier':'Tiers',
     // Gift EN
     'gift.title':'Silver Tier Access — 1 Month',
     'gift.sub':'Have an idea to improve RadARG? If we implement it, we gift you 1 month of Silver.',
@@ -2333,7 +2337,7 @@ const T = {
     'tier.bronze.name':'Bronze','tier.bronze.tagline':'The full index, no barriers. Everything you need to get started.',
     'tier.bronze.f1':'RadARG Index in real time','tier.bronze.f2':'5 index dimensions with descriptions','tier.bronze.f3':'Historical chart 2000–today','tier.bronze.f4':'AI analysis of the moment','tier.bronze.f5':'Relevant news of the day',
     'tier.bronze.x1':'Weekly newsletter','tier.bronze.x2':'Personalized AI summarizer','tier.bronze.x3':'Index weighting tool',
-    'tier.bronze.cta':'Support the project',
+    'tier.bronze.cta':'Explore RadARG',
     'tier.silver.name':'Silver','tier.silver.tagline':'For those who want to stay one step ahead of the market with concrete weekly analysis.',
     'tier.silver.f1':'Everything in Bronze','tier.silver.f2':'Weekly newsletter every Monday','tier.silver.f3':'AI summarizer: weekly market context','tier.silver.f4':'Alerts on sharp market moves','tier.silver.f5':'Early access to new features',
     'tier.silver.x1':'Custom index weighting tool','tier.silver.x2':'Extended macro indicators',
@@ -2356,7 +2360,7 @@ const T = {
     'gift.cta':'Activate access',
     'gift.modal.title':'Verify your suggestion',
     'gift.modal.cta':'✦ Send request',
-    'nav.tier':'Tier',
+    'nav.tier':'Tiers',
     'gift.title':'Silver Tier Access — 1 Month','gift.sub':'Have an idea to improve RadARG? If we implement it, we gift you 1 month of Silver.','gift.cta':'Activate access',
     'gift.modal.title':'Verify your suggestion','gift.modal.sub':'Enter your email and we verify if your suggestion was implemented. 1 month free, card required to activate.',
     'gift.modal.placeholder':'your@email.com','gift.modal.cta':'✦ Send request',
@@ -3185,7 +3189,7 @@ function computeSubIndices(bs) {
   const avg1 = vars => clamp(vars.reduce((s,v)=>s+v.score*(v.w||1),0) / vars.reduce((s,v)=>s+(v.w||1),0));
 
   const SEGS = {
-    inflacion:  { vars:seg1, score:avg1(seg1), w:25, icon:'📈', key:'inflacion',
+    inflacion:  { vars:seg1, score:avg1(seg1), w:25, icon:'💸', key:'inflacion',
                   name: es?'Inflación y Pol. Monetaria':'Inflation & Monetary Policy',
                   question: es?'¿Está el peso funcionando como moneda?':'Is the peso functioning as a currency?',
                   color:'#f59e0b' },
@@ -3193,7 +3197,7 @@ function computeSubIndices(bs) {
                   name: es?'Tipo de Cambio y Reservas':'Exchange Rate & Reserves',
                   question: es?'¿Tiene el país los dólares necesarios?':'Does the country have enough dollars?',
                   color:'#0ea5e9' },
-    actividad:  { vars:seg3, score:avg1(seg3), w:15, icon:'🏭', key:'actividad',
+    actividad:  { vars:seg3, score:avg1(seg3), w:15, icon:'🏗️', key:'actividad',
                   name: es?'Actividad Real y Bienestar':'Real Activity & Wellbeing',
                   question: es?'¿Crece la economía? ¿Hay trabajo?':'Is the economy growing? Is there work?',
                   color:'#22c55e' },
@@ -3952,7 +3956,14 @@ function renderIndicators(brechaScore) {
     `;
     card.addEventListener('click', () => {
       const el = document.getElementById('seg-'+key);
-      if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+      if(el) {
+        el.scrollIntoView({behavior:'smooth', block:'start'});
+        setTimeout(() => {
+          el.style.transition='box-shadow .15s';
+          el.style.boxShadow='0 0 0 2px '+sc+', 0 0 24px '+sc+'44';
+          setTimeout(()=>{ el.style.boxShadow=''; }, 700);
+        }, 350);
+      }
     });
     strip.appendChild(card);
 
@@ -3990,6 +4001,7 @@ function renderIndicators(brechaScore) {
           </div>
           <div class="subidx-sec-bar"><div class="subidx-sec-bar-fill" style="background:${sc};width:${s}%"></div></div>
           <div class="subidx-sec-weight" style="color:${sc};opacity:.8">${seg.w}% ${LANG==='en'?'of final score':'del score final'}</div>
+      ${(key==='actividad'||key==='fiscal') ? `<div style="margin-top:6px;display:inline-flex;align-items:center;gap:4px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.25);border-radius:4px;padding:2px 7px;font-size:9px;font-weight:700;color:#f59e0b;letter-spacing:.06em">⚠️ ${LANG==='en'?'PARTIAL DATA':'DATOS PARCIALES'}</div>` : ''}
         </div>
         <div class="subidx-sec-prose">
           <div class="subidx-sec-question">${seg.question}</div>
@@ -4002,7 +4014,8 @@ function renderIndicators(brechaScore) {
 
     // Render variable cards
     const varsEl = sect.querySelector('#vars-'+key);
-    seg.vars.forEach(v => {
+    const sortedVars = [...seg.vars].sort((a,b) => (a.unavailable?1:0)-(b.unavailable?1:0));
+    sortedVars.forEach(v => {
       const vs   = Math.min(100, Math.max(0, Math.round(v.score)));
       const vc   = v.unavailable ? 'var(--text3)' : scoreColor(vs);
       const vbg  = v.unavailable ? 'rgba(100,100,100,.12)' : scoreBg(vs);
@@ -4069,8 +4082,8 @@ async function runAI(score){
     if(cachedScore && Math.abs(cachedScore - score) > 8) {
       const nota = document.getElementById('aiNota');
       if(nota) nota.textContent = (LANG==='en'
-        ? `Analysis from score ${cachedScore} · updated every 2h`
-        : `Análisis del score ${cachedScore} · se actualiza cada 2h`);
+        ? `Analysis generated with previous data · updating every 2h`
+        : `Análisis generado con datos anteriores · se actualiza cada 2h`);
     }
     return;
   }
@@ -4768,7 +4781,11 @@ function shareScore(){
   const text=`RadARG — Mercado Argentino\nScore: ${score} · ${lbl}\n9 indicadores en tiempo real 🇦🇷\n`;
   const url=window.location.href.split('?')[0];
   if(navigator.share){navigator.share({title:'RadARG',text,url}).catch(()=>{});}
-  else if(navigator.clipboard){navigator.clipboard.writeText(text+url).then(()=>{const b=document.querySelector('.h-btn');if(b){const o=b.innerHTML;b.textContent='✅';setTimeout(()=>b.innerHTML=o,2000);}});}
+  else if(navigator.clipboard){navigator.clipboard.writeText(text+url).then(()=>{
+    const btns=document.querySelectorAll('.h-btn');
+    const shareBtn=Array.from(btns).find(b=>b.getAttribute('onclick')==='shareScore()');
+    if(shareBtn){const o=shareBtn.innerHTML;shareBtn.innerHTML='✅ <span>Copiado</span>';setTimeout(()=>shareBtn.innerHTML=o,2000);}
+  });}
 }
 function submitSuggest(e){
   e.preventDefault();
