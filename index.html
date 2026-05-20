@@ -4686,11 +4686,12 @@ const milestonesPlugin={
     const{ctx,scales:{x,y},chartArea:{top,bottom,left:caLeft,right:caRight}}=chart;
     if(!x||!y) return;
     const labels=chart.data.labels;
-    const vis=MILESTONES.filter(m=>labels.includes(m.label));
+    // Labels have zero-width space prefix to prevent date parsing — strip for comparison
+    const vis=MILESTONES.filter(m=>labels.includes('​'+m.label));
     if(!vis.length) return;
     const showLabels=labels.length<=120;
     vis.forEach(m=>{
-      const idx=labels.indexOf(m.label);
+      const idx=labels.indexOf('​'+m.label);
       const xPos=x.getPixelForValue(idx),yPos=y.getPixelForValue(m.score);
       // dashed line
       ctx.save();ctx.beginPath();ctx.setLineDash([3,4]);
