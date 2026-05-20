@@ -119,7 +119,8 @@ body.lm .t-ts  { color: #484864; }
 body.lm .t-val { color: #0a0a14; }
 body.lm .sc-date { color: #484864; }
 body.lm .sc-ref-period { color: #484864; }
-body.lm .sc-refresh { color: #484864; }
+body.lm .sc-refresh { color: #484864; border-top-color: rgba(0,0,0,.12); }
+body.lm .sc-refresh-next { color: #0271b0; }
 body.lm .ai-sub { color: #2a2a40; }
 body.lm .ai-text { color: #2a2a40; background:#f4f5f8; border-color:rgba(0,0,0,.12); }
 body.lm .ai-disclaimer { color: #484864; }
@@ -371,7 +372,9 @@ main { position:relative; z-index:1; max-width:1440px; margin:0 auto; padding:2r
   font-size:11px; font-weight:700; padding:1px 6px; border-radius:4px;
   color:#fff; font-family:'JetBrains Mono',monospace;
 }
-.sc-refresh { font-size:10px; color:var(--text3); font-family:'JetBrains Mono',monospace; margin-top:.75rem; display:flex; align-items:center; gap:5px; }
+.sc-refresh { font-size:10px; color:var(--text3); font-family:'JetBrains Mono',monospace; margin-top:.875rem; display:flex; flex-direction:column; gap:3px; padding-top:.75rem; border-top:1px solid var(--border); }
+.sc-refresh-row { display:flex; align-items:center; gap:5px; }
+.sc-refresh-next { display:flex; align-items:center; gap:5px; color:var(--ac); font-size:9.5px; }
 .sc-refresh-dot { font-size:13px; color:var(--g); line-height:1; flex-shrink:0; }
 .sc-ref-delta { font-size:11px; font-weight:700; flex-shrink:0; }
 
@@ -484,7 +487,25 @@ main { position:relative; z-index:1; max-width:1440px; margin:0 auto; padding:2r
 body.lm .strip-bar { background:rgba(0,0,0,.1); }
 .strip-bar-fill { height:100%; border-radius:1px; transition:width .9s cubic-bezier(.4,0,.2,1); }
 .strip-weight { font-size:8.5px; color:var(--text3); font-family:'JetBrains Mono',monospace; position:relative; z-index:1; }
-body.lm .strip-card { border-color:rgba(0,0,0,.1); }
+body.lm .strip-card { border-color:rgba(0,0,0,.14); background:#ffffff; }
+body.lm .subidx-section { background:#ffffff; border-color:rgba(0,0,0,.12); }
+body.lm .subidx-section-header { border-bottom-color:rgba(0,0,0,.1); }
+body.lm .subidx-vars { background:#f4f5f8; }
+body.lm .var-card { background:#ffffff; border-color:rgba(0,0,0,.12); border-left-width:2px; }
+body.lm .var-card.unavailable { background:#f8f9fb; opacity:.7; }
+body.lm .var-card-badge-unavail { background:rgba(180,83,9,.1); color:#b45309; border-color:rgba(180,83,9,.2); }
+body.lm .news-card { border-color:rgba(0,0,0,.1); }
+body.lm .hito-card { border-color:rgba(0,0,0,.1); }
+body.lm .ctx-card  { border-color:rgba(0,0,0,.1); }
+body.lm .score-card { border-color:rgba(0,0,0,.1); }
+body.lm .gauge-card { border-color:rgba(0,0,0,.1); }
+body.lm .ai-panel  { border-color:rgba(0,0,0,.1); }
+body.lm .chart-card { border-color:rgba(0,0,0,.1); }
+body.lm .chart-zone-legend { background:#ebedf2; border-color:rgba(0,0,0,.1); }
+body.lm .tier-card { border-width:2px; }
+body.lm .gift-strip { background:rgba(21,128,61,.05); }
+body.lm .sc-divider { background:rgba(0,0,0,.1); }
+body.lm .ai-text { border-color:rgba(0,0,0,.1); }
 
 /* ════════ SUB-INDEX DETAIL SECTIONS ════════════════════════ */
 .subidx-sections { display:flex; flex-direction:column; gap:2rem; margin-bottom:2rem; }
@@ -589,6 +610,41 @@ body.lm .var-card-bar { background:rgba(0,0,0,.07); }
 .czl-name  { font-size:11px; font-weight:600; color:var(--text); }
 .czl-range { font-size:10px; color:var(--text3); font-family:'JetBrains Mono',monospace; }
 .chart-wrap { position:relative; height:300px; }
+
+/* ── Merval toggle switch ─────────────────────────────────── */
+.merval-switch-wrap {
+  display:flex; align-items:center; gap:8px;
+  margin-left:auto; flex-shrink:0;
+  font-size:11px; font-weight:600; color:var(--text2);
+  cursor:pointer; user-select:none;
+}
+.merval-switch-wrap:hover { color:var(--text); }
+.merval-switch {
+  position:relative; width:34px; height:18px; flex-shrink:0;
+}
+.merval-switch input { opacity:0; width:0; height:0; position:absolute; }
+.merval-switch-track {
+  position:absolute; inset:0;
+  background:var(--bg4); border-radius:9px;
+  border:1px solid var(--border2);
+  transition:background .2s, border-color .2s;
+}
+.merval-switch-thumb {
+  position:absolute; top:2px; left:2px;
+  width:12px; height:12px; border-radius:50%;
+  background:#fff; transition:transform .2s, background .2s;
+  box-shadow:0 1px 3px rgba(0,0,0,.3);
+}
+.merval-switch input:checked ~ .merval-switch-track {
+  background:#f59e0b; border-color:#f59e0b;
+}
+.merval-switch input:checked ~ .merval-switch-thumb {
+  transform:translateX(16px);
+}
+body.lm .merval-switch-track { background:#dcdee8; border-color:rgba(0,0,0,.18); }
+body.lm .merval-switch-thumb { background:#ffffff; box-shadow:0 1px 3px rgba(0,0,0,.2); }
+body.lm .merval-switch-wrap { color:#2a2a40; }
+body.lm .merval-switch-wrap:hover { color:#0a0a14; }
 
 /* ── Range slider ────────────────────────────────────────────── */
 .range-wrap { display:flex; flex-direction:column; gap:8px; margin-top:1.25rem; }
@@ -1485,8 +1541,13 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
         </div>
       </div>
       <div class="sc-refresh" id="gRefresh">
-        <span class="sc-refresh-dot"></span>
-        <span data-i18n="score.updating">Actualizando…</span>
+        <div class="sc-refresh-row">
+          <span class="sc-refresh-dot" style="font-size:8px">●</span>
+          <span id="gRefreshTime" data-i18n="score.updating">Actualizando…</span>
+        </div>
+        <div class="sc-refresh-next" id="gRefreshNext" style="display:none">
+          <span>↻</span><span id="gRefreshNextTxt"></span>
+        </div>
       </div>
     </div>
 
@@ -1637,10 +1698,14 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
         <div class="czl-item"><div class="czl-color" style="background:#eab308"></div><div><div class="czl-name" data-i18n="zone.n">Neutral</div><div class="czl-range">45–55</div></div></div>
         <div class="czl-item"><div class="czl-color" style="background:#22c55e"></div><div><div class="czl-name" data-i18n="zone.g">Codicia</div><div class="czl-range">56–74</div></div></div>
         <div class="czl-item"><div class="czl-color" style="background:#16a34a"></div><div><div class="czl-name" data-i18n="zone.ge">Codicia Extrema</div><div class="czl-range">75–100</div></div></div>
-        <button id="mervalToggle" onclick="toggleMerval()" class="merval-toggle-btn" title="Mostrar/ocultar Merval USD en el gráfico">
-          <span style="color:#f59e0b;margin-right:4px;font-size:12px">📈</span>
-          <span data-i18n="chart.mervalToggle">Merval USD</span>
-        </button>
+        <label class="merval-switch-wrap" title="Mostrar/ocultar Merval USD en el gráfico" onclick="toggleMerval()">
+          <span data-i18n="chart.mervalToggle" style="color:#f59e0b">📈 Merval USD</span>
+          <div class="merval-switch">
+            <input type="checkbox" id="mervalToggle" readonly>
+            <div class="merval-switch-track"></div>
+            <div class="merval-switch-thumb"></div>
+          </div>
+        </label>
       </div>
       <div class="chart-wrap">
         <canvas id="histChart"></canvas>
@@ -3971,9 +4036,16 @@ function renderGauge(score){
   const now=new Date();
   if($('gDate')) $('gDate').textContent=now.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})+' · '+(S.live?t('ui.realtime'):t('ui.fallback'));
   if($('hdrDate')) $('hdrDate').textContent='LIVE · '+now.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'}).toUpperCase();
-  if($('gRefresh')){
-    const tt=now.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-    $('gRefresh').innerHTML=`<span class="sc-refresh-dot">↻</span><span>${t('ui.lastUpdate')} ${tt}<br>${t('ui.nextIn')}</span>`;
+  if($('gRefreshTime')){
+    const loc = LANG==='en'?'en-US':'es-AR';
+    const tt = now.toLocaleTimeString(loc,{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    $('gRefreshTime').textContent = t('ui.lastUpdate')+' '+tt;
+    const nextEl = $('gRefreshNext');
+    const nextTxt = $('gRefreshNextTxt');
+    if(nextEl && nextTxt){
+      nextEl.style.display='flex';
+      nextTxt.textContent = LANG==='en' ? 'Next update in 5 min' : 'Próxima actualización en 5 min';
+    }
   }
   // Historical refs — calculated from MONTHLY data (not hardcoded)
   // MONTHLY.scores is monthly, so: 1w≈current, 1m=1 month ago, 3m=3, 1y=12
@@ -4670,8 +4742,8 @@ const milestonesPlugin={
 let mervalVisible = false;
 function toggleMerval() {
   mervalVisible = !mervalVisible;
-  const btn = document.getElementById('mervalToggle');
-  if(btn) btn.classList.toggle('active', mervalVisible);
+  const chk = document.getElementById('mervalToggle');
+  if(chk) chk.checked = mervalVisible;
   buildChart(sliderFrom, sliderTo);
 }
 
@@ -4780,7 +4852,20 @@ function updateSlider(){
   $('rl-from').textContent=window.MONTHLY.labels[f]; $('rl-to').textContent=window.MONTHLY.labels[to_];
   document.querySelectorAll('.range-tick').forEach(tk=>{tk.classList.toggle('in-range',parseInt(tk.dataset.idx)>=f&&parseInt(tk.dataset.idx)<=to_);});
   const n=t-f+1,yrs=(n/12).toFixed(1).replace('.0','');
-  if($('chartSub')) $('chartSub').textContent=`${LANG==='en'?'Monthly data':'Datos mensuales'} · ${window.MONTHLY.labels[f]} – ${window.MONTHLY.labels[to_]} · ${n} ${LANG==='en'?'months':'meses'}${n>=12?` (${yrs} ${LANG==='en'?'yr':'años'})`:''}`;
+  if($('chartSub')) {
+    const lf = window.MONTHLY.labels[f] || '';
+    const lt = window.MONTHLY.labels[to_] || '';
+    // Clean label: just "May 2026" not full date string
+    const cleanLbl = l => {
+      if(!l) return '';
+      // If it's already short (e.g. "Ene 2000"), return as-is
+      if(l.length <= 10) return l;
+      // Try to parse and format
+      try { const d=new Date(l); if(!isNaN(d)) return d.toLocaleDateString(LANG==='en'?'en-US':'es-AR',{month:'short',year:'numeric'}); } catch(e){}
+      return l.split(' ').slice(0,2).join(' ');
+    };
+    $('chartSub').textContent=`${LANG==='en'?'Monthly data':'Datos mensuales'} · ${cleanLbl(lf)} – ${cleanLbl(lt)} · ${n} ${LANG==='en'?'months':'meses'}${n>=12?` (${yrs} ${LANG==='en'?'yr':'años'})`:''}`;
+  }
   buildChart(f,to_);
 }
 
