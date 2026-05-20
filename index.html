@@ -4964,11 +4964,11 @@ async function loadDataJSON() {
 
     // Apply all scalar fields
     const f = k => (d[k] !== undefined && d[k] !== null && d[k] !== '') ? d[k] : null;
-    if(f('embi_bps')!==null)              LIVE.embi.bps = f('embi_bps');
+    if(f('embi_bps')!==null)   { const v=f('embi_bps');   LIVE.embi.bps=v; LIVE.embi.score=embiToScore(v); LIVE.embi.raw=`${v} bps`; LIVE.embi.src='data.json'; LIVE.embi.live=true; }
     if(f('tna_pf')!==null)                LIVE.tasaReal.tna = f('tna_pf');
     if(f('ipc_mensual')!==null)           LIVE.tasaReal.ipc = f('ipc_mensual');
-    if(f('reservas_mM')!==null)           LIVE.reservas.raw = f('reservas_mM');
-    if(f('merval_usd')!==null)            LIVE.merval.raw = f('merval_usd');
+    if(f('reservas_mM')!==null) { const mM=f('reservas_mM'); const disp=mM>=1000?'USD '+(mM/1000).toFixed(1)+'MM':'USD '+Math.round(mM)+'M'; LIVE.reservas={mM,score:reservasToScore(mM),raw:disp+' brutas',src:'data.json',live:true}; }
+    if(f('merval_usd')!==null)  { const v=f('merval_usd'); LIVE.merval.usd=v; LIVE.merval.score=mervalToScore(v); LIVE.merval.raw=`USD ${Math.round(v).toLocaleString('es-AR')}`; LIVE.merval.src='data.json'; LIVE.merval.live=true; }
     if(f('soja_usd')!==null)              LIVE.soja = f('soja_usd');
     if(f('icg_utdt')!==null)              LIVE.icg = f('icg_utdt');
     if(f('rem_12m')!==null)               LIVE._rem12m = f('rem_12m');
