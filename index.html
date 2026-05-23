@@ -4844,7 +4844,11 @@ function buildChart(from,to){
           footerColor:isLM?'#44445c':'#c0c0d8', footerFont:{family:"'Inter',sans-serif",size:11,weight:'400'},
           footerMarginTop:7, padding:12, cornerRadius:8,
           callbacks:{
-            title: items => window.MONTHLY_DISPLAY(rawLabels[items[0].dataIndex]||''),
+            title: items => {
+              const lbl=rawLabels[items[0].dataIndex];
+              if(!lbl) return '';
+              try { return window.MONTHLY_DISPLAY(lbl); } catch(e){ return lbl; }
+            },
             label: c => {
               if(c.dataset.label==='Merval USD'){
                 const raw = MERVAL_MAP[_disp(rawLabels[c.dataIndex])];
@@ -4881,7 +4885,9 @@ function buildChart(from,to){
             callback:(v)=>{
               const i=Math.round(v);
               if(i<0||i>=n||i%step!==0) return '';
-              return window.MONTHLY_DISPLAY(rawLabels[i]||'');
+              const lbl=rawLabels[i];
+              if(!lbl) return '';
+              try { return window.MONTHLY_DISPLAY(lbl); } catch(e){ return ''; }
             },
           },
           grid:{color:()=>isLM?'rgba(0,0,0,.06)':'rgba(255,255,255,.04)'},
@@ -4922,8 +4928,15 @@ function initSlider(){
   const ticksEl=$('rangeTicks'); if(!ticksEl) return;
   ticksEl.innerHTML='';
   const years=[];
-  window.MONTHLY.labels.forEach((lbl,i)=>{if(lbl.startsWith('Ene'))years.push({label:lbl.split(' ')[1],idx:i});});
-  years.push({label:'May 26',idx:TOTAL_MONTHS-1});
+  // Labels are "YYYY-MM" — detect January (month 01) for year ticks
+  window.MONTHLY.labels.forEach((lbl,i)=>{
+    if(lbl&&lbl.length===7&&lbl.slice(5)==='01') years.push({label:lbl.slice(0,4),idx:i});
+  });
+  // Add last entry if not already a Jan
+  const lastLbl=window.MONTHLY.labels[TOTAL_MONTHS-1]||'';
+  if(!years.length||years[years.length-1].idx!==TOTAL_MONTHS-1){
+    years.push({label:window.MONTHLY_DISPLAY?window.MONTHLY_DISPLAY(lastLbl).split(' ').join(' '):lastLbl,idx:TOTAL_MONTHS-1});
+  }
   years.forEach(yr=>{
     const tick=document.createElement('span');
     tick.className='range-tick'; tick.textContent=yr.label; tick.dataset.idx=yr.idx;
