@@ -556,7 +556,16 @@ body.lm .subidx-sec-bar { background:rgba(0,0,0,.1); }
   letter-spacing:.08em; margin-bottom:.375rem;
 }
 .subidx-sec-desc { font-size:13px; color:var(--text2); line-height:1.7; }
+.subidx-ai-summary { margin:0 1.25rem 1.25rem; padding:1rem 1.125rem; border-radius:10px; background:linear-gradient(135deg, color-mix(in srgb, var(--ac) 6%, transparent), transparent); border:1px solid color-mix(in srgb, var(--ac) 22%, transparent); }
+body.lm .subidx-ai-summary { background:color-mix(in srgb, var(--ac) 5%, #fff); border-color:color-mix(in srgb, var(--ac) 20%, transparent); }
+.subidx-ai-head { display:flex; align-items:center; gap:6px; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--ac); margin-bottom:.5rem; }
+.subidx-ai-icon { font-size:12px; }
+.subidx-ai-body { font-size:13.5px; line-height:1.7; color:var(--text2); }
+body.lm .subidx-ai-body { color:#2a2a40; }
+.subidx-ai-body.loading { color:var(--text3); font-style:italic; }
 @media(max-width:680px){
+  .subidx-ai-summary { margin:0 1.125rem 1.125rem; padding:.875rem 1rem; }
+  .subidx-ai-body { font-size:14px; }
   .subidx-section-header { flex-direction:column; gap:.875rem; padding:1rem 1.125rem; }
   .subidx-sec-left { min-width:0; width:100%; flex-direction:row; align-items:center; flex-wrap:wrap; gap:.5rem .75rem; }
   .subidx-sec-icon { margin-bottom:0; }
@@ -3106,7 +3115,7 @@ function computeSubIndices(bs) {
       raw: LIVE.tasaReal.raw || '',
       desc: es?'Rendimiento real de un plazo fijo (TNA/12 − IPC blend). Tasa negativa desincentiva el ahorro en pesos e incentiva la dolarización.'
              :'Real return of time deposits (TNA/12 − blended CPI). Negative rate discourages peso savings and incentivizes dollarization.' },
-    { name: es?'Expec. Inflación 12m (REM)':'12m Inflation Expectations',
+    { name: es?'Expectativas de Inflación 12m (REM)':'12m Inflation Expectations',
       w:20, score: remScore, src:'BCRA REM', live: !!LIVE.tasaReal.rem12m,
       raw: LIVE.tasaReal.rem12m ? `REM 12m: ${LIVE.tasaReal.rem12m.toFixed(1)}% i.a.` : '',
       desc: es?'Qué espera el mercado que pase con la inflación en el próximo año. Expectativas altas reflejan desconfianza en el ancla nominal.'
@@ -3363,7 +3372,7 @@ function computeSubIndices(bs) {
 
   const SEGS = {
     inflacion:  { vars:seg1, score:avg1(seg1), w:25, icon:'💸', key:'inflacion',
-                  name: es?'Inflación y Pol. Monetaria':'Inflation & Monetary Policy',
+                  name: es?'Inflación y Política Monetaria':'Inflation & Monetary Policy',
                   question: es?'¿Está el peso funcionando como moneda?':'Is the peso functioning as a currency?',
                   color:'#f59e0b' },
     cambiario:  { vars:seg2, score:avg1(seg2), w:25, icon:'💵', key:'cambiario',
@@ -4228,6 +4237,13 @@ function renderIndicators(brechaScore) {
       <div class="subidx-vars-wrap">
         <div class="subidx-vars-inner">
           <div class="subidx-vars" id="vars-${key}"></div>
+          <div class="subidx-ai-summary" id="ai-summary-${key}">
+            <div class="subidx-ai-head">
+              <span class="subidx-ai-icon">✦</span>
+              <span>${LANG==='en'?'AI summary':'Resumen con IA'}</span>
+            </div>
+            <div class="subidx-ai-body loading" id="ai-summary-body-${key}">${LANG==='en'?'Generating summary…':'Generando resumen…'}</div>
+          </div>
         </div>
       </div>
     `;
@@ -4243,9 +4259,13 @@ function renderIndicators(brechaScore) {
     // Start collapsed
     sect.classList.add('collapsed');
 
-    // Toggle on header click
+    // Toggle on header click — generate AI summary lazily on first expand
     hdr.addEventListener('click', () => {
       sect.classList.toggle('collapsed');
+      if(!sect.classList.contains('collapsed') && !sect.dataset.aiLoaded){
+        sect.dataset.aiLoaded = '1';
+        generateSegmentSummary(key, seg);
+      }
     });
 
     sections.appendChild(sect);
@@ -4386,6 +4406,62 @@ Sin títulos, sin bullets, sin disclaimers. Hoy: ${fecha}.`;
 
   eEl.classList.remove('loading');
   pEl.classList.remove('loading');
+}
+
+/* ── AI summary per segment ─────────────────────────────────── */
+async function generateSegmentSummary(key, seg){
+  const bodyEl = document.getElementById('ai-summary-body-'+key);
+  if(!bodyEl) return;
+
+  // Build a compact data snapshot of this segment's variables
+  const varLines = seg.vars
+    .filter(v => !v.unavailable)
+    .map(v => {
+      const sc = Math.round(v.score);
+      const raw = (v.raw!=null && v.raw!=='') ? ` (${v.raw})` : '';
+      return `- ${v.name}: ${sc}/100${raw}`;
+    }).join('\n');
+
+  const segScore = Math.round(seg.score);
+  const segLbl = scoreLabel(segScore);
+
+  const systemPrompt = LANG === 'en'
+    ? `You are a clear, friendly Argentine economy explainer writing for a GENERAL audience with no finance background. Write a single explanatory paragraph (4-6 sentences) that gives an overall picture of this dimension of the index. Explain what the numbers mean in plain language, why they matter for ordinary people, and what the overall reading suggests right now. Avoid jargon; when you must use a term, explain it in a few words. No headers, no bullet points, no disclaimers, no numbered lists. Warm but informative tone.`
+    : `Sos un divulgador económico argentino claro y amable que escribe para PÚBLICO GENERAL sin conocimientos de finanzas. Escribí un único párrafo explicativo (4-6 oraciones) que dé un pantallazo general de esta dimensión del índice. Explicá en lenguaje simple qué significan los números, por qué le importan a una persona común, y qué sugiere la lectura general en este momento. Evitá la jerga; si usás un término técnico, aclaralo en pocas palabras. Sin títulos, sin viñetas, sin disclaimers, sin listas numeradas. Tono cercano pero informativo.`;
+
+  const userPrompt = LANG === 'en'
+    ? `Index dimension: "${seg.name}" — overall score ${segScore}/100 (${segLbl}).\nKey question this dimension answers: ${seg.question}\nIndicators:\n${varLines}\n\nWrite the general-audience summary paragraph.`
+    : `Dimensión del índice: "${seg.name}" — puntaje general ${segScore}/100 (${segLbl}).\nPregunta que responde esta dimensión: ${seg.question}\nIndicadores:\n${varLines}\n\nEscribí el párrafo resumen para público general.`;
+
+  try {
+    const apiUrl = IS_LOCAL ? '/api/anthropic' : 'https://api.anthropic.com/v1/messages';
+    const res = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 350,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userPrompt }]
+      })
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const text = (data.content?.[0]?.text || '').trim();
+    if(text){
+      bodyEl.textContent = text;
+      bodyEl.classList.remove('loading');
+    } else {
+      throw new Error('empty');
+    }
+  } catch(err){
+    console.warn('[AI summary '+key+']', err.message);
+    // Fallback: use the static prose description already on the page
+    bodyEl.textContent = LANG==='en'
+      ? 'Summary unavailable right now. See the indicators above for the current reading.'
+      : 'Resumen no disponible en este momento. Revisá los indicadores de arriba para ver la lectura actual.';
+    bodyEl.classList.remove('loading');
+  }
 }
 
 /* ── Historical chart ──────────────────────────────────────── */
