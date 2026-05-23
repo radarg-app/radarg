@@ -4348,9 +4348,15 @@ Sin títulos, sin bullets, sin disclaimers. Hoy: ${fecha}.`;
   window.MONTHLY={labels:[],scores:[]};
   // Labels stored as "YYYY-MM" — never parseable as Date by Chart.js
   window.MONTHLY_DISPLAY = k => {
-    if(!k||k.length<7) return k||'';
-    const yr=k.slice(0,4), mo=parseInt(k.slice(5,7))-1;
-    return ((LANG==='en'?MNAMES_EN:MNAMES)[mo]||'')+' '+yr;
+    if(!k) return '';
+    // Format "YYYY-MM" — the canonical internal format
+    if(/^\d{4}-\d{2}$/.test(k)) {
+      const yr=k.slice(0,4), mo=parseInt(k.slice(5,7))-1;
+      const names = (typeof LANG!=='undefined'&&LANG==='en') ? MNAMES_EN : MNAMES;
+      return (names[mo]||'')+' '+yr;
+    }
+    // Already in display format or unknown — return as-is (never try new Date())
+    return String(k);
   };
   const BY_YEAR={
     2000:[55,54,54,53,52,51,50,51,52,51,50,49],2001:[46,42,38,34,30,27,25,24,23,22,21,20],
@@ -4812,6 +4818,8 @@ function buildChart(from,to){
   // numLabels = [0,1,2,...] — purely numeric so Chart.js never tries to parse
   const numLabels = rawLabels.map((_,i) => i);
 
+  // Guard: need at least 2 points to render
+  if(n < 2) { console.warn('[RadARG] buildChart: rango muy corto (n='+n+')'); return; }
   histInst = new Chart($('histChart'), {
     type:'line',
     data:{ labels:numLabels, datasets:[{
@@ -4865,7 +4873,7 @@ function buildChart(from,to){
       },
       scales:{
         x:{
-          type:'linear', min:0, max:n-1,
+          type:'linear', min:0, max:Math.max(1,n-1),
           ticks:{
             color:()=>isLM?'#6868a0':'#606080',
             font:{family:"'JetBrains Mono',monospace",size:10},
@@ -4928,7 +4936,8 @@ function initSlider(){
 }
 function updateSlider(){
   let f=parseInt($('rangeFrom').value),to_=parseInt($('rangeTo').value);let t=to_;
-  if(f>=to_){if(to_<TOTAL_MONTHS-1)to_=Math.min(f+1,TOTAL_MONTHS-1);else f=Math.max(0,to_-1);$('rangeFrom').value=f;$('rangeTo').value=to_;}t=to_;
+  const MIN_RANGE=3;
+  if(to_-f<MIN_RANGE){if(to_<TOTAL_MONTHS-1)to_=Math.min(f+MIN_RANGE,TOTAL_MONTHS-1);else f=Math.max(0,to_-MIN_RANGE);$('rangeFrom').value=f;$('rangeTo').value=to_;}t=to_;
   sliderFrom=f;sliderTo=to_;
   const pct=100/(TOTAL_MONTHS-1);
   $('rangeTrackFill').style.left=(f*pct)+'%'; $('rangeTrackFill').style.right=(100-to_*pct)+'%';
