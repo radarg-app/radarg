@@ -385,13 +385,7 @@ main { position:relative; z-index:1; max-width:1440px; margin:0 auto; padding:2r
   box-shadow:var(--shadow-lg); display:flex; flex-direction:column;
   align-items:stretch;
 }
-.gauge-canvas-wrap { position:relative; width:100%; max-width:640px; margin:0 auto; display:flex; justify-content:center; }
-.gauge-body { display:flex; align-items:center; gap:.5rem; width:100%; }
-.gauge-body .gauge-canvas-wrap { flex:1 1 auto; min-width:0; max-width:440px; }
-.gauge-refs { flex:0 0 165px; display:flex; flex-direction:column; gap:.6rem; align-items:flex-end; text-align:right; }
-.gauge-refs .sc-ref { display:flex; flex-direction:column; gap:2px; align-items:flex-end; }
-.gauge-refs .sc-ref-period { font-size:10px; }
-@media(max-width:980px){ .gauge-body{flex-direction:column;gap:.75rem} .gauge-refs{flex:1 1 auto;width:100%;flex-direction:row;flex-wrap:wrap;align-items:stretch} .gauge-refs .sc-ref{flex:1;min-width:120px;align-items:flex-start} }
+.gauge-canvas-wrap { position:relative; width:100%; max-width:560px; margin:0 auto; display:flex; justify-content:center; align-items:center; flex:1; }
 .gauge-canvas-wrap canvas { width:100% !important; }
 #mainGauge { width:100%; height:auto; display:block; }
 
@@ -1521,30 +1515,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
       <span class="sc-label" id="gLbl">–</span>
       <span class="sc-date"  id="gDate">–</span>
       <div class="sc-divider"></div>
-      <div class="sc-refresh" id="gRefresh">
-        <div class="sc-refresh-row">
-          <span class="sc-refresh-dot" style="font-size:8px">●</span>
-          <span id="gRefreshTime" data-i18n="score.updating">Actualizando…</span>
-        </div>
-        <div class="sc-refresh-next" id="gRefreshNext" style="display:none">
-          <span>↻</span><span id="gRefreshNextTxt"></span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Gauge -->
-    <div class="gauge-card">
-      <div style="text-align:center;padding:1rem 0 .25rem">
-        <div style="font-size:26px;font-weight:800;letter-spacing:-.5px;color:var(--text);margin-bottom:6px" data-i18n="gauge.title">Índice de Sentimiento del Mercado</div>
-        <div style="font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--text3)" class="gauge-label-txt" data-i18n="gauge.label">Argentina</div>
-        <div style="font-size:10px;color:var(--text3);margin-top:2px;font-family:'JetBrains Mono',monospace" class="gauge-scale-txt" data-i18n="gauge.scale">0 = pánico total · 50 = neutral · 100 = euforia</div>
-      </div>
-      <div class="gauge-body">
-        <div class="gauge-canvas-wrap">
-          <canvas id="mainGauge" style="display:block;width:100%" role="img"></canvas>
-        </div>
-        <div class="gauge-refs">
-<div class="sc-refs" id="scRefs">
+      <div class="sc-refs" id="scRefs">
         <div class="sc-ref">
           <span class="sc-ref-period" data-i18n="score.1w">Hace 1 semana</span>
           <div class="sc-ref-row">
@@ -1578,7 +1549,27 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
           </div>
         </div>
       </div>
+      <div class="sc-divider"></div>
+      <div class="sc-refresh" id="gRefresh">
+        <div class="sc-refresh-row">
+          <span class="sc-refresh-dot" style="font-size:8px">●</span>
+          <span id="gRefreshTime" data-i18n="score.updating">Actualizando…</span>
         </div>
+        <div class="sc-refresh-next" id="gRefreshNext" style="display:none">
+          <span>↻</span><span id="gRefreshNextTxt"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gauge -->
+    <div class="gauge-card">
+      <div style="text-align:center;padding:1rem 0 .25rem">
+        <div style="font-size:26px;font-weight:800;letter-spacing:-.5px;color:var(--text);margin-bottom:6px" data-i18n="gauge.title">Índice de Sentimiento del Mercado</div>
+        <div style="font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--text3)" class="gauge-label-txt" data-i18n="gauge.label">Argentina</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px;font-family:'JetBrains Mono',monospace" class="gauge-scale-txt" data-i18n="gauge.scale">0 = pánico total · 50 = neutral · 100 = euforia</div>
+      </div>
+      <div class="gauge-canvas-wrap">
+        <canvas id="mainGauge" style="display:block;width:100%" role="img"></canvas>
       </div>
     </div>
 
