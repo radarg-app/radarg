@@ -383,15 +383,15 @@ main { position:relative; z-index:1; max-width:1440px; margin:0 auto; padding:2r
   background:var(--bg2); border:1px solid var(--border);
   border-radius:var(--radius-lg); padding:.875rem 1.5rem .75rem;
   box-shadow:var(--shadow-lg); display:flex; flex-direction:column;
-  align-items:center;
+  align-items:stretch;
 }
 .gauge-canvas-wrap { position:relative; width:100%; max-width:640px; margin:0 auto; display:flex; justify-content:center; }
-.gauge-body { display:flex; align-items:center; gap:1rem; padding:0 .25rem; }
+.gauge-body { display:flex; align-items:center; gap:.5rem; width:100%; }
 .gauge-body .gauge-canvas-wrap { flex:1 1 auto; min-width:0; max-width:none; }
-.gauge-refs { flex:0 0 175px; display:flex; flex-direction:column; gap:.6rem; }
-.gauge-refs .sc-ref { display:flex; flex-direction:column; gap:2px; }
+.gauge-refs { flex:0 0 165px; display:flex; flex-direction:column; gap:.6rem; align-items:flex-end; text-align:right; }
+.gauge-refs .sc-ref { display:flex; flex-direction:column; gap:2px; align-items:flex-end; }
 .gauge-refs .sc-ref-period { font-size:10px; }
-@media(max-width:980px){ .gauge-body{flex-direction:column;gap:.75rem} .gauge-refs{flex:1 1 auto;width:100%;flex-direction:row;flex-wrap:wrap} .gauge-refs .sc-ref{flex:1;min-width:120px} }
+@media(max-width:980px){ .gauge-body{flex-direction:column;gap:.75rem} .gauge-refs{flex:1 1 auto;width:100%;flex-direction:row;flex-wrap:wrap;align-items:stretch} .gauge-refs .sc-ref{flex:1;min-width:120px;align-items:flex-start} }
 .gauge-canvas-wrap canvas { width:100% !important; }
 #mainGauge { width:100%; height:auto; display:block; }
 
