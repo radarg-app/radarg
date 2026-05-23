@@ -1681,8 +1681,6 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
       <span class="sec-ttl" data-i18n="sec.indicators">5 Dimensiones del Índice</span>
       <div class="sec-line"></div>
     </div>
-    <!-- Score strip: 5 segmentos en fila horizontal -->
-    <div class="subidx-strip fade fade-3" id="subidxStrip"></div>
     <!-- Detail sections: one per segment -->
     <div class="subidx-sections fade fade-4" id="subidxSections"></div>
   </section>
@@ -4094,8 +4092,8 @@ function renderIndicators(brechaScore) {
   const sub = computeSubIndices(bs);
   const strip    = document.getElementById('subidxStrip');
   const sections = document.getElementById('subidxSections');
-  if(!strip || !sections) return;
-  strip.innerHTML = '';
+  if(!sections) return;
+  if(strip) strip.innerHTML = '';
   sections.innerHTML = '';
 
   const segOrder = ['inflacion','cambiario','actividad','fiscal','mercados'];
@@ -4137,7 +4135,7 @@ function renderIndicators(brechaScore) {
         }, 350);
       }
     });
-    strip.appendChild(card);
+    if(strip) strip.appendChild(card);
 
     // ── DETAIL SECTION ───────────────────────────────────────
     const sect = document.createElement('div');
