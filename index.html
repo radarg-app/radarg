@@ -4792,7 +4792,7 @@ const milestonesPlugin={
         ctx.fillStyle='rgba(10,10,15,.88)';ctx.fill();ctx.strokeStyle=m.color+'70';ctx.lineWidth=1;ctx.stroke();
         ctx.fillStyle='#e0e0f0';ctx.fillText(m.short,xPos,ty2);
         // desc pill when very zoomed
-        if(labels.length<=60&&m.desc){
+        if(numLabels.length<=60&&m.desc){
           ctx.font='400 8px "Inter",sans-serif';
           const words=m.desc.split(' ');let cur='';const out=[];
           words.forEach(w=>{const t=cur?cur+' '+w:w;if(t.length<=42)cur=t;else{if(cur)out.push(cur);cur=w;}});
