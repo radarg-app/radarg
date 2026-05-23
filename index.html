@@ -520,7 +520,16 @@ body.lm .ai-text { border-color:rgba(0,0,0,.1); }
   position:relative; overflow:hidden;
   border-bottom:1px solid var(--border);
   display:flex; align-items:flex-start; gap:1.25rem;
+  cursor:pointer; user-select:none;
 }
+.subidx-section-header:hover { background:rgba(255,255,255,.02); }
+body.lm .subidx-section-header:hover { background:rgba(0,0,0,.018); }
+.subidx-chevron { font-size:14px; color:var(--text3); transition:transform .25s ease; flex-shrink:0; margin-left:auto; padding-left:12px; align-self:center; position:relative; z-index:1; }
+.subidx-section.collapsed .subidx-chevron { transform:rotate(-90deg); }
+.subidx-vars-wrap { display:grid; grid-template-rows:1fr; transition:grid-template-rows .3s ease; }
+.subidx-section.collapsed .subidx-vars-wrap { grid-template-rows:0fr; }
+.subidx-section.collapsed .subidx-section-header { border-bottom-color:transparent; }
+.subidx-vars-inner { overflow:hidden; }
 .subidx-section-header::before {
   content:''; position:absolute; top:0; left:0; right:0; height:2px;
   background:var(--ss-color,var(--ac)); box-shadow:0 0 10px var(--ss-color,var(--ac));
@@ -4119,6 +4128,7 @@ function renderIndicators(brechaScore) {
     card.addEventListener('click', () => {
       const el = document.getElementById('seg-'+key);
       if(el) {
+        if(el.classList.contains('collapsed')) el.classList.remove('collapsed');
         el.scrollIntoView({behavior:'smooth', block:'start'});
         setTimeout(() => {
           el.style.transition='box-shadow .15s';
@@ -4170,8 +4180,29 @@ function renderIndicators(brechaScore) {
           <div class="subidx-sec-desc">${prose}</div>
         </div>
       </div>
-      <div class="subidx-vars" id="vars-${key}"></div>
+      <div class="subidx-vars-wrap">
+        <div class="subidx-vars-inner">
+          <div class="subidx-vars" id="vars-${key}"></div>
+        </div>
+      </div>
     `;
+
+    // Chevron
+    const hdr = sect.querySelector('.subidx-section-header');
+    const chev = document.createElement('span');
+    chev.className = 'subidx-chevron';
+    chev.setAttribute('aria-hidden','true');
+    chev.textContent = '▾';
+    hdr.appendChild(chev);
+
+    // Start collapsed
+    sect.classList.add('collapsed');
+
+    // Toggle on header click
+    hdr.addEventListener('click', () => {
+      sect.classList.toggle('collapsed');
+    });
+
     sections.appendChild(sect);
 
     // Render variable cards
