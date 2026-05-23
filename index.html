@@ -4053,16 +4053,20 @@ function drawGauge(score){
   // Subtle ring
   ctx.beginPath();ctx.arc(cx,cy,hubR,0,Math.PI*2);
   ctx.strokeStyle=isLM?'rgba(0,0,0,.06)':'rgba(255,255,255,.08)';ctx.lineWidth=1;ctx.stroke();
-  // Score number inside the hub — optically centered using font metrics
+  // Score number inside the hub — optically centered using actual glyph bounds
   ctx.save();
   ctx.textAlign='center'; ctx.textBaseline='alphabetic';
-  ctx.font=`800 ${Math.round(hubR*0.82)}px "Inter",sans-serif`;
+  const numFont=Math.round(hubR*0.80);
+  ctx.font=`800 ${numFont}px "Inter",sans-serif`;
   ctx.fillStyle=isLM?'#0a0a14':'#ffffff';
   const scoreTxt=String(Math.round(score));
   const tm=ctx.measureText(scoreTxt);
-  const ascent=tm.actualBoundingBoxAscent||Math.round(hubR*0.6);
-  const descent=tm.actualBoundingBoxDescent||0;
-  const numY=cy+(ascent-descent)/2; // true vertical center of the glyph
+  // Glyph's actual top and bottom relative to the baseline
+  const aAsc=(tm.actualBoundingBoxAscent!=null)?tm.actualBoundingBoxAscent:numFont*0.72;
+  const aDesc=(tm.actualBoundingBoxDescent!=null)?tm.actualBoundingBoxDescent:0;
+  // To center the glyph's bounding box on cy, baseline must sit at:
+  // cy + (glyphHeight/2) - distanceFromBaselineToBottom = cy + (aAsc+aDesc)/2 - aDesc
+  const numY=cy+(aAsc+aDesc)/2-aDesc;
   ctx.fillText(scoreTxt, cx, numY);
   ctx.restore();
 }
