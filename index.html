@@ -5094,7 +5094,7 @@ function renderNews(){
   if(title) title.textContent = LANG==='en' ? 'Relevant news' : 'Noticias relevantes';
   if(ts) ts.textContent = LANG==='en' ? 'Curated · ' + new Date().toLocaleDateString('en') : 'Curado · ' + new Date().toLocaleDateString('es-AR');
   const impactClass = {high:'news-impact-high',med:'news-impact-med',pos:'news-impact-pos'};
-  strip.innerHTML = news.map(n=>{
+  strip.innerHTML = news.slice(0,4).map(n=>{
     const parts = (n.meta||'').split('·');
     const source = parts[0] ? parts[0].trim() : '';
     const date   = parts[1] ? parts[1].trim() : '';
@@ -5270,17 +5270,18 @@ async function loadDataJSON() {
 
     // Apply noticias
     if(d._noticias && d._noticias.length) {
-      window._sheetNoticias = d._noticias.map(n => ({
-        tag:        n.tag || 'economy',
-        tagLabel_es: n.impacto_es || n.tag,
-        tagLabel_en: n.impacto_en || n.tag,
+      const TAG_LABELS = {economy:{es:'Economía',en:'Economy'},politics:{es:'Política',en:'Politics'},market:{es:'Mercado',en:'Market'},intl:{es:'Internacional',en:'International'}};
+      window._sheetNoticias = d._noticias.slice(-8).map(n => ({
+        tag:         n.tag || 'economy',
+        tagLabel_es: (TAG_LABELS[n.tag]||{es:n.tag}).es,
+        tagLabel_en: (TAG_LABELS[n.tag]||{en:n.tag}).en,
         headline_es: n.titular_es || n.titulo_es || '',
         headline_en: n.titular_en || n.titulo_es || '',
-        meta:       n.fuente || 'Google News',
-        impact:     n.impacto || 'neutral',
-        impact_es:  n.impacto_es || 'Neutral',
-        impact_en:  n.impacto_en || 'Neutral',
-        url:        n.url || '#',
+        meta:        n.fuente || 'Google News',
+        impact:      n.impacto || 'neutral',
+        impact_es:   n.impacto_es || 'Neutral',
+        impact_en:   n.impacto_en || 'Neutral',
+        url:         n.url || '#',
       }));
       console.log('[data.json] Noticias:', window._sheetNoticias.length);
     }
