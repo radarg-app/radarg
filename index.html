@@ -4344,7 +4344,14 @@ Sin títulos, sin bullets, sin disclaimers. Hoy: ${fecha}.`;
 /* ── Historical chart ──────────────────────────────────────── */
 (function(){
   const MNAMES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const MNAMES_EN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   window.MONTHLY={labels:[],scores:[]};
+  // Labels stored as "YYYY-MM" — never parseable as Date by Chart.js
+  window.MONTHLY_DISPLAY = k => {
+    if(!k||k.length<7) return k||'';
+    const yr=k.slice(0,4), mo=parseInt(k.slice(5,7))-1;
+    return ((LANG==='en'?MNAMES_EN:MNAMES)[mo]||'')+' '+yr;
+  };
   const BY_YEAR={
     2000:[55,54,54,53,52,51,50,51,52,51,50,49],2001:[46,42,38,34,30,27,25,24,23,22,21,20],
     2002:[10,7,5,5,6,7,8,9,11,14,17,20],2003:[22,25,28,30,32,34,36,37,38,37,36,35],
@@ -4361,7 +4368,7 @@ Sin títulos, sin bullets, sin disclaimers. Hoy: ${fecha}.`;
     2024:[35,38,40,43,46,48,50,52,50,48,47,46],2025:[44,44,45,48,44,42,40,38,36,34,35,37],
     2026:[47,51,53,46,56],
   };
-  Object.entries(BY_YEAR).forEach(([yr,ms])=>{ms.forEach((sc,m)=>{window.MONTHLY.labels.push(`${MNAMES[m]} ${yr}`);window.MONTHLY.scores.push(sc);});});
+  Object.entries(BY_YEAR).forEach(([yr,ms])=>{ms.forEach((sc,m)=>{window.MONTHLY.labels.push(`${yr}-${String(m+1).padStart(2,'0')}`);window.MONTHLY.scores.push(sc);});});
 })();
 
 /* ── Merval USD historical data (monthly, Jan 2000–present) ── */
@@ -4717,11 +4724,12 @@ const milestonesPlugin={
     // labels are now numeric indices [0,1,...]; use chart._rawLabels for text lookup
     const rawLbls = chart._radargRawLabels || [];
     const numLabels = chart.data.labels;
-    const vis=MILESTONES.filter(m=>rawLbls.includes(m.label));
+    const disp = k => window.MONTHLY_DISPLAY ? window.MONTHLY_DISPLAY(k) : k;
+    const vis=MILESTONES.filter(m=>rawLbls.some(k=>disp(k)===m.label));
     if(!vis.length) return;
     const showLabels=numLabels.length<=120;
     vis.forEach(m=>{
-      const idx=rawLbls.indexOf(m.label);
+      const idx=rawLbls.findIndex(k=>disp(k)===m.label);
       const xPos=x.getPixelForValue(idx),yPos=y.getPixelForValue(m.score);
       // dashed line
       ctx.save();ctx.beginPath();ctx.setLineDash([3,4]);
@@ -4787,7 +4795,8 @@ function buildChart(from,to){
   if(histInst) histInst.destroy();
 
   // Merval normalised 0-100
-  const mervalRaw  = rawLabels.map(lbl => MERVAL_MAP[lbl] ?? null);
+  const _disp = k => window.MONTHLY_DISPLAY ? window.MONTHLY_DISPLAY(k) : k;
+  const mervalRaw  = rawLabels.map(lbl => MERVAL_MAP[_disp(lbl)] ?? null);
   const mervalVals = mervalRaw.filter(v => v !== null);
   const mervalMin  = mervalVals.length ? Math.min(...mervalVals) : 0;
   const mervalMax  = mervalVals.length ? Math.max(...mervalVals) : 1;
@@ -4827,16 +4836,16 @@ function buildChart(from,to){
           footerColor:isLM?'#44445c':'#c0c0d8', footerFont:{family:"'Inter',sans-serif",size:11,weight:'400'},
           footerMarginTop:7, padding:12, cornerRadius:8,
           callbacks:{
-            title: items => rawLabels[items[0].dataIndex] || '',
+            title: items => window.MONTHLY_DISPLAY(rawLabels[items[0].dataIndex]||''),
             label: c => {
               if(c.dataset.label==='Merval USD'){
-                const raw = MERVAL_MAP[rawLabels[c.dataIndex]];
+                const raw = MERVAL_MAP[_disp(rawLabels[c.dataIndex])];
                 return raw!=null ? `  Merval: USD ${raw.toLocaleString('es-AR')}` : '  Merval: s/d';
               }
               return `  ${t('chart.score')}: ${c.parsed.y}  —  ${scoreLabel(c.parsed.y)}`;
             },
             footer: items => {
-              const lbl = rawLabels[items[0]?.dataIndex];
+              const lbl = _disp(rawLabels[items[0]?.dataIndex]||'');
               const m = MILESTONES.find(m=>m.label===lbl);
               if(!m) return undefined;
               const out=[`\u{1F4CC}  ${m.short}`];
@@ -4847,7 +4856,7 @@ function buildChart(from,to){
             },
           },
           borderColor: ctx => {
-            const lbl = rawLabels[ctx.tooltipItems?.[0]?.dataIndex];
+            const lbl = _disp(rawLabels[ctx.tooltipItems?.[0]?.dataIndex]||'');
             const m = MILESTONES.find(m=>m.label===lbl);
             return m ? m.color+'99' : (isLM?'rgba(0,0,0,.1)':'rgba(255,255,255,.1)');
           },
@@ -4864,7 +4873,7 @@ function buildChart(from,to){
             callback:(v)=>{
               const i=Math.round(v);
               if(i<0||i>=n||i%step!==0) return '';
-              return rawLabels[i]||'';
+              return window.MONTHLY_DISPLAY(rawLabels[i]||'');
             },
           },
           grid:{color:()=>isLM?'rgba(0,0,0,.06)':'rgba(255,255,255,.04)'},
@@ -4923,12 +4932,7 @@ function updateSlider(){
   sliderFrom=f;sliderTo=to_;
   const pct=100/(TOTAL_MONTHS-1);
   $('rangeTrackFill').style.left=(f*pct)+'%'; $('rangeTrackFill').style.right=(100-to_*pct)+'%';
-  const _cleanLbl = l => {
-    if(!l) return '';
-    // Labels are already formatted ("Ene 2000", "May 2026") — just return as-is
-    // Never parse as Date to avoid timezone/locale formatting issues
-    return String(l).split(' ').slice(0,2).join(' ');
-  };
+  const _cleanLbl = l => window.MONTHLY_DISPLAY ? window.MONTHLY_DISPLAY(l) : (l||'');
   $('rl-from').textContent=_cleanLbl(window.MONTHLY.labels[f]); $('rl-to').textContent=_cleanLbl(window.MONTHLY.labels[to_]);
   document.querySelectorAll('.range-tick').forEach(tk=>{tk.classList.toggle('in-range',parseInt(tk.dataset.idx)>=f&&parseInt(tk.dataset.idx)<=to_);});
   const n=t-f+1,yrs=(n/12).toFixed(1).replace('.0','');
@@ -4936,10 +4940,7 @@ function updateSlider(){
     const lf = window.MONTHLY.labels[f] || '';
     const lt = window.MONTHLY.labels[to_] || '';
     // Clean label: just "May 2026" not full date string
-    const cleanLbl = l => {
-      if(!l) return '';
-      return String(l).split(' ').slice(0,2).join(' ');
-    };
+    const cleanLbl = l => window.MONTHLY_DISPLAY ? window.MONTHLY_DISPLAY(l) : (l||'');
     $('chartSub').textContent=`${LANG==='en'?'Monthly data':'Datos mensuales'} · ${cleanLbl(lf)} – ${cleanLbl(lt)} · ${n} ${LANG==='en'?'months':'meses'}${n>=12?` (${yrs} ${LANG==='en'?'yr':'años'})`:''}`;
   }
   buildChart(f,to_);
@@ -5318,7 +5319,11 @@ async function loadDataJSON() {
     // Apply historico — solo si tiene datos reales (no sobreescribir con array vacío)
     if(d._historico && d._historico.labels && d._historico.labels.length > 0
        && d._historico.scores && d._historico.scores.length > 0) {
-      window.MONTHLY.labels = d._historico.labels;
+      const _MMAP={Ene:1,Feb:2,Mar:3,Abr:4,May:5,Jun:6,Jul:7,Ago:8,Sep:9,Oct:10,Nov:11,Dic:12,Jan:1,Apr:4,Aug:8,Dec:12};
+      window.MONTHLY.labels = d._historico.labels.map(l=>{
+        const p=String(l).trim().split(' ');
+        return (p.length===2&&_MMAP[p[0]]) ? p[1]+'-'+String(_MMAP[p[0]]).padStart(2,'0') : l;
+      });
       window.MONTHLY.scores = d._historico.scores;
       console.log('[data.json] Histórico:', d._historico.labels.length, 'meses');
     } else {
@@ -5637,7 +5642,12 @@ async function loadSheetHistorico() {
   if(!validRows.length) return;
 
   // Replace MONTHLY data
-  window.MONTHLY.labels = validRows.map(r => r.label || r.mes_nombre+' '+r.anio);
+  const _MMAP2={Ene:1,Feb:2,Mar:3,Abr:4,May:5,Jun:6,Jul:7,Ago:8,Sep:9,Oct:10,Nov:11,Dic:12};
+  window.MONTHLY.labels = validRows.map(r => {
+    const lbl = r.label || r.mes_nombre+' '+r.anio;
+    const p = String(lbl).trim().split(' ');
+    return (p.length===2&&_MMAP2[p[0]]) ? p[1]+'-'+String(_MMAP2[p[0]]).padStart(2,'0') : lbl;
+  });
   window.MONTHLY.scores = validRows.map(r => parseInt(r.score) || 0);
 
   // Update slider max
