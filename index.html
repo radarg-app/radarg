@@ -386,6 +386,11 @@ main { position:relative; z-index:1; max-width:1440px; margin:0 auto; padding:2r
   align-items:center;
 }
 .gauge-canvas-wrap { position:relative; width:100%; max-width:640px; margin:0 auto; display:flex; justify-content:center; }
+.gauge-body { display:flex; align-items:center; gap:1.5rem; padding:0 .5rem; }
+.gauge-body .gauge-canvas-wrap { flex:1; min-width:0; }
+.gauge-refs { flex-shrink:0; width:230px; display:flex; flex-direction:column; gap:.75rem; padding-right:.5rem; }
+.gauge-refs .sc-ref { display:flex; flex-direction:column; gap:3px; }
+@media(max-width:980px){ .gauge-body{flex-direction:column} .gauge-refs{width:100%;flex-direction:row;flex-wrap:wrap} .gauge-refs .sc-ref{flex:1;min-width:130px} }
 .gauge-canvas-wrap canvas { width:100% !important; }
 #mainGauge { width:100%; height:auto; display:block; }
 
@@ -1515,7 +1520,30 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
       <span class="sc-label" id="gLbl">–</span>
       <span class="sc-date"  id="gDate">–</span>
       <div class="sc-divider"></div>
-      <div class="sc-refs">
+      <div class="sc-refresh" id="gRefresh">
+        <div class="sc-refresh-row">
+          <span class="sc-refresh-dot" style="font-size:8px">●</span>
+          <span id="gRefreshTime" data-i18n="score.updating">Actualizando…</span>
+        </div>
+        <div class="sc-refresh-next" id="gRefreshNext" style="display:none">
+          <span>↻</span><span id="gRefreshNextTxt"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gauge -->
+    <div class="gauge-card">
+      <div style="text-align:center;padding:1rem 0 .25rem">
+        <div style="font-size:26px;font-weight:800;letter-spacing:-.5px;color:var(--text);margin-bottom:6px" data-i18n="gauge.title">Índice de Sentimiento del Mercado</div>
+        <div style="font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--text3)" class="gauge-label-txt" data-i18n="gauge.label">Argentina</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px;font-family:'JetBrains Mono',monospace" class="gauge-scale-txt" data-i18n="gauge.scale">0 = pánico total · 50 = neutral · 100 = euforia</div>
+      </div>
+      <div class="gauge-body">
+        <div class="gauge-canvas-wrap">
+          <canvas id="mainGauge" style="display:block;width:100%" role="img"></canvas>
+        </div>
+        <div class="gauge-refs">
+<div class="sc-refs" id="scRefs">
         <div class="sc-ref">
           <span class="sc-ref-period" data-i18n="score.1w">Hace 1 semana</span>
           <div class="sc-ref-row">
@@ -1549,26 +1577,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
           </div>
         </div>
       </div>
-      <div class="sc-refresh" id="gRefresh">
-        <div class="sc-refresh-row">
-          <span class="sc-refresh-dot" style="font-size:8px">●</span>
-          <span id="gRefreshTime" data-i18n="score.updating">Actualizando…</span>
         </div>
-        <div class="sc-refresh-next" id="gRefreshNext" style="display:none">
-          <span>↻</span><span id="gRefreshNextTxt"></span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Gauge -->
-    <div class="gauge-card">
-      <div style="text-align:center;padding:1rem 0 .25rem">
-        <div style="font-size:26px;font-weight:800;letter-spacing:-.5px;color:var(--text);margin-bottom:6px" data-i18n="gauge.title">Índice de Sentimiento del Mercado</div>
-        <div style="font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--text3)" class="gauge-label-txt" data-i18n="gauge.label">Argentina</div>
-        <div style="font-size:10px;color:var(--text3);margin-top:2px;font-family:'JetBrains Mono',monospace" class="gauge-scale-txt" data-i18n="gauge.scale">0 = pánico total · 50 = neutral · 100 = euforia</div>
-      </div>
-      <div class="gauge-canvas-wrap">
-        <canvas id="mainGauge" style="display:block;width:100%" role="img"></canvas>
       </div>
     </div>
 
@@ -3979,12 +3988,9 @@ function drawGauge(score){
   const railR = RIN - Math.round((RIN - 8) * 0.35); // 35% down from RIN toward center
   for(let i=0;i<=48;i++){const a=Math.PI+(i/48)*Math.PI;ctx.beginPath();ctx.arc(cx+railR*Math.cos(a),cy+railR*Math.sin(a),1.2,0,Math.PI*2);
     ctx.fillStyle=isLM?'rgba(0,0,0,.18)':'rgba(255,255,255,.18)';ctx.fill();}
-  // Ticks — lines on the colored arc
+  // Scale numbers on the inner rail (no lines over the colored arc)
   [0,25,50,75,100].forEach(v=>{
     const a=Math.PI+(v/100)*Math.PI;
-    ctx.beginPath();ctx.moveTo(cx+(RIN+2)*Math.cos(a),cy+(RIN+2)*Math.sin(a));ctx.lineTo(cx+(ROUT-2)*Math.cos(a),cy+(ROUT-2)*Math.sin(a));
-    ctx.strokeStyle=isLM?'rgba(0,0,0,.2)':'rgba(255,255,255,.25)';ctx.lineWidth=1;ctx.stroke();
-    // Numbers on the rail
     ctx.save();ctx.translate(cx+railR*Math.cos(a),cy+railR*Math.sin(a));ctx.rotate(a+Math.PI/2);
     ctx.font=`600 ${Math.max(7,ROUT*.065)}px "JetBrains Mono",monospace`;
     ctx.fillStyle=isLM?'rgba(0,0,0,.55)':'rgba(255,255,255,.55)';
@@ -4019,19 +4025,46 @@ function drawGauge(score){
     displayLines.forEach((l,i)=>ctx.fillText(l,0,sy+i*lh));
     ctx.restore();
   });
-  // Needle — reaches the middle of the colored arc
+  // Needle — tapered triangle (wide at base, sharp tip) like the reference design
   const na=Math.PI+(score/100)*Math.PI;
-  const nLen=(RIN+ROUT)/2; // midpoint of colored segments
-  const needleColor = isLM ? '#1a1a2e' : '#fff';
-  const needleShadow = isLM ? 'rgba(0,0,0,.3)' : 'rgba(0,0,0,.8)';
-  ctx.save();ctx.shadowColor=needleShadow;ctx.shadowBlur=isLM?6:12;
-  ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+nLen*Math.cos(na),cy+nLen*Math.sin(na));
-  ctx.strokeStyle=needleColor;ctx.lineWidth=2.5;ctx.lineCap='round';ctx.stroke();ctx.restore();
-  // Needle hub
-  ctx.beginPath();ctx.arc(cx,cy,8,0,Math.PI*2);
-  ctx.fillStyle=isLM?'#1a1a2e':'#fff';ctx.fill();
-  ctx.beginPath();ctx.arc(cx,cy,4,0,Math.PI*2);
-  ctx.fillStyle=isLM?gaugeBg:'#111118';ctx.fill();
+  const nLen=(RIN+ROUT)/2; // tip reaches midpoint of colored segments
+  const hubRForNeedle = Math.round(RIN * 0.42);
+  const needleColor = isLM ? '#1a1a2e' : '#e8e8f0';
+  const baseW = Math.max(4, RIN*0.08); // half-width at base
+  // Perpendicular angle for the base width
+  const perp = na + Math.PI/2;
+  const tipX = cx + nLen*Math.cos(na), tipY = cy + nLen*Math.sin(na);
+  // Base centered on hub, offset slightly outward from center
+  const baseCx = cx, baseCy = cy;
+  ctx.save();
+  ctx.shadowColor=isLM?'rgba(0,0,0,.25)':'rgba(0,0,0,.6)'; ctx.shadowBlur=isLM?5:10;
+  ctx.beginPath();
+  ctx.moveTo(tipX, tipY);
+  ctx.lineTo(baseCx + baseW*Math.cos(perp), baseCy + baseW*Math.sin(perp));
+  ctx.lineTo(baseCx - baseW*Math.cos(perp), baseCy - baseW*Math.sin(perp));
+  ctx.closePath();
+  ctx.fillStyle=needleColor; ctx.fill();
+  ctx.restore();
+  // ── Hub with score number — large white circle at the base ──
+  // The needle emerges from here; the score sits inside (like the reference design)
+  const hubR = Math.round(RIN * 0.42);
+  // Outer hub circle (white/dark bg)
+  ctx.save();
+  ctx.shadowColor=isLM?'rgba(0,0,0,.12)':'rgba(0,0,0,.5)';
+  ctx.shadowBlur=isLM?8:14; ctx.shadowOffsetY=2;
+  ctx.beginPath();ctx.arc(cx,cy,hubR,0,Math.PI*2);
+  ctx.fillStyle=isLM?'#ffffff':'#16161f';ctx.fill();
+  ctx.restore();
+  // Subtle ring
+  ctx.beginPath();ctx.arc(cx,cy,hubR,0,Math.PI*2);
+  ctx.strokeStyle=isLM?'rgba(0,0,0,.06)':'rgba(255,255,255,.08)';ctx.lineWidth=1;ctx.stroke();
+  // Score number inside the hub
+  ctx.save();
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.font=`800 ${Math.round(hubR*0.85)}px "Inter",sans-serif`;
+  ctx.fillStyle=isLM?'#0a0a14':'#ffffff';
+  ctx.fillText(String(Math.round(score)), cx, cy);
+  ctx.restore();
 }
 
 function renderGauge(score){
