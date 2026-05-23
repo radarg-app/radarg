@@ -556,6 +556,16 @@ body.lm .subidx-sec-bar { background:rgba(0,0,0,.1); }
   letter-spacing:.08em; margin-bottom:.375rem;
 }
 .subidx-sec-desc { font-size:13px; color:var(--text2); line-height:1.7; }
+@media(max-width:680px){
+  .subidx-section-header { flex-direction:column; gap:.875rem; padding:1rem 1.125rem; }
+  .subidx-sec-left { min-width:0; width:100%; flex-direction:row; align-items:center; flex-wrap:wrap; gap:.5rem .75rem; }
+  .subidx-sec-icon { margin-bottom:0; }
+  .subidx-sec-name { width:100%; order:-1; }
+  .subidx-sec-bar { order:10; }
+  .subidx-sec-prose { width:100%; }
+  .subidx-sec-desc { font-size:13.5px; }
+  .subidx-chevron { position:absolute; top:1rem; right:1.125rem; margin-left:0; padding-left:0; }
+}
 
 /* Variable cards grid inside each section */
 .subidx-vars {
@@ -4182,18 +4192,18 @@ function renderIndicators(brechaScore) {
 
     // Prose description per segment
     const proseES = {
-      inflacion: 'La inflación es el problema estructural más profundo de Argentina y la variable que más directamente afecta la vida cotidiana de la población. Este segmento mide si el peso está funcionando como moneda: si la inflación cede, si las tasas reales incentivan el ahorro en pesos y si las expectativas convergen. Un score alto aquí es la señal más importante de estabilización macroeconómica real.',
-      cambiario: 'El tipo de cambio y las reservas son el "ancla" del programa económico actual. Históricamente, todos los episodios de crisis en Argentina comenzaron por este eje: un atraso cambiario real excesivo, reservas insuficientes para defender el tipo de cambio, o expectativas de devaluación que se autoconfirman. Este segmento mide si ese ancla está sólida o si hay señales de fragilidad acumulándose.',
-      actividad: 'Este segmento conecta el índice con la experiencia cotidiana de quienes no son inversores. Mide si la economía crece, si hay empleo, si los salarios le ganan a la inflación y si el consumo recupera. Actualmente en construcción: la mayoría de estos datos son mensuales o trimestrales y se integrarán en las próximas semanas. Es el segmento más relevante para evaluar el costo social del ajuste.',
-      fiscal: 'El equilibrio fiscal es el pilar del programa Milei y la condición que el FMI y los mercados monitorean en tiempo real. La ausencia de dominancia fiscal es lo que permite al BCRA mantener el ancla inflacionaria. Este segmento mide si las cuentas públicas están ordenadas, si el Tesoro puede renovar su deuda sin presión monetaria y si el acuerdo con el FMI está en curso.',
-      mercados: 'Este segmento mide cómo valúan los inversores el riesgo argentino. Es el más reactivo al corto plazo y puede sobrereaccionar a noticias puntuales, por eso recibe menor ponderación que los fundamentals. Incluye el riesgo país, la valuación del Merval, la curva de bonos, la amplitud del mercado y el componente político-electoral que el mercado está descontando.',
+      inflacion: 'Mide si el peso sirve como moneda: si los precios se estabilizan y si conviene ahorrar en pesos. Es lo que más impacta en el día a día de la gente.',
+      cambiario: 'Mide si el país tiene los dólares necesarios y si el tipo de cambio es sostenible. Casi todas las crisis argentinas empezaron por acá.',
+      actividad: 'Mide si la economía crece, si hay empleo y si los sueldos le ganan a la inflación. Es el termómetro del bienestar cotidiano. (En construcción: sumamos datos pronto.)',
+      fiscal: 'Mide si el Estado gasta menos de lo que recauda y si puede pagar su deuda sin emitir. Es la base que sostiene la baja de la inflación.',
+      mercados: 'Mide cómo ven los inversores al país: riesgo país, acciones, bonos y expectativas. Reacciona rápido a las noticias, por eso pesa un poco menos.',
     };
     const proseEN = {
-      inflacion: 'Inflation is Argentina\'s deepest structural problem and the variable that most directly affects everyday life. This segment measures whether the peso is functioning as a currency: whether inflation is declining, whether real rates incentivize peso savings, and whether expectations are converging. A high score here is the most important signal of real macroeconomic stabilization.',
-      cambiario: 'The exchange rate and reserves are the "anchor" of the current economic program. Historically, all Argentine crisis episodes started on this axis: excessive real FX appreciation, insufficient reserves to defend the rate, or self-fulfilling devaluation expectations. This segment measures whether that anchor is solid or whether fragility signals are accumulating.',
-      actividad: 'This segment connects the index to the everyday experience of non-investors. It measures whether the economy is growing, whether there is employment, whether wages beat inflation, and whether consumption is recovering. Currently under construction: most of these figures are monthly or quarterly and will be integrated in the coming weeks. It is the most relevant segment for evaluating the social cost of adjustment.',
-      fiscal: 'Fiscal balance is the cornerstone of the Milei program and the condition that the IMF and markets monitor in real time. The absence of fiscal dominance is what allows the BCRA to maintain the inflation anchor. This segment measures whether public finances are in order, whether the Treasury can roll over its debt without monetary pressure, and whether the IMF agreement is on track.',
-      mercados: 'This segment measures how investors price Argentine risk. It is the most reactive to the short term and can overreact to specific news, which is why it receives lower weighting than the fundamentals. It includes country risk, Merval valuation, the bond curve, market breadth, and the political-electoral component the market is pricing in.',
+      inflacion: 'Measures whether the peso works as money: whether prices are stabilizing and whether saving in pesos makes sense. This is what most affects everyday life.',
+      cambiario: 'Measures whether the country has enough dollars and whether the exchange rate is sustainable. Almost every Argentine crisis started here.',
+      actividad: 'Measures whether the economy is growing, whether there are jobs and whether wages beat inflation. The everyday well-being gauge. (Under construction: more data soon.)',
+      fiscal: 'Measures whether the State spends less than it collects and can pay its debt without printing money. The foundation that keeps inflation down.',
+      mercados: 'Measures how investors see the country: country risk, stocks, bonds and expectations. It reacts fast to news, so it weighs slightly less.',
     };
     const prose = LANG==='en' ? proseEN[key] : proseES[key];
 
