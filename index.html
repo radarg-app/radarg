@@ -3936,7 +3936,7 @@ function drawGauge(score){
   const M=44;
   // Radius driven by available width; height computed to fit arc + hub below center
   const ROUT=(cssW/2-M)*.90, RIN=ROUT*.56;
-  const hubExtra=Math.round(RIN*0.42)+14; // space for the hub+number below center
+  const hubExtra=Math.round(RIN*0.38)+14; // space for the hub+number below center
   const cssH=Math.round(ROUT+M+hubExtra);
   const dpr=window.devicePixelRatio||1;
   cvs.style.width=cssW+'px'; cvs.style.height=cssH+'px';
@@ -4042,7 +4042,7 @@ function drawGauge(score){
   ctx.restore();
   // ── Hub with score number — large white circle at the base ──
   // The needle emerges from here; the score sits inside (like the reference design)
-  const hubR = Math.round(RIN * 0.42);
+  const hubR = Math.round(RIN * 0.38);
   // Outer hub circle (white/dark bg)
   ctx.save();
   ctx.shadowColor=isLM?'rgba(0,0,0,.12)':'rgba(0,0,0,.5)';
@@ -4053,12 +4053,17 @@ function drawGauge(score){
   // Subtle ring
   ctx.beginPath();ctx.arc(cx,cy,hubR,0,Math.PI*2);
   ctx.strokeStyle=isLM?'rgba(0,0,0,.06)':'rgba(255,255,255,.08)';ctx.lineWidth=1;ctx.stroke();
-  // Score number inside the hub
+  // Score number inside the hub — optically centered using font metrics
   ctx.save();
-  ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.font=`800 ${Math.round(hubR*0.85)}px "Inter",sans-serif`;
+  ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+  ctx.font=`800 ${Math.round(hubR*0.82)}px "Inter",sans-serif`;
   ctx.fillStyle=isLM?'#0a0a14':'#ffffff';
-  ctx.fillText(String(Math.round(score)), cx, cy);
+  const scoreTxt=String(Math.round(score));
+  const tm=ctx.measureText(scoreTxt);
+  const ascent=tm.actualBoundingBoxAscent||Math.round(hubR*0.6);
+  const descent=tm.actualBoundingBoxDescent||0;
+  const numY=cy+(ascent-descent)/2; // true vertical center of the glyph
+  ctx.fillText(scoreTxt, cx, numY);
   ctx.restore();
 }
 
