@@ -4829,7 +4829,14 @@ function buildChart(from,to){
   const isLM      = document.body.classList.contains('lm');
   // Guard BEFORE destroy — if range too small, keep existing chart
   if(n < 2) { console.warn('[RadARG] buildChart: rango muy corto (n='+n+'), manteniendo chart'); return; }
-  if(histInst) histInst.destroy();
+  if(histInst) { try { histInst.destroy(); } catch(e){} histInst = null; }
+  // Replace canvas to guarantee a clean 2D context — Chart.js can corrupt it on destroy
+  const oldCanvas = document.getElementById('histChart');
+  if(oldCanvas && oldCanvas.parentNode) {
+    const newCanvas = document.createElement('canvas');
+    newCanvas.id = 'histChart';
+    oldCanvas.parentNode.replaceChild(newCanvas, oldCanvas);
+  }
 
   // Merval normalised 0-100
   const _disp = k => window.MONTHLY_DISPLAY ? window.MONTHLY_DISPLAY(k) : k;
