@@ -387,7 +387,7 @@ main { position:relative; z-index:1; max-width:1440px; margin:0 auto; padding:2r
 }
 .gauge-canvas-wrap { position:relative; width:100%; max-width:640px; margin:0 auto; display:flex; justify-content:center; }
 .gauge-body { display:flex; align-items:center; gap:.5rem; width:100%; }
-.gauge-body .gauge-canvas-wrap { flex:1 1 auto; min-width:0; max-width:none; }
+.gauge-body .gauge-canvas-wrap { flex:1 1 auto; min-width:0; max-width:440px; }
 .gauge-refs { flex:0 0 165px; display:flex; flex-direction:column; gap:.6rem; align-items:flex-end; text-align:right; }
 .gauge-refs .sc-ref { display:flex; flex-direction:column; gap:2px; align-items:flex-end; }
 .gauge-refs .sc-ref-period { font-size:10px; }
@@ -3942,15 +3942,18 @@ function getAZ(score){const p=score/100;return ZONES.find(z=>p>=z.f&&(p<z.t||z.t
 function drawGauge(score){
   const cvs=$('mainGauge'); if(!cvs) return;
   const cssW=cvs.parentElement.clientWidth||400;
-  const cssH=Math.round(cssW*.46);
+  const M=44;
+  // Radius driven by available width; height computed to fit arc + hub below center
+  const ROUT=(cssW/2-M)*.90, RIN=ROUT*.56;
+  const hubExtra=Math.round(RIN*0.42)+14; // space for the hub+number below center
+  const cssH=Math.round(ROUT+M+hubExtra);
   const dpr=window.devicePixelRatio||1;
   cvs.style.width=cssW+'px'; cvs.style.height=cssH+'px';
   cvs.width=cssW*dpr; cvs.height=cssH*dpr;
   const ctx=cvs.getContext('2d');
   ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,cssW,cssH);
   const az=getAZ(score);
-  const M=44, cx=cssW/2, cy=cssH-10;
-  const ROUT=Math.min(cx-M,cy-M)*.90, RIN=ROUT*.56;
+  const cx=cssW/2, cy=cssH-hubExtra;
   const isLM=document.body.classList.contains('lm');
   const gaugeBg=isLM?'#f4f6fb':'#111118';
 
