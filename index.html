@@ -4829,14 +4829,9 @@ function buildChart(from,to){
   const isLM      = document.body.classList.contains('lm');
   // Guard BEFORE destroy — if range too small, keep existing chart
   if(n < 2) { console.warn('[RadARG] buildChart: rango muy corto (n='+n+'), manteniendo chart'); return; }
+  const canvasEl = document.getElementById('histChart');
+  if(!canvasEl) { console.warn('[RadARG] buildChart: canvas histChart no existe'); return; }
   if(histInst) { try { histInst.destroy(); } catch(e){} histInst = null; }
-  // Replace canvas to guarantee a clean 2D context — Chart.js can corrupt it on destroy
-  const oldCanvas = document.getElementById('histChart');
-  if(oldCanvas && oldCanvas.parentNode) {
-    const newCanvas = document.createElement('canvas');
-    newCanvas.id = 'histChart';
-    oldCanvas.parentNode.replaceChild(newCanvas, oldCanvas);
-  }
 
   // Merval normalised 0-100
   const _disp = k => window.MONTHLY_DISPLAY ? window.MONTHLY_DISPLAY(k) : k;
@@ -4847,7 +4842,7 @@ function buildChart(from,to){
   const mervalRange = mervalMax - mervalMin || 1; // avoid div by zero
   const mervalNorm = mervalRaw.map(v => v === null ? null :
     Math.round((v - mervalMin) / mervalRange * 100));
-  const mervalDatasets = mervalVisible ? [{
+  const mervalDatasets = (mervalVisible && mervalVals.length >= 2) ? [{
     label:'Merval USD', data:mervalNorm,
     borderColor:'#f59e0b', borderWidth:2, borderDash:[5,3],
     pointRadius:0, pointHoverRadius:4, pointBackgroundColor:'#f59e0b',
@@ -4857,7 +4852,8 @@ function buildChart(from,to){
   // numLabels = [0,1,2,...] — purely numeric so Chart.js never tries to parse
   const numLabels = rawLabels.map((_,i) => i);
 
-  histInst = new Chart($('histChart'), {
+  try {
+  histInst = new Chart(canvasEl, {
     type:'line',
     data:{ labels:numLabels, datasets:[{
       data:scores, borderColor:'#0ea5e9', borderWidth:2, yAxisID:'y',
@@ -4960,6 +4956,9 @@ function buildChart(from,to){
     ],
   });
   histInst._radargRawLabels = rawLabels;
+  } catch(err) {
+    console.error('[RadARG] buildChart error:', err, '| n='+n+' from='+from+' to='+to);
+  }
 }
 function initSlider(){
   const ticksEl=$('rangeTicks'); if(!ticksEl) return;
@@ -5006,7 +5005,9 @@ function updateSlider(){
     const cleanLbl = l => window.MONTHLY_DISPLAY ? window.MONTHLY_DISPLAY(l) : (l||'');
     $('chartSub').textContent=`${LANG==='en'?'Monthly data':'Datos mensuales'} · ${cleanLbl(lf)} – ${cleanLbl(lt)} · ${n} ${LANG==='en'?'months':'meses'}${n>=12?` (${yrs} ${LANG==='en'?'yr':'años'})`:''}`;
   }
-  buildChart(f,to_);
+  // Debounce the chart rebuild — input fires dozens of times/sec during drag
+  clearTimeout(window._chartRebuildTimer);
+  window._chartRebuildTimer = setTimeout(() => buildChart(sliderFrom, sliderTo), 60);
 }
 
 /* ── Hitos ─────────────────────────────────────────────────── */
