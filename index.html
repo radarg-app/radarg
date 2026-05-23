@@ -4347,16 +4347,43 @@ Sin títulos, sin bullets, sin disclaimers. Hoy: ${fecha}.`;
   const MNAMES_EN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   window.MONTHLY={labels:[],scores:[]};
   // Labels stored as "YYYY-MM" — never parseable as Date by Chart.js
+  // Normalize any date format to "YYYY-MM" for internal storage
+  window.MONTHLY_NORMALIZE = k => {
+    if(!k) return '';
+    const s = String(k).trim();
+    // Already YYYY-MM
+    if(/^\d{4}-\d{2}$/.test(s)) return s;
+    // "Ene 2000", "Feb 2026" etc — Spanish month names
+    const MES={Ene:'01',Feb:'02',Mar:'03',Abr:'04',May:'05',Jun:'06',
+               Jul:'07',Ago:'08',Sep:'09',Oct:'10',Nov:'11',Dic:'12'};
+    const m1=s.match(/^(\w{3})\s+(\d{4})$/);
+    if(m1&&MES[m1[1]]) return m1[2]+'-'+MES[m1[1]];
+    // "Mon Sep 01 2003 00:00:00 GMT-0300 ..." — JS Date.toString() format
+    // Extract month name and year
+    const EMOS={Jan:'01',Feb:'02',Mar:'03',Apr:'04',May:'05',Jun:'06',
+                Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12'};
+    const m2=s.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\w*\s+\d{1,2}\s+(\d{4})/);
+    if(m2&&EMOS[m2[1]]) return m2[2]+'-'+EMOS[m2[1]];
+    // ISO date "2003-09-01T..."
+    const m3=s.match(/^(\d{4})-(\d{2})-\d{2}/);
+    if(m3) return m3[1]+'-'+m3[2];
+    // Try new Date() as last resort
+    try {
+      const d=new Date(s);
+      if(!isNaN(d)) return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    } catch(e){}
+    return s;
+  };
   window.MONTHLY_DISPLAY = k => {
     if(!k) return '';
-    // Format "YYYY-MM" — the canonical internal format
-    if(/^\d{4}-\d{2}$/.test(k)) {
-      const yr=k.slice(0,4), mo=parseInt(k.slice(5,7))-1;
+    // Normalize to YYYY-MM first
+    const norm = window.MONTHLY_NORMALIZE ? window.MONTHLY_NORMALIZE(k) : String(k);
+    if(/^\d{4}-\d{2}$/.test(norm)) {
+      const yr=norm.slice(0,4), mo=parseInt(norm.slice(5,7))-1;
       const names = (typeof LANG!=='undefined'&&LANG==='en') ? MNAMES_EN : MNAMES;
       return (names[mo]||'')+' '+yr;
     }
-    // Already in display format or unknown — return as-is (never try new Date())
-    return String(k);
+    return norm;
   };
   const BY_YEAR={
     2000:[55,54,54,53,52,51,50,51,52,51,50,49],2001:[46,42,38,34,30,27,25,24,23,22,21,20],
@@ -5341,11 +5368,9 @@ async function loadDataJSON() {
     // Apply historico — solo si tiene datos reales (no sobreescribir con array vacío)
     if(d._historico && d._historico.labels && d._historico.labels.length > 0
        && d._historico.scores && d._historico.scores.length > 0) {
-      const _MMAP={Ene:1,Feb:2,Mar:3,Abr:4,May:5,Jun:6,Jul:7,Ago:8,Sep:9,Oct:10,Nov:11,Dic:12,Jan:1,Apr:4,Aug:8,Dec:12};
-      window.MONTHLY.labels = d._historico.labels.map(l=>{
-        const p=String(l).trim().split(' ');
-        return (p.length===2&&_MMAP[p[0]]) ? p[1]+'-'+String(_MMAP[p[0]]).padStart(2,'0') : l;
-      });
+      window.MONTHLY.labels = d._historico.labels.map(l =>
+        window.MONTHLY_NORMALIZE ? window.MONTHLY_NORMALIZE(l) : l
+      );
       window.MONTHLY.scores = d._historico.scores;
       console.log('[data.json] Histórico:', d._historico.labels.length, 'meses');
     } else {
@@ -5664,11 +5689,9 @@ async function loadSheetHistorico() {
   if(!validRows.length) return;
 
   // Replace MONTHLY data
-  const _MMAP2={Ene:1,Feb:2,Mar:3,Abr:4,May:5,Jun:6,Jul:7,Ago:8,Sep:9,Oct:10,Nov:11,Dic:12};
   window.MONTHLY.labels = validRows.map(r => {
     const lbl = r.label || r.mes_nombre+' '+r.anio;
-    const p = String(lbl).trim().split(' ');
-    return (p.length===2&&_MMAP2[p[0]]) ? p[1]+'-'+String(_MMAP2[p[0]]).padStart(2,'0') : lbl;
+    return window.MONTHLY_NORMALIZE ? window.MONTHLY_NORMALIZE(lbl) : lbl;
   });
   window.MONTHLY.scores = validRows.map(r => parseInt(r.score) || 0);
 
