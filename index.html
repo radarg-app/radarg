@@ -4728,8 +4728,10 @@ const MERVAL_HIST = [
 const MERVAL_MAP = {};
 MERVAL_HIST.forEach(([lbl, v]) => { MERVAL_MAP[lbl] = v; });
 
-const TOTAL_MONTHS=window.MONTHLY.labels.length;
-let histInst=null, sliderFrom=0, sliderTo=TOTAL_MONTHS-1;
+let histInst=null, sliderFrom=0, sliderTo=0;
+// TOTAL_MONTHS must be dynamic — loadSheetHistorico can update MONTHLY.labels
+const getTotalMonths=()=>window.MONTHLY.labels.length;
+let TOTAL_MONTHS=getTotalMonths(); // updated after each Sheet load
 function tickStep(n){if(n<=24)return 1;if(n<=48)return 3;if(n<=96)return 6;if(n<=180)return 12;return 24;}
 
 const MILESTONES=[
@@ -4825,6 +4827,8 @@ function buildChart(from,to){
   const n         = rawLabels.length;
   const step      = tickStep(n);
   const isLM      = document.body.classList.contains('lm');
+  // Guard BEFORE destroy — if range too small, keep existing chart
+  if(n < 2) { console.warn('[RadARG] buildChart: rango muy corto (n='+n+'), manteniendo chart'); return; }
   if(histInst) histInst.destroy();
 
   // Merval normalised 0-100
@@ -4833,8 +4837,9 @@ function buildChart(from,to){
   const mervalVals = mervalRaw.filter(v => v !== null);
   const mervalMin  = mervalVals.length ? Math.min(...mervalVals) : 0;
   const mervalMax  = mervalVals.length ? Math.max(...mervalVals) : 1;
+  const mervalRange = mervalMax - mervalMin || 1; // avoid div by zero
   const mervalNorm = mervalRaw.map(v => v === null ? null :
-    Math.round((v - mervalMin) / (mervalMax - mervalMin) * 100));
+    Math.round((v - mervalMin) / mervalRange * 100));
   const mervalDatasets = mervalVisible ? [{
     label:'Merval USD', data:mervalNorm,
     borderColor:'#f59e0b', borderWidth:2, borderDash:[5,3],
@@ -4845,8 +4850,6 @@ function buildChart(from,to){
   // numLabels = [0,1,2,...] — purely numeric so Chart.js never tries to parse
   const numLabels = rawLabels.map((_,i) => i);
 
-  // Guard: need at least 2 points to render
-  if(n < 2) { console.warn('[RadARG] buildChart: rango muy corto (n='+n+')'); return; }
   histInst = new Chart($('histChart'), {
     type:'line',
     data:{ labels:numLabels, datasets:[{
@@ -4960,9 +4963,10 @@ function initSlider(){
     if(lbl&&lbl.length===7&&lbl.slice(5)==='01') years.push({label:lbl.slice(0,4),idx:i});
   });
   // Add last entry if not already a Jan
-  const lastLbl=window.MONTHLY.labels[TOTAL_MONTHS-1]||'';
-  if(!years.length||years[years.length-1].idx!==TOTAL_MONTHS-1){
-    years.push({label:window.MONTHLY_DISPLAY?window.MONTHLY_DISPLAY(lastLbl).split(' ').join(' '):lastLbl,idx:TOTAL_MONTHS-1});
+  const _tot=getTotalMonths();
+  const lastLbl=window.MONTHLY.labels[_tot-1]||'';
+  if(!years.length||years[years.length-1].idx!==_tot-1){
+    years.push({label:window.MONTHLY_DISPLAY?window.MONTHLY_DISPLAY(lastLbl):lastLbl,idx:_tot-1});
   }
   years.forEach(yr=>{
     const tick=document.createElement('span');
@@ -4970,16 +4974,19 @@ function initSlider(){
     tick.onclick=()=>{const mid=(sliderFrom+sliderTo)/2;if(yr.idx<=mid){sliderFrom=yr.idx;$('rangeFrom').value=yr.idx;}else{sliderTo=yr.idx;$('rangeTo').value=yr.idx;}updateSlider();};
     ticksEl.appendChild(tick);
   });
+  TOTAL_MONTHS=getTotalMonths();
+  sliderTo=TOTAL_MONTHS-1;
   $('rangeFrom').max=TOTAL_MONTHS-1; $('rangeTo').max=TOTAL_MONTHS-1;
   $('rangeFrom').value=0; $('rangeTo').value=TOTAL_MONTHS-1;
   updateSlider();
 }
 function updateSlider(){
   let f=parseInt($('rangeFrom').value),to_=parseInt($('rangeTo').value);let t=to_;
-  const MIN_RANGE=3;
+  TOTAL_MONTHS=getTotalMonths();
+  const MIN_RANGE=6;
   if(to_-f<MIN_RANGE){if(to_<TOTAL_MONTHS-1)to_=Math.min(f+MIN_RANGE,TOTAL_MONTHS-1);else f=Math.max(0,to_-MIN_RANGE);$('rangeFrom').value=f;$('rangeTo').value=to_;}t=to_;
   sliderFrom=f;sliderTo=to_;
-  const pct=100/(TOTAL_MONTHS-1);
+  const pct=TOTAL_MONTHS>1?100/(TOTAL_MONTHS-1):100;
   $('rangeTrackFill').style.left=(f*pct)+'%'; $('rangeTrackFill').style.right=(100-to_*pct)+'%';
   const _cleanLbl = l => window.MONTHLY_DISPLAY ? window.MONTHLY_DISPLAY(l) : (l||'');
   $('rl-from').textContent=_cleanLbl(window.MONTHLY.labels[f]); $('rl-to').textContent=_cleanLbl(window.MONTHLY.labels[to_]);
