@@ -1733,6 +1733,14 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
             <div class="merval-switch-thumb"></div>
           </div>
         </label>
+        <label class="merval-switch-wrap" title="Mostrar/ocultar mandatos presidenciales" for="presToggle">
+          <span data-i18n="chart.presToggle" style="color:#a78bfa">🏛️ Presidentes</span>
+          <div class="merval-switch">
+            <input type="checkbox" id="presToggle" onchange="togglePresidents()">
+            <div class="merval-switch-track"></div>
+            <div class="merval-switch-thumb"></div>
+          </div>
+        </label>
       </div>
       <div class="chart-wrap">
         <canvas id="histChart"></canvas>
@@ -2382,6 +2390,8 @@ const T = {
     // Chart tooltip
     'chart.score':'Score','chart.sliderHint':'Drag the ends to adjust the period',
     'chart.mervalToggle':'Merval USD',
+    'chart.presToggle':'Presidents',
+    'chart.presToggle':'Presidentes',
     // AI refresh title
     'ai.refresh':'Actualizar análisis',
     // AI fallback
@@ -4821,6 +4831,27 @@ const MERVAL_HIST = [
 const MERVAL_MAP = {};
 MERVAL_HIST.forEach(([lbl, v]) => { MERVAL_MAP[lbl] = v; });
 
+/* ── Mandatos presidenciales argentinos (desde 2000) ──────────
+   start: "YYYY-MM" del inicio del mandato (o del período cubierto)
+   name: nombre a mostrar
+   party: nombre del partido/frente
+   color: color representativo del partido (con baja opacidad para el fondo) */
+const PRESIDENTS = [
+  { start:'2000-01', name:'Fernando de la Rúa',        party:'Alianza (UCR/FREPASO)', color:'#d22730' },
+  { start:'2001-12', name:'Rodríguez Saá / Duhalde',   party:'PJ (interinato)',        color:'#1f4fa8' },
+  { start:'2002-01', name:'Eduardo Duhalde',           party:'Partido Justicialista',  color:'#1f4fa8' },
+  { start:'2003-05', name:'Néstor Kirchner',           party:'Frente para la Victoria',color:'#3aa3dc' },
+  { start:'2007-12', name:'Cristina Kirchner',         party:'Frente para la Victoria',color:'#3aa3dc' },
+  { start:'2015-12', name:'Mauricio Macri',            party:'Cambiemos / PRO',        color:'#f9d616' },
+  { start:'2019-12', name:'Alberto Fernández',         party:'Frente de Todos',        color:'#3aa3dc' },
+  { start:'2023-12', name:'Javier Milei',              party:'La Libertad Avanza',     color:'#8b3fd1' },
+];
+// Convierte "YYYY-MM" a índice dentro de window.MONTHLY.labels (o -1)
+function presIndexForStart(startKey){
+  const norm = window.MONTHLY_NORMALIZE ? window.MONTHLY_NORMALIZE(startKey) : startKey;
+  return window.MONTHLY.labels.indexOf(norm);
+}
+
 let histInst=null, sliderFrom=0, sliderTo=0;
 // TOTAL_MONTHS must be dynamic — loadSheetHistorico can update MONTHLY.labels
 const getTotalMonths=()=>window.MONTHLY.labels.length;
@@ -4912,6 +4943,120 @@ function toggleMerval() {
   mervalVisible = chk ? chk.checked : !mervalVisible;
   buildChart(sliderFrom, sliderTo);
 }
+
+let presidentsVisible = false;
+function togglePresidents() {
+  const chk = document.getElementById('presToggle');
+  presidentsVisible = chk ? chk.checked : !presidentsVisible;
+  buildChart(sliderFrom, sliderTo);
+}
+
+// Plugin: bandas de color por mandato presidencial (fondo) + líneas + nombres
+const presidentsPlugin = {
+  id: 'presidents',
+  // Bandas de fondo — van detrás de la línea del gráfico
+  beforeDatasetsDraw(chart) {
+    if (!presidentsVisible) return;
+    const { ctx, chartArea:{ top, bottom, left, right }, scales:{ x } } = chart;
+    if (!x) return;
+    const rawLbls = chart._radargRawLabels || [];
+    const n = rawLbls.length;
+    if (!n) return;
+
+    // Para cada presidente, calcular el rango de índices visible en la ventana actual
+    PRESIDENTS.forEach((p, i) => {
+      const startIdxGlobal = presIndexForStart(p.start);
+      const nextStartGlobal = (i < PRESIDENTS.length-1) ? presIndexForStart(PRESIDENTS[i+1].start) : window.MONTHLY.labels.length;
+      if (startIdxGlobal < 0) return;
+
+      // Convertir índices globales a índices locales de la ventana (sliderFrom..sliderTo)
+      const localStart = startIdxGlobal - sliderFrom;
+      const localEnd   = nextStartGlobal - sliderFrom; // exclusivo
+
+      // Recortar a la ventana visible [0, n-1]
+      const visStart = Math.max(0, localStart);
+      const visEnd   = Math.min(n-1, localEnd-1);
+      if (visEnd < visStart) return; // mandato fuera de la ventana
+
+      const xStart = x.getPixelForValue(visStart);
+      const xEnd   = x.getPixelForValue(visEnd);
+      // Banda de color del partido (baja opacidad)
+      ctx.save();
+      ctx.fillStyle = p.color + '22';
+      ctx.fillRect(xStart, top, xEnd - xStart, bottom - top);
+      ctx.restore();
+    });
+  },
+  // Líneas verticales de inicio/fin + nombres — van encima de todo
+  afterDatasetsDraw(chart) {
+    if (!presidentsVisible) return;
+    const { ctx, chartArea:{ top, bottom, left, right }, scales:{ x } } = chart;
+    if (!x) return;
+    const rawLbls = chart._radargRawLabels || [];
+    const n = rawLbls.length;
+    if (!n) return;
+
+    const isLM = document.body.classList.contains('lm');
+    const labelY = top + 6; // los nombres arriba del todo, lejos de las líneas de datos
+
+    PRESIDENTS.forEach((p, i) => {
+      const startIdxGlobal = presIndexForStart(p.start);
+      const nextStartGlobal = (i < PRESIDENTS.length-1) ? presIndexForStart(PRESIDENTS[i+1].start) : window.MONTHLY.labels.length;
+      if (startIdxGlobal < 0) return;
+
+      const localStart = startIdxGlobal - sliderFrom;
+      const localEnd   = nextStartGlobal - sliderFrom;
+      const visStart = Math.max(0, localStart);
+      const visEnd   = Math.min(n-1, localEnd-1);
+      if (visEnd < visStart) return;
+
+      const xStart = x.getPixelForValue(visStart);
+      const xEnd   = x.getPixelForValue(visEnd);
+
+      // Línea vertical de inicio (solo si el inicio real cae dentro de la ventana)
+      if (localStart >= 0 && localStart <= n-1) {
+        ctx.save();
+        ctx.strokeStyle = p.color + 'cc';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([4,3]);
+        ctx.beginPath();
+        ctx.moveTo(xStart, top);
+        ctx.lineTo(xStart, bottom);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // Nombre del presidente, centrado en su banda, arriba del todo
+      const bandW = xEnd - xStart;
+      if (bandW > 28) { // solo si hay espacio
+        const cx = (xStart + xEnd) / 2;
+        ctx.save();
+        ctx.font = `700 10px "Inter",sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        // Apellido para ahorrar espacio si la banda es angosta
+        let label = p.name;
+        if (bandW < 90) {
+          const parts = p.name.split(' ');
+          label = parts[parts.length-1]; // apellido
+        }
+        // Fondo tipo pill para que el nombre no se confunda con las líneas
+        const tw = ctx.measureText(label).width;
+        const padX = 5, pillH = 15;
+        const pillX = cx - tw/2 - padX, pillW = tw + padX*2;
+        ctx.fillStyle = isLM ? p.color + 'e0' : p.color + 'cc';
+        if (ctx.roundRect) {
+          ctx.beginPath(); ctx.roundRect(pillX, labelY, pillW, pillH, 4); ctx.fill();
+        } else {
+          ctx.fillRect(pillX, labelY, pillW, pillH);
+        }
+        ctx.fillStyle = '#fff';
+        ctx.fillText(label, cx, labelY + 2);
+        ctx.restore();
+      }
+    });
+  }
+};
 
 function buildChart(from,to){
   // Use numeric indices — prevents Chart.js from parsing month strings as dates
@@ -5045,6 +5190,7 @@ function buildChart(from,to){
           ctx.restore();
         });
       }},
+      presidentsPlugin,
       milestonesPlugin,
     ],
   });
