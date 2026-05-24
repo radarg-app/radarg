@@ -4845,11 +4845,11 @@ const PRESIDENTS = [
   { start:'2002-01', name:'Eduardo Duhalde',           party:'Partido Justicialista',  color:'#1f4fa8', dark:false },
   { start:'2003-05', name:'Néstor Kirchner',           party:'Frente para la Victoria',color:'#2b8fc9', dark:false },
   { start:'2007-12', name:'Cristina Kirchner',         party:'Frente para la Victoria',color:'#2b8fc9', dark:false },
-  { start:'2015-12', name:'Mauricio Macri',            party:'Cambiemos / PRO',        color:'#e0b400', dark:true  },
+  { start:'2015-12', name:'Mauricio Macri',            party:'Cambiemos / PRO',        color:'#f9d616', pillColor:'#a16207' },
   { start:'2019-12', name:'Alberto Fernández',         party:'Frente de Todos',        color:'#2b8fc9', dark:false },
   { start:'2023-12', name:'Javier Milei',              party:'La Libertad Avanza',     color:'#8b3fd1', dark:false },
 ];
-// dark:true → texto oscuro sobre el pill (para colores claros como el amarillo)
+// pillColor → color alternativo para el pill cuando el color de banda es muy claro (ej: amarillo PRO)
 // Convierte "YYYY-MM" a índice dentro de window.MONTHLY.labels (o -1)
 function presIndexForStart(startKey){
   const norm = window.MONTHLY_NORMALIZE ? window.MONTHLY_NORMALIZE(startKey) : startKey;
@@ -5050,7 +5050,8 @@ const presidentsPlugin = {
         const padX = 6, pillH = 16;
         const pillX = cx - tw/2 - padX, pillW = tw + padX*2;
         // Pill con color partidario sólido + borde sutil para separarlo del fondo
-        ctx.fillStyle = p.color;
+        // Usa pillColor si está definido (para partidos de color muy claro como el PRO)
+        ctx.fillStyle = p.pillColor || p.color;
         if (ctx.roundRect) {
           ctx.beginPath(); ctx.roundRect(pillX, labelY, pillW, pillH, 4); ctx.fill();
         } else {
@@ -5061,8 +5062,8 @@ const presidentsPlugin = {
         if (ctx.roundRect) {
           ctx.beginPath(); ctx.roundRect(pillX, labelY, pillW, pillH, 4); ctx.stroke();
         }
-        // Texto: oscuro para colores claros (amarillo), blanco para el resto
-        ctx.fillStyle = p.dark ? '#1a1500' : '#ffffff';
+        // Texto siempre blanco (los pills usan colores suficientemente oscuros)
+        ctx.fillStyle = '#ffffff';
         ctx.fillText(label, cx, labelY + 3);
         ctx.restore();
       }
