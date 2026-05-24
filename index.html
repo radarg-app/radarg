@@ -2979,6 +2979,23 @@ function primarioScore(v) {
   if(v>=0.2) return 62; if(v>=0) return 52; if(v>=-0.5) return 38;
   if(v>=-1.5) return 25; if(v>=-3) return 15; return 8;
 }
+function rolloverScore(v) {
+  // Rollover de deuda (%). >100% = renueva todo sin emitir (codicia).
+  if(v===null||v===undefined) return 50;
+  if(v>=130) return 88; if(v>=115) return 80; if(v>=105) return 72;
+  if(v>=100) return 65; if(v>=95) return 55; if(v>=85) return 42;
+  if(v>=70) return 28; if(v>=50) return 16; return 8;
+}
+function fmiScore(v) {
+  // Cumplimiento FMI: ya viene como score 0-100.
+  if(v===null||v===undefined) return 50;
+  return Math.max(0, Math.min(100, v));
+}
+function calificacionScore(v) {
+  // Calificación soberana: ya viene como escalón 0-100.
+  if(v===null||v===undefined) return 50;
+  return Math.max(0, Math.min(100, v));
+}
 function depositosPFScore(v) {
   // Depósitos plazo fijo, var real mensual. Crecimiento = confianza en el peso.
   if(v===null||v===undefined) return 50;
@@ -3323,6 +3340,9 @@ function computeSubIndices(bs) {
   // ── SEGMENTO 4: Fiscal y Deuda Soberana (15%) ────────────
   const gd35Y = LIVE._gd35Yield;
   const primarioV = LIVE._resultadoPrimario;
+  const rolloverV = LIVE._rollover;
+  const fmiV = LIVE._cumplFMI;
+  const califV = LIVE._calificacion;
   const seg4 = [
     { name: es?'Resultado Primario':'Primary Fiscal Balance',
       w:28, score: primarioV!=null ? primarioScore(primarioV) : 50,
@@ -3333,8 +3353,11 @@ function computeSubIndices(bs) {
       desc: es?'Superávit o déficit primario acumulado (sin intereses), como % del PIB. Es el pilar del programa económico y la condición sine qua non del acuerdo con el FMI.'
              :'Accumulated primary surplus or deficit (excluding interest), as % of GDP. It is the cornerstone of the economic program and the sine qua non condition of the IMF agreement.' },
     { name: es?'Rollover de Deuda (%)':'Debt Rollover (%)',
-      w:22, score: 50, src: NA, live: false, unavailable: true,
-      unavailNote: es?'Dato por licitación. El más informativo del corto plazo. En desarrollo.' : 'Per-auction figure. Most informative short-term indicator. In development.',
+      w:22, score: rolloverV!=null ? rolloverScore(rolloverV) : 50,
+      src: rolloverV!=null ? 'Sec. Finanzas' : NA,
+      live: rolloverV!=null, unavailable: rolloverV==null,
+      raw: rolloverV!=null ? `${rolloverV.toFixed(0)}% renovado` : '',
+      unavailNote: rolloverV==null ? (es?'Dato por licitación. El más informativo del corto plazo. En desarrollo.' : 'Per-auction figure. Most informative short-term indicator. In development.') : '',
       desc: es?'Porcentaje de vencimientos en pesos que el Tesoro logra renovar. Por debajo del 100% es alarma roja: el mercado no quiere renovar y el riesgo de monetización sube.'
              :'% of peso maturities the Treasury manages to roll over. Below 100% is a red alert: the market refuses to renew and monetization risk rises.' },
     { name: es?'Recaudación Tributaria (i.a.)':'Tax Revenue (y.o.y.)',
@@ -3351,13 +3374,19 @@ function computeSubIndices(bs) {
       desc: es?'Pendiente de la curva soberana usando el rendimiento del GD35. Una curva invertida o muy empinada señala expectativas de stress fiscal en el mediano plazo.'
              :'Slope of the sovereign curve using GD35 yield. An inverted or very steep curve signals medium-term fiscal stress expectations.' },
     { name: es?'Cumplimiento Metas FMI':'IMF Target Compliance',
-      w:10, score: 50, src: NA, live: false, unavailable: true,
-      unavailNote: es?'Señal cualitativa mensual basada en comunicados FMI/Economía. En desarrollo.' : 'Monthly qualitative signal based on IMF/Economy communiques. In development.',
-      desc: es?'Evaluación cualitativa del cumplimiento de las metas cuantitativas del acuerdo con el FMI. El incumplimiento activa cláusulas de waiver y genera incertidumbre.'
-             :'Qualitative assessment of compliance with IMF agreement quantitative targets. Non-compliance triggers waiver clauses and generates uncertainty.' },
+      w:10, score: fmiV!=null ? fmiScore(fmiV) : 50,
+      src: fmiV!=null ? 'FMI / Min. Economía' : NA,
+      live: fmiV!=null, unavailable: fmiV==null,
+      raw: fmiV!=null ? `${fmiV.toFixed(0)}/100` : '',
+      unavailNote: fmiV==null ? (es?'Señal cualitativa mensual basada en comunicados FMI/Economía. En desarrollo.' : 'Monthly qualitative signal based on IMF/Economy communiques. In development.') : '',
+      desc: es?'Evaluación del cumplimiento de las metas cuantitativas del acuerdo con el FMI. El incumplimiento activa cláusulas de waiver y genera incertidumbre.'
+             :'Assessment of compliance with IMF agreement quantitative targets. Non-compliance triggers waiver clauses and generates uncertainty.' },
     { name: es?'Calificación Soberana':'Sovereign Rating',
-      w:7, score: 50, src: NA, live: false, unavailable: true,
-      unavailNote: es?'Señal puntual Fitch/S&P/Moody\'s. Se actualiza con cada revisión. En desarrollo.' : 'Spot signal from Fitch/S&P/Moody\'s. Updated with each review. In development.',
+      w:7, score: califV!=null ? calificacionScore(califV) : 50,
+      src: califV!=null ? 'Fitch/S&P/Moody\'s' : NA,
+      live: califV!=null, unavailable: califV==null,
+      raw: califV!=null ? (es?'Fitch B- · S&P CCC+ · Moody\'s Caa1' : 'Fitch B- · S&P CCC+ · Moody\'s Caa1') : '',
+      unavailNote: califV==null ? (es?'Señal puntual Fitch/S&P/Moody\'s. Se actualiza con cada revisión. En desarrollo.' : 'Spot signal from Fitch/S&P/Moody\'s. Updated with each review. In development.') : '',
       desc: es?'Calificación crediticia soberana de las tres grandes agencias. Cambios de outlook o de calificación impactan directamente en el costo de financiamiento.'
              :'Sovereign credit rating from the three major agencies. Outlook or rating changes directly impact borrowing costs.' },
   ];
@@ -5435,7 +5464,7 @@ function closeSuggestPopup(){
 // In production this would come from a news API or RSS parser
 /* ── Noticias inyectadas por el GAS (se actualiza automáticamente) ── */
 // RADARG_DATA_START
-window.INJECTED_DATA = {"embi_bps":543,"tna_pf":19.85,"ipc_mensual":2.6,"reservas_mM":46062,"merval_usd":1862,"base_monetaria_var":-1.6,"reservas_netas_mM":25334,"gd35_yield":6.67,"soja_usd":1205.25,"icg_utdt":2.02,"rem_12m":24.2,"rem_1m":2.3,"prima_electoral_bps":419,"ipc_nucleo":2.88,"tcrm_idx":79.77,"compras_bcra_mM":138,"emae_var_mensual":3.89,"ripte_var_real":2.4,"recaudacion_var_real":26.2,"resultado_primario_pib":0.5,"depositos_pf_real":1.8,"fae_atesoramiento":2470,"rofex_deval_implicita":24.5,"merval_vol_30d":0,"adefa_var_mensual":0,"al30_precio":63.13,"al30_var":-0.35,"gd30_precio":64.24,"gd30_var":-1.15,"gd35_precio":78.95,"gd35_var":-0.5,"amplitud_up":7,"amplitud_dn":12,"amplitud_fl":1,"amplitud_total":20,"amplitud_score":40,"sentimiento_noticias":65,"icc_utdt":39.64,"desempleo_eph":7.9,"ai_analisis_es":"La economía argentina muestra señales mixtas pero con tendencia positiva: la brecha cambiaria de apenas 1.1% refleja la solidez del esquema de bandas, mientras las reservas treparon a USD 46.100 millones y el riesgo país se comprimió a 543 bps, su nivel más bajo en años. Sin embargo, la inflación mensual de 2.6% y una TNA de 19.85% indican que el proceso de desinflación aún no está consolidado, con tasas reales que siguen siendo el ancla principal del programa.\n\nEl clima político mantiene al mercado en modo cauteloso: el ICG-UTDT de 2.02/5 revela una confianza en el gobierno notablemente baja, lo que genera ruido sobre la sostenibilidad política del ajuste fiscal de cara al ciclo electoral que se avecina. El Merval en USD 1.862 muestra que el capital de riesgo sigue apostando al programa, pero cualquier fractura en la coalición oficialista o deterioro en las urnas puede revertir rápidamente ese optimismo.","ai_analisis_en":"Argentina's economy shows stabilizing signals heading into mid-2026, with the FX gap compressed to just 1.1% following the April unification, and monthly CPI at 2.6% — still elevated but well below the peaks of late 2023. Gross reserves have recovered to USD 46.1B, reflecting sustained IMF disbursements and improved trade flows, while country risk at 543bps remains high but has trended downward from crisis-era levels. The Merval at USD 1,862 and soybean prices at USD 1,205/mt provide additional tailwinds for both equity valuations and agricultural export revenue.\n\nThe Milei administration maintains its fiscal anchor as the central political narrative, but consumer confidence at 2.02/5 per the ICG-UTDT signals persistent social fatigue with austerity. Midterm election positioning is intensifying, creating noise around whether adjustment commitments will hold post-October, which partly explains why country risk remains sticky above 500bps despite macro improvements. The TNA at 19.85% ref","ai_fecha":"Tue May 19 2026 22:55:00 GMT-0300 (Argentina Standard Time)","ai_score":59,"ai_seg_inflacion_es":"La inflación mide cuánto suben los precios mes a mes y si el peso conserva su valor. Con una inflación mensual en torno al 2,6% y tasas de interés que apenas la superan, el peso está recuperando lentamente su función de moneda, aunque todavía no conviene del todo confiar en él para ahorrar a largo plazo. El puntaje neutral refleja que vamos por buen camino pero el proceso no está consolidado.","ai_seg_inflacion_en":"Inflation measures how much prices rise month to month and whether the peso keeps its value. With monthly inflation around 2.6% and interest rates barely above it, the peso is slowly recovering its role as money, though it is not yet fully reliable for long-term savings. The neutral score reflects progress that is not yet consolidated.","ai_seg_cambiario_es":"Esta dimensión mira si el país tiene suficientes dólares y si el tipo de cambio es sostenible. Con una brecha cambiaria casi inexistente y reservas en recuperación, el panorama es de los más sólidos de los últimos años. Para una persona común, esto significa menos riesgo de un salto brusco del dólar en el corto plazo.","ai_seg_cambiario_en":"This dimension looks at whether the country has enough dollars and whether the exchange rate is sustainable. With an almost nonexistent FX gap and recovering reserves, the picture is among the strongest in years. For an ordinary person, this means lower risk of a sudden jump in the dollar in the short term.","ai_seg_actividad_es":"Acá medimos si la economía crece, si hay trabajo y si los sueldos le ganan a la inflación. Es la dimensión que más se siente en el bolsillo y en el día a día. Todavía estamos sumando indicadores para tener una foto completa, pero los primeros datos muestran una recuperación gradual de la actividad.","ai_seg_actividad_en":"Here we measure whether the economy is growing, whether there are jobs, and whether wages beat inflation. It is the dimension most felt in everyday life. We are still adding indicators for a complete picture, but early data shows a gradual recovery in activity.","ai_seg_fiscal_es":"Mide si el Estado gasta menos de lo que recauda y si puede pagar sus deudas sin emitir dinero. Un Estado ordenado es la base que permite mantener la inflación baja. Los indicadores actuales sugieren que las cuentas públicas están relativamente bajo control, lo que da confianza a los mercados.","ai_seg_fiscal_en":"It measures whether the State spends less than it collects and can pay its debts without printing money. An orderly State is the foundation for keeping inflation low. Current indicators suggest public finances are relatively under control, which gives markets confidence.","ai_seg_mercados_es":"Refleja cómo ven los inversores al país: el riesgo país, el valor de las acciones y los bonos. Es la dimensión que más rápido reacciona a las noticias del día. Un riesgo país en baja y un Merval firme indican que el capital sigue apostando al programa económico, aunque la confianza política todavía es frágil.","ai_seg_mercados_en":"It reflects how investors see the country: country risk, stock values, and bonds. It is the fastest-reacting dimension to daily news. Falling country risk and a firm Merval indicate capital is still betting on the economic program, though political confidence remains fragile."};
+window.INJECTED_DATA = {"embi_bps":543,"tna_pf":19.85,"ipc_mensual":2.6,"reservas_mM":46062,"merval_usd":1862,"base_monetaria_var":-1.6,"reservas_netas_mM":25334,"gd35_yield":6.67,"soja_usd":1205.25,"icg_utdt":2.02,"rem_12m":24.2,"rem_1m":2.3,"prima_electoral_bps":419,"ipc_nucleo":2.88,"tcrm_idx":79.77,"compras_bcra_mM":138,"emae_var_mensual":3.89,"ripte_var_real":2.4,"recaudacion_var_real":26.2,"resultado_primario_pib":0.5,"rollover_deuda":123.4,"cumplimiento_fmi":78,"calificacion_soberana":18,"depositos_pf_real":1.8,"fae_atesoramiento":2470,"rofex_deval_implicita":24.5,"merval_vol_30d":0,"adefa_var_mensual":0,"al30_precio":63.13,"al30_var":-0.35,"gd30_precio":64.24,"gd30_var":-1.15,"gd35_precio":78.95,"gd35_var":-0.5,"amplitud_up":7,"amplitud_dn":12,"amplitud_fl":1,"amplitud_total":20,"amplitud_score":40,"sentimiento_noticias":65,"icc_utdt":39.64,"desempleo_eph":7.9,"ai_analisis_es":"La economía argentina muestra señales mixtas pero con tendencia positiva: la brecha cambiaria de apenas 1.1% refleja la solidez del esquema de bandas, mientras las reservas treparon a USD 46.100 millones y el riesgo país se comprimió a 543 bps, su nivel más bajo en años. Sin embargo, la inflación mensual de 2.6% y una TNA de 19.85% indican que el proceso de desinflación aún no está consolidado, con tasas reales que siguen siendo el ancla principal del programa.\n\nEl clima político mantiene al mercado en modo cauteloso: el ICG-UTDT de 2.02/5 revela una confianza en el gobierno notablemente baja, lo que genera ruido sobre la sostenibilidad política del ajuste fiscal de cara al ciclo electoral que se avecina. El Merval en USD 1.862 muestra que el capital de riesgo sigue apostando al programa, pero cualquier fractura en la coalición oficialista o deterioro en las urnas puede revertir rápidamente ese optimismo.","ai_analisis_en":"Argentina's economy shows stabilizing signals heading into mid-2026, with the FX gap compressed to just 1.1% following the April unification, and monthly CPI at 2.6% — still elevated but well below the peaks of late 2023. Gross reserves have recovered to USD 46.1B, reflecting sustained IMF disbursements and improved trade flows, while country risk at 543bps remains high but has trended downward from crisis-era levels. The Merval at USD 1,862 and soybean prices at USD 1,205/mt provide additional tailwinds for both equity valuations and agricultural export revenue.\n\nThe Milei administration maintains its fiscal anchor as the central political narrative, but consumer confidence at 2.02/5 per the ICG-UTDT signals persistent social fatigue with austerity. Midterm election positioning is intensifying, creating noise around whether adjustment commitments will hold post-October, which partly explains why country risk remains sticky above 500bps despite macro improvements. The TNA at 19.85% ref","ai_fecha":"Tue May 19 2026 22:55:00 GMT-0300 (Argentina Standard Time)","ai_score":59,"ai_seg_inflacion_es":"La inflación mide cuánto suben los precios mes a mes y si el peso conserva su valor. Con una inflación mensual en torno al 2,6% y tasas de interés que apenas la superan, el peso está recuperando lentamente su función de moneda, aunque todavía no conviene del todo confiar en él para ahorrar a largo plazo. El puntaje neutral refleja que vamos por buen camino pero el proceso no está consolidado.","ai_seg_inflacion_en":"Inflation measures how much prices rise month to month and whether the peso keeps its value. With monthly inflation around 2.6% and interest rates barely above it, the peso is slowly recovering its role as money, though it is not yet fully reliable for long-term savings. The neutral score reflects progress that is not yet consolidated.","ai_seg_cambiario_es":"Esta dimensión mira si el país tiene suficientes dólares y si el tipo de cambio es sostenible. Con una brecha cambiaria casi inexistente y reservas en recuperación, el panorama es de los más sólidos de los últimos años. Para una persona común, esto significa menos riesgo de un salto brusco del dólar en el corto plazo.","ai_seg_cambiario_en":"This dimension looks at whether the country has enough dollars and whether the exchange rate is sustainable. With an almost nonexistent FX gap and recovering reserves, the picture is among the strongest in years. For an ordinary person, this means lower risk of a sudden jump in the dollar in the short term.","ai_seg_actividad_es":"Acá medimos si la economía crece, si hay trabajo y si los sueldos le ganan a la inflación. Es la dimensión que más se siente en el bolsillo y en el día a día. Todavía estamos sumando indicadores para tener una foto completa, pero los primeros datos muestran una recuperación gradual de la actividad.","ai_seg_actividad_en":"Here we measure whether the economy is growing, whether there are jobs, and whether wages beat inflation. It is the dimension most felt in everyday life. We are still adding indicators for a complete picture, but early data shows a gradual recovery in activity.","ai_seg_fiscal_es":"Mide si el Estado gasta menos de lo que recauda y si puede pagar sus deudas sin emitir dinero. Un Estado ordenado es la base que permite mantener la inflación baja. Los indicadores actuales sugieren que las cuentas públicas están relativamente bajo control, lo que da confianza a los mercados.","ai_seg_fiscal_en":"It measures whether the State spends less than it collects and can pay its debts without printing money. An orderly State is the foundation for keeping inflation low. Current indicators suggest public finances are relatively under control, which gives markets confidence.","ai_seg_mercados_es":"Refleja cómo ven los inversores al país: el riesgo país, el valor de las acciones y los bonos. Es la dimensión que más rápido reacciona a las noticias del día. Un riesgo país en baja y un Merval firme indican que el capital sigue apostando al programa económico, aunque la confianza política todavía es frágil.","ai_seg_mercados_en":"It reflects how investors see the country: country risk, stock values, and bonds. It is the fastest-reacting dimension to daily news. Falling country risk and a firm Merval indicate capital is still betting on the economic program, though political confidence remains fragile."};
 // RADARG_DATA_END
 
 // RADARG_NEWS_START
@@ -5642,6 +5671,9 @@ async function loadDataJSON() {
     if(f('ripte_var_real')!==null)        LIVE._ripteVar = f('ripte_var_real');
     if(f('recaudacion_var_real')!==null)  LIVE._recaudVar = f('recaudacion_var_real');
     if(f('resultado_primario_pib')!==null) LIVE._resultadoPrimario = f('resultado_primario_pib');
+    if(f('rollover_deuda')!==null) LIVE._rollover = f('rollover_deuda');
+    if(f('cumplimiento_fmi')!==null) LIVE._cumplFMI = f('cumplimiento_fmi');
+    if(f('calificacion_soberana')!==null) LIVE._calificacion = f('calificacion_soberana');
     if(f('depositos_pf_real')!==null) LIVE._depositosPF = f('depositos_pf_real');
     if(f('fae_atesoramiento')!==null) LIVE._fae = f('fae_atesoramiento');
     if(f('rofex_deval_implicita')!==null) LIVE._rofex = f('rofex_deval_implicita');
@@ -5744,6 +5776,9 @@ function applyInjectedData() {
   if(_f('ripte_var_real')!==null)        LIVE._ripteVar = _f('ripte_var_real');
   if(_f('recaudacion_var_real')!==null)  LIVE._recaudVar = _f('recaudacion_var_real');
   if(_f('resultado_primario_pib')!==null) LIVE._resultadoPrimario = _f('resultado_primario_pib');
+  if(_f('rollover_deuda')!==null) LIVE._rollover = _f('rollover_deuda');
+  if(_f('cumplimiento_fmi')!==null) LIVE._cumplFMI = _f('cumplimiento_fmi');
+  if(_f('calificacion_soberana')!==null) LIVE._calificacion = _f('calificacion_soberana');
   if(_f('depositos_pf_real')!==null) LIVE._depositosPF = _f('depositos_pf_real');
   if(_f('fae_atesoramiento')!==null) LIVE._fae = _f('fae_atesoramiento');
   if(_f('rofex_deval_implicita')!==null) LIVE._rofex = _f('rofex_deval_implicita');
@@ -5851,6 +5886,9 @@ async function loadSheetSubDatos() {
   override('desempleo_eph',      v => { if(!isNaN(v)) LIVE._desempleoEph = v; });
   override('recaudacion_var_real',v=>{ if(!isNaN(v)) LIVE._recaudVar = v; });
   override('resultado_primario_pib',v=>{ if(!isNaN(v)) LIVE._resultadoPrimario = v; });
+  override('rollover_deuda',v=>{ if(!isNaN(v)) LIVE._rollover = v; });
+  override('cumplimiento_fmi',v=>{ if(!isNaN(v)) LIVE._cumplFMI = v; });
+  override('calificacion_soberana',v=>{ if(!isNaN(v)) LIVE._calificacion = v; });
   override('depositos_pf_real',v=>{ if(!isNaN(v)) LIVE._depositosPF = v; });
   override('fae_atesoramiento',v=>{ if(!isNaN(v)) LIVE._fae = v; });
   override('rofex_deval_implicita',v=>{ if(!isNaN(v)) LIVE._rofex = v; });
@@ -5873,6 +5911,9 @@ async function loadSheetSubDatos() {
   override('desempleo_eph',      v => { if(!isNaN(v)) LIVE._desempleoEph = v; });
   override('recaudacion_var_real',v=>{ if(!isNaN(v)) LIVE._recaudVar = v; });
   override('resultado_primario_pib',v=>{ if(!isNaN(v)) LIVE._resultadoPrimario = v; });
+  override('rollover_deuda',v=>{ if(!isNaN(v)) LIVE._rollover = v; });
+  override('cumplimiento_fmi',v=>{ if(!isNaN(v)) LIVE._cumplFMI = v; });
+  override('calificacion_soberana',v=>{ if(!isNaN(v)) LIVE._calificacion = v; });
   override('depositos_pf_real',v=>{ if(!isNaN(v)) LIVE._depositosPF = v; });
   override('fae_atesoramiento',v=>{ if(!isNaN(v)) LIVE._fae = v; });
   override('rofex_deval_implicita',v=>{ if(!isNaN(v)) LIVE._rofex = v; });
