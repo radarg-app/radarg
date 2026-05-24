@@ -169,6 +169,8 @@ body.lm .foot-tagline { color: #484864; }
 body.lm .foot-tag { color: #484864; }
 body.lm .foot-copy span { color: #696990; }
 body.lm .h-btn { color: #2a2a40; border-color:rgba(0,0,0,.18); }
+body.lm .h-btn-primary { color:#fff; border-color:var(--ac); }
+body.lm .h-btn-primary:hover { color:#fff; }
 body.lm .h-btn:hover { color: #0a0a14; }
 body.lm .lang-btn { color: #2a2a40; border-color:rgba(0,0,0,.18); }
 body.lm .lang-btn.active { color: #0a0a14; }
@@ -1502,7 +1504,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
     </div>
     <button class="h-btn" onclick="shareScore()">↑ <span data-i18n="header.share">Compartir</span></button>
     <button class="h-btn" onclick="toggleMode()" id="modeBtn">🌙</button>
-    <button class="h-btn h-btn-primary" onclick="openTierModal('silver')">✦ <span data-i18n="nav.tier">Tiers</span></button>
+    <a href="#tiers" class="h-btn h-btn-primary" style="text-decoration:none">✦ <span data-i18n="nav.tier">Tiers</span></a>
   </div>
 </header>
 
