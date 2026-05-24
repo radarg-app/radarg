@@ -2953,6 +2953,20 @@ function adefaScore(v) {
   if(v>20) return 85; if(v>5) return 70; if(v>0) return 57;
   if(v>-10) return 42; if(v>-25) return 28; return 15;
 }
+function iccScoreFn(v) {
+  // ICC UTDT escala 0-100. Más alto = más confianza = codicia.
+  if(v===null||v===undefined) return 50;
+  if(v>=60) return 90; if(v>=50) return 75; if(v>=45) return 65;
+  if(v>=40) return 55; if(v>=35) return 45; if(v>=30) return 33;
+  if(v>=25) return 22; return 12;
+}
+function desempleoScore(v) {
+  // Tasa de desempleo EPH (%). Más bajo = mejor = codicia (inverso).
+  if(v===null||v===undefined) return 50;
+  if(v<5) return 88; if(v<6) return 78; if(v<7) return 68;
+  if(v<8) return 56; if(v<9) return 46; if(v<11) return 35;
+  if(v<14) return 22; return 12;
+}
 function recaudScore(v) {
   if(v===null||v===undefined) return 50;
   if(v>80) return 85; if(v>50) return 70; if(v>30) return 55;
@@ -3213,6 +3227,8 @@ function computeSubIndices(bs) {
   const cDurV   = LIVE._consumoDurable;
   const cFinV   = LIVE._consumoFinan;
   const cSrvV   = LIVE._consumoServ;
+  const iccV    = LIVE._iccUtdt;
+  const desempV = LIVE._desempleoEph;
   const seg3 = [
     { name: es?'EMAE (actividad económica)':'EMAE (economic activity)',
       w:20, score: emaeV!=null ? emaeScore(emaeV) : 50,
@@ -3263,13 +3279,19 @@ function computeSubIndices(bs) {
       desc: es?'Variación real del salario promedio vs inflación (YoY). Es la variable que más directamente captura si el trabajador típico gana o pierde poder adquisitivo.'
              :'Real average wage change vs inflation (YoY). Most directly captures whether the typical worker is gaining or losing purchasing power.' },
     { name: es?'Confianza del Consumidor (ICC)':'Consumer Confidence (ICC)',
-      w:20, score: 50, src: NA, live: false, unavailable: true,
-      unavailNote: es?'Dato mensual UTDT (distinto del ICG). Mide predisposición al consumo. En desarrollo.' : 'Monthly UTDT figure (different from ICG). Measures consumption propensity. In development.',
+      w:20, score: iccV!=null ? iccScoreFn(iccV) : 50,
+      src: iccV!=null ? 'UTDT' : NA,
+      live: iccV!=null, unavailable: iccV==null,
+      raw: iccV!=null ? `${iccV.toFixed(1)} pts` : '',
+      unavailNote: iccV==null ? (es?'Dato mensual UTDT (distinto del ICG). Mide predisposición al consumo. En desarrollo.' : 'Monthly UTDT figure (different from ICG). Measures consumption propensity. In development.') : '',
       desc: es?'Índice de Confianza del Consumidor UTDT. Diferente al ICG político: mide si la gente se anima a gastar, invertir o si prefiere ahorrar por precaución.'
              :'UTDT Consumer Confidence Index. Different from the political ICG: measures whether people are inclined to spend, invest, or save precautionarily.' },
     { name: es?'Tasa de Desempleo (EPH)':'Unemployment Rate (EPH)',
-      w:15, score: 50, src: NA, live: false, unavailable: true,
-      unavailNote: es?'Dato trimestral INDEC (EPH). Baja frecuencia. En desarrollo.' : 'Quarterly INDEC figure (EPH). Low frequency. In development.',
+      w:15, score: desempV!=null ? desempleoScore(desempV) : 50,
+      src: desempV!=null ? 'INDEC/datos.gob.ar' : NA,
+      live: desempV!=null, unavailable: desempV==null,
+      raw: desempV!=null ? `${desempV.toFixed(1)}%` : '',
+      unavailNote: desempV==null ? (es?'Dato trimestral INDEC (EPH). Baja frecuencia. En desarrollo.' : 'Quarterly INDEC figure (EPH). Low frequency. In development.') : '',
       desc: es?'Tasa de desempleo de la Encuesta Permanente de Hogares. Indicador rezagado del ciclo pero fundamental para evaluar el costo social del ajuste.'
              :'Unemployment rate from the Permanent Household Survey. Lagging cycle indicator but fundamental for assessing the social cost of adjustment.' },
     { name: es?'Ventas de Autos (ADEFA)':'Car Sales (ADEFA)',
@@ -5394,7 +5416,7 @@ function closeSuggestPopup(){
 // In production this would come from a news API or RSS parser
 /* ── Noticias inyectadas por el GAS (se actualiza automáticamente) ── */
 // RADARG_DATA_START
-window.INJECTED_DATA = {"embi_bps":543,"tna_pf":19.85,"ipc_mensual":2.6,"reservas_mM":46062,"merval_usd":1862,"base_monetaria_var":-1.6,"reservas_netas_mM":25334,"gd35_yield":6.67,"soja_usd":1205.25,"icg_utdt":2.02,"rem_12m":24.2,"rem_1m":2.3,"prima_electoral_bps":419,"ipc_nucleo":2.88,"tcrm_idx":79.77,"compras_bcra_mM":138,"emae_var_mensual":3.89,"ripte_var_real":2.4,"recaudacion_var_real":26.2,"merval_vol_30d":0,"adefa_var_mensual":0,"al30_precio":63.13,"al30_var":-0.35,"gd30_precio":64.24,"gd30_var":-1.15,"gd35_precio":78.95,"gd35_var":-0.5,"amplitud_up":7,"amplitud_dn":12,"amplitud_fl":1,"amplitud_total":20,"amplitud_score":40,"sentimiento_noticias":65,"ai_analisis_es":"La economía argentina muestra señales mixtas pero con tendencia positiva: la brecha cambiaria de apenas 1.1% refleja la solidez del esquema de bandas, mientras las reservas treparon a USD 46.100 millones y el riesgo país se comprimió a 543 bps, su nivel más bajo en años. Sin embargo, la inflación mensual de 2.6% y una TNA de 19.85% indican que el proceso de desinflación aún no está consolidado, con tasas reales que siguen siendo el ancla principal del programa.\n\nEl clima político mantiene al mercado en modo cauteloso: el ICG-UTDT de 2.02/5 revela una confianza en el gobierno notablemente baja, lo que genera ruido sobre la sostenibilidad política del ajuste fiscal de cara al ciclo electoral que se avecina. El Merval en USD 1.862 muestra que el capital de riesgo sigue apostando al programa, pero cualquier fractura en la coalición oficialista o deterioro en las urnas puede revertir rápidamente ese optimismo.","ai_analisis_en":"Argentina's economy shows stabilizing signals heading into mid-2026, with the FX gap compressed to just 1.1% following the April unification, and monthly CPI at 2.6% — still elevated but well below the peaks of late 2023. Gross reserves have recovered to USD 46.1B, reflecting sustained IMF disbursements and improved trade flows, while country risk at 543bps remains high but has trended downward from crisis-era levels. The Merval at USD 1,862 and soybean prices at USD 1,205/mt provide additional tailwinds for both equity valuations and agricultural export revenue.\n\nThe Milei administration maintains its fiscal anchor as the central political narrative, but consumer confidence at 2.02/5 per the ICG-UTDT signals persistent social fatigue with austerity. Midterm election positioning is intensifying, creating noise around whether adjustment commitments will hold post-October, which partly explains why country risk remains sticky above 500bps despite macro improvements. The TNA at 19.85% ref","ai_fecha":"Tue May 19 2026 22:55:00 GMT-0300 (Argentina Standard Time)","ai_score":59,"ai_seg_inflacion_es":"La inflación mide cuánto suben los precios mes a mes y si el peso conserva su valor. Con una inflación mensual en torno al 2,6% y tasas de interés que apenas la superan, el peso está recuperando lentamente su función de moneda, aunque todavía no conviene del todo confiar en él para ahorrar a largo plazo. El puntaje neutral refleja que vamos por buen camino pero el proceso no está consolidado.","ai_seg_inflacion_en":"Inflation measures how much prices rise month to month and whether the peso keeps its value. With monthly inflation around 2.6% and interest rates barely above it, the peso is slowly recovering its role as money, though it is not yet fully reliable for long-term savings. The neutral score reflects progress that is not yet consolidated.","ai_seg_cambiario_es":"Esta dimensión mira si el país tiene suficientes dólares y si el tipo de cambio es sostenible. Con una brecha cambiaria casi inexistente y reservas en recuperación, el panorama es de los más sólidos de los últimos años. Para una persona común, esto significa menos riesgo de un salto brusco del dólar en el corto plazo.","ai_seg_cambiario_en":"This dimension looks at whether the country has enough dollars and whether the exchange rate is sustainable. With an almost nonexistent FX gap and recovering reserves, the picture is among the strongest in years. For an ordinary person, this means lower risk of a sudden jump in the dollar in the short term.","ai_seg_actividad_es":"Acá medimos si la economía crece, si hay trabajo y si los sueldos le ganan a la inflación. Es la dimensión que más se siente en el bolsillo y en el día a día. Todavía estamos sumando indicadores para tener una foto completa, pero los primeros datos muestran una recuperación gradual de la actividad.","ai_seg_actividad_en":"Here we measure whether the economy is growing, whether there are jobs, and whether wages beat inflation. It is the dimension most felt in everyday life. We are still adding indicators for a complete picture, but early data shows a gradual recovery in activity.","ai_seg_fiscal_es":"Mide si el Estado gasta menos de lo que recauda y si puede pagar sus deudas sin emitir dinero. Un Estado ordenado es la base que permite mantener la inflación baja. Los indicadores actuales sugieren que las cuentas públicas están relativamente bajo control, lo que da confianza a los mercados.","ai_seg_fiscal_en":"It measures whether the State spends less than it collects and can pay its debts without printing money. An orderly State is the foundation for keeping inflation low. Current indicators suggest public finances are relatively under control, which gives markets confidence.","ai_seg_mercados_es":"Refleja cómo ven los inversores al país: el riesgo país, el valor de las acciones y los bonos. Es la dimensión que más rápido reacciona a las noticias del día. Un riesgo país en baja y un Merval firme indican que el capital sigue apostando al programa económico, aunque la confianza política todavía es frágil.","ai_seg_mercados_en":"It reflects how investors see the country: country risk, stock values, and bonds. It is the fastest-reacting dimension to daily news. Falling country risk and a firm Merval indicate capital is still betting on the economic program, though political confidence remains fragile."};
+window.INJECTED_DATA = {"embi_bps":543,"tna_pf":19.85,"ipc_mensual":2.6,"reservas_mM":46062,"merval_usd":1862,"base_monetaria_var":-1.6,"reservas_netas_mM":25334,"gd35_yield":6.67,"soja_usd":1205.25,"icg_utdt":2.02,"rem_12m":24.2,"rem_1m":2.3,"prima_electoral_bps":419,"ipc_nucleo":2.88,"tcrm_idx":79.77,"compras_bcra_mM":138,"emae_var_mensual":3.89,"ripte_var_real":2.4,"recaudacion_var_real":26.2,"merval_vol_30d":0,"adefa_var_mensual":0,"al30_precio":63.13,"al30_var":-0.35,"gd30_precio":64.24,"gd30_var":-1.15,"gd35_precio":78.95,"gd35_var":-0.5,"amplitud_up":7,"amplitud_dn":12,"amplitud_fl":1,"amplitud_total":20,"amplitud_score":40,"sentimiento_noticias":65,"icc_utdt":39.81,"desempleo_eph":7.9,"ai_analisis_es":"La economía argentina muestra señales mixtas pero con tendencia positiva: la brecha cambiaria de apenas 1.1% refleja la solidez del esquema de bandas, mientras las reservas treparon a USD 46.100 millones y el riesgo país se comprimió a 543 bps, su nivel más bajo en años. Sin embargo, la inflación mensual de 2.6% y una TNA de 19.85% indican que el proceso de desinflación aún no está consolidado, con tasas reales que siguen siendo el ancla principal del programa.\n\nEl clima político mantiene al mercado en modo cauteloso: el ICG-UTDT de 2.02/5 revela una confianza en el gobierno notablemente baja, lo que genera ruido sobre la sostenibilidad política del ajuste fiscal de cara al ciclo electoral que se avecina. El Merval en USD 1.862 muestra que el capital de riesgo sigue apostando al programa, pero cualquier fractura en la coalición oficialista o deterioro en las urnas puede revertir rápidamente ese optimismo.","ai_analisis_en":"Argentina's economy shows stabilizing signals heading into mid-2026, with the FX gap compressed to just 1.1% following the April unification, and monthly CPI at 2.6% — still elevated but well below the peaks of late 2023. Gross reserves have recovered to USD 46.1B, reflecting sustained IMF disbursements and improved trade flows, while country risk at 543bps remains high but has trended downward from crisis-era levels. The Merval at USD 1,862 and soybean prices at USD 1,205/mt provide additional tailwinds for both equity valuations and agricultural export revenue.\n\nThe Milei administration maintains its fiscal anchor as the central political narrative, but consumer confidence at 2.02/5 per the ICG-UTDT signals persistent social fatigue with austerity. Midterm election positioning is intensifying, creating noise around whether adjustment commitments will hold post-October, which partly explains why country risk remains sticky above 500bps despite macro improvements. The TNA at 19.85% ref","ai_fecha":"Tue May 19 2026 22:55:00 GMT-0300 (Argentina Standard Time)","ai_score":59,"ai_seg_inflacion_es":"La inflación mide cuánto suben los precios mes a mes y si el peso conserva su valor. Con una inflación mensual en torno al 2,6% y tasas de interés que apenas la superan, el peso está recuperando lentamente su función de moneda, aunque todavía no conviene del todo confiar en él para ahorrar a largo plazo. El puntaje neutral refleja que vamos por buen camino pero el proceso no está consolidado.","ai_seg_inflacion_en":"Inflation measures how much prices rise month to month and whether the peso keeps its value. With monthly inflation around 2.6% and interest rates barely above it, the peso is slowly recovering its role as money, though it is not yet fully reliable for long-term savings. The neutral score reflects progress that is not yet consolidated.","ai_seg_cambiario_es":"Esta dimensión mira si el país tiene suficientes dólares y si el tipo de cambio es sostenible. Con una brecha cambiaria casi inexistente y reservas en recuperación, el panorama es de los más sólidos de los últimos años. Para una persona común, esto significa menos riesgo de un salto brusco del dólar en el corto plazo.","ai_seg_cambiario_en":"This dimension looks at whether the country has enough dollars and whether the exchange rate is sustainable. With an almost nonexistent FX gap and recovering reserves, the picture is among the strongest in years. For an ordinary person, this means lower risk of a sudden jump in the dollar in the short term.","ai_seg_actividad_es":"Acá medimos si la economía crece, si hay trabajo y si los sueldos le ganan a la inflación. Es la dimensión que más se siente en el bolsillo y en el día a día. Todavía estamos sumando indicadores para tener una foto completa, pero los primeros datos muestran una recuperación gradual de la actividad.","ai_seg_actividad_en":"Here we measure whether the economy is growing, whether there are jobs, and whether wages beat inflation. It is the dimension most felt in everyday life. We are still adding indicators for a complete picture, but early data shows a gradual recovery in activity.","ai_seg_fiscal_es":"Mide si el Estado gasta menos de lo que recauda y si puede pagar sus deudas sin emitir dinero. Un Estado ordenado es la base que permite mantener la inflación baja. Los indicadores actuales sugieren que las cuentas públicas están relativamente bajo control, lo que da confianza a los mercados.","ai_seg_fiscal_en":"It measures whether the State spends less than it collects and can pay its debts without printing money. An orderly State is the foundation for keeping inflation low. Current indicators suggest public finances are relatively under control, which gives markets confidence.","ai_seg_mercados_es":"Refleja cómo ven los inversores al país: el riesgo país, el valor de las acciones y los bonos. Es la dimensión que más rápido reacciona a las noticias del día. Un riesgo país en baja y un Merval firme indican que el capital sigue apostando al programa económico, aunque la confianza política todavía es frágil.","ai_seg_mercados_en":"It reflects how investors see the country: country risk, stock values, and bonds. It is the fastest-reacting dimension to daily news. Falling country risk and a firm Merval indicate capital is still betting on the economic program, though political confidence remains fragile."};
 // RADARG_DATA_END
 
 // RADARG_NEWS_START
@@ -5602,6 +5624,8 @@ async function loadDataJSON() {
     if(f('recaudacion_var_real')!==null)  LIVE._recaudVar = f('recaudacion_var_real');
     if(f('merval_vol_30d')!==null)        LIVE._mervalVol = f('merval_vol_30d');
     if(f('adefa_var_mensual')!==null)     LIVE._adefaVar = f('adefa_var_mensual');
+    if(f('icc_utdt')!==null)              LIVE._iccUtdt = f('icc_utdt');
+    if(f('desempleo_eph')!==null)         LIVE._desempleoEph = f('desempleo_eph');
     if(f('consumo_masivo_var')!==null)    LIVE._consumoMasivo = f('consumo_masivo_var');
     if(f('consumo_durable_var')!==null)   LIVE._consumoDurable = f('consumo_durable_var');
     if(f('consumo_financiero_var')!==null)LIVE._consumoFinan = f('consumo_financiero_var');
@@ -5698,6 +5722,8 @@ function applyInjectedData() {
   if(_f('recaudacion_var_real')!==null)  LIVE._recaudVar = _f('recaudacion_var_real');
   if(_f('merval_vol_30d')!==null)        LIVE._mervalVol = _f('merval_vol_30d');
   if(_f('adefa_var_mensual')!==null)     LIVE._adefaVar = _f('adefa_var_mensual');
+  if(_f('icc_utdt')!==null)              LIVE._iccUtdt = _f('icc_utdt');
+  if(_f('desempleo_eph')!==null)         LIVE._desempleoEph = _f('desempleo_eph');
   if(_f('consumo_masivo_var')!==null)    LIVE._consumoMasivo = _f('consumo_masivo_var');
   if(_f('consumo_durable_var')!==null)   LIVE._consumoDurable = _f('consumo_durable_var');
   if(_f('consumo_financiero_var')!==null)LIVE._consumoFinan = _f('consumo_financiero_var');
@@ -5794,6 +5820,8 @@ async function loadSheetSubDatos() {
   override('emae_var_mensual',   v => { if(!isNaN(v)) LIVE._emaeVar = v; });
   override('ripte_var_real',     v => { if(!isNaN(v)) LIVE._ripteVar = v; });
   override('adefa_var_mensual',  v => { if(!isNaN(v)) LIVE._adefaVar = v; });
+  override('icc_utdt',           v => { if(!isNaN(v)) LIVE._iccUtdt = v; });
+  override('desempleo_eph',      v => { if(!isNaN(v)) LIVE._desempleoEph = v; });
   override('recaudacion_var_real',v=>{ if(!isNaN(v)) LIVE._recaudVar = v; });
   override('merval_vol_30d',     v => { if(!isNaN(v)&&v>0) LIVE._mervalVol = v; });
   override('consumo_masivo_var',   v => { if(!isNaN(v)) LIVE._consumoMasivo = v; });
@@ -5810,6 +5838,8 @@ async function loadSheetSubDatos() {
   override('emae_var_mensual',   v => { if(!isNaN(v)) LIVE._emaeVar = v; });
   override('ripte_var_real',     v => { if(!isNaN(v)) LIVE._ripteVar = v; });
   override('adefa_var_mensual',  v => { if(!isNaN(v)) LIVE._adefaVar = v; });
+  override('icc_utdt',           v => { if(!isNaN(v)) LIVE._iccUtdt = v; });
+  override('desempleo_eph',      v => { if(!isNaN(v)) LIVE._desempleoEph = v; });
   override('recaudacion_var_real',v=>{ if(!isNaN(v)) LIVE._recaudVar = v; });
   override('merval_vol_30d',     v => { if(!isNaN(v)&&v>0) LIVE._mervalVol = v; });
   if(sheetTna !== null) LIVE.tasaReal.tna = sheetTna;
