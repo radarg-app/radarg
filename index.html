@@ -3266,9 +3266,6 @@ function computeSubIndices(bs) {
   const ripteV  = LIVE._ripteVar;
   const adefaV  = LIVE._adefaVar;
   const cMasV   = LIVE._consumoMasivo;
-  const cDurV   = LIVE._consumoDurable;
-  const cFinV   = LIVE._consumoFinan;
-  const cSrvV   = LIVE._consumoServ;
   const iccV    = LIVE._iccUtdt;
   const desempV = LIVE._desempleoEph;
   const seg3 = [
@@ -3286,42 +3283,18 @@ function computeSubIndices(bs) {
       live: ripteV!=null, unavailable: ripteV==null,
       raw: ripteV!=null ? `Var. real: ${ripteV>0?'+':''}${ripteV.toFixed(1)}%` : '',
       unavailNote: ripteV==null ? (es?'Dato mensual. En desarrollo.':'Monthly figure. In development.') : '',
-    },
+      desc: es?'Variación real del salario promedio vs inflación (YoY). Es la variable que más directamente captura si el trabajador típico gana o pierde poder adquisitivo.'
+             :'Real average wage change vs inflation (YoY). Most directly captures whether the typical worker is gaining or losing purchasing power.' },
     { name: es?'Consumo Masivo (supermercados)':'Mass Consumption (supermarkets)',
-      w:18, score: cMasV!=null ? consumoMasivoScore(cMasV) : 50,
+      w:17, score: cMasV!=null ? consumoMasivoScore(cMasV) : 50,
       src: cMasV!=null ? 'INDEC datos.gob.ar' : NA,
       live: cMasV!=null, unavailable: cMasV==null,
       raw: cMasV!=null ? `Var. i.a.: ${cMasV>0?'+':''}${cMasV.toFixed(1)}%` : '',
       desc: es?'Variación real de ventas en supermercados. Proxy del consumo de bienes no durables y de primera necesidad.':'Real change in supermarket sales. Proxy for non-durable goods consumption.',
       unavailNote: cMasV==null ? (es?'Ventas supermercados INDEC en términos reales. Buscando serie en datos.gob.ar.':'INDEC supermarket sales in real terms. Sourcing series from datos.gob.ar.') : '',
     },
-    { name: es?'Consumo Durable (electrodom. + shoppings)':'Durable Goods Consumption',
-      w:15, score: cDurV!=null ? consumoDurableScore(cDurV) : 50,
-      src: cDurV!=null ? 'INDEC datos.gob.ar' : NA,
-      live: cDurV!=null, unavailable: cDurV==null,
-      raw: cDurV!=null ? `Var. i.a.: ${cDurV>0?'+':''}${cDurV.toFixed(1)}%` : '',
-      desc: es?'Ventas de electrodomésticos y centros de compras. Indicador adelantado del ciclo económico y la confianza del consumidor.':'Appliance and shopping center sales. Leading indicator of the economic cycle.',
-      unavailNote: cDurV==null ? (es?'Ventas electrodomésticos + shoppings INDEC. Buscando serie.':'INDEC appliance/mall sales. Sourcing series.') : '',
-    },
-    { name: es?'Consumo Financiero (crédito)':'Financial Consumption (credit)',
-      w:15, score: cFinV!=null ? consumoFinanScore(cFinV) : 50,
-      src: cFinV!=null ? 'BCRA v4' : NA,
-      live: cFinV!=null, unavailable: cFinV==null,
-      raw: cFinV!=null ? `ARS ${(cFinV/1000000).toFixed(1)}B` : '',
-      desc: es?'Crédito al consumo (préstamos personales + tarjetas) del sector bancario. Mide la demanda financiada de consumo privado.':'Consumer credit (personal loans + cards). Measures credit-financed private consumption.',
-      unavailNote: cFinV==null ? (es?'Crédito al consumo BCRA. Identificando variable en API BCRA.':'BCRA consumer credit. Identifying variable in BCRA API.') : '',
-    },
-    { name: es?'Consumo de Servicios (real)':'Services Consumption (real)',
-      w:12, score: cSrvV!=null ? consumoServScore(cSrvV) : 50,
-      src: cSrvV!=null ? 'datos.gob.ar/INDEC' : NA,
-      live: cSrvV!=null, unavailable: cSrvV==null,
-      raw: cSrvV!=null ? `Var. real: ${cSrvV>0?'+':''}${cSrvV.toFixed(2)}%/mes` : '',
-      desc: es?'IPC Servicios deflactado vs IPC general. Variación positiva indica que el consumo de servicios crece en términos reales.':'Services CPI deflated vs headline CPI. Positive change indicates real growth in services spending.',
-      unavailNote: cSrvV==null ? (es?'IPC Servicios INDEC deflactado. Buscando serie.':'INDEC Services CPI deflated. Sourcing series.') : '',
-      desc: es?'Variación real del salario promedio vs inflación (YoY). Es la variable que más directamente captura si el trabajador típico gana o pierde poder adquisitivo.'
-             :'Real average wage change vs inflation (YoY). Most directly captures whether the typical worker is gaining or losing purchasing power.' },
     { name: es?'Confianza del Consumidor (ICC)':'Consumer Confidence (ICC)',
-      w:20, score: iccV!=null ? iccScoreFn(iccV) : 50,
+      w:18, score: iccV!=null ? iccScoreFn(iccV) : 50,
       src: iccV!=null ? 'UTDT' : NA,
       live: iccV!=null, unavailable: iccV==null,
       raw: iccV!=null ? `${iccV.toFixed(1)} pts` : '',
@@ -3329,7 +3302,7 @@ function computeSubIndices(bs) {
       desc: es?'Índice de Confianza del Consumidor UTDT. Diferente al ICG político: mide si la gente se anima a gastar, invertir o si prefiere ahorrar por precaución.'
              :'UTDT Consumer Confidence Index. Different from the political ICG: measures whether people are inclined to spend, invest, or save precautionarily.' },
     { name: es?'Tasa de Desempleo (EPH)':'Unemployment Rate (EPH)',
-      w:15, score: desempV!=null ? desempleoScore(desempV) : 50,
+      w:13, score: desempV!=null ? desempleoScore(desempV) : 50,
       src: desempV!=null ? 'INDEC/datos.gob.ar' : NA,
       live: desempV!=null, unavailable: desempV==null,
       raw: desempV!=null ? `${desempV.toFixed(1)}%` : '',
