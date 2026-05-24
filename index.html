@@ -2988,10 +2988,12 @@ function depositosPFScore(v) {
 }
 function faeScore(v) {
   // FAE/atesoramiento (M USD compra neta billetes personas humanas). INVERSO.
+  // Centro neutro anclado en el piso cultural argentino (~US$1.500M/mes sin cepo).
   if(v===null||v===undefined) return 50;
-  if(v<=0) return 85; if(v<=500) return 75; if(v<=1000) return 62;
-  if(v<=1500) return 50; if(v<=2000) return 40; if(v<=2500) return 30;
-  if(v<=3500) return 20; if(v<=5000) return 12; return 6;
+  if(v<=-500) return 92; if(v<=0) return 85; if(v<=700) return 75;
+  if(v<=1200) return 66; if(v<=1600) return 58; if(v<=2200) return 48;
+  if(v<=2800) return 38; if(v<=3500) return 28; if(v<=4500) return 18;
+  if(v<=6000) return 10; return 5;
 }
 function volScore(v) {
   if(!v) return 50;
