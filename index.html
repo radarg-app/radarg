@@ -640,7 +640,7 @@ body.lm .var-card-bar { background:rgba(0,0,0,.07); }
 .czl-color { width:24px; height:8px; border-radius:2px; flex-shrink:0; }
 .czl-name  { font-size:11px; font-weight:600; color:var(--text); }
 .czl-range { font-size:10px; color:var(--text3); font-family:'JetBrains Mono',monospace; }
-.chart-wrap { position:relative; height:300px; }
+.chart-wrap { position:relative; height:420px; }
 
 /* ── Merval toggle switch ─────────────────────────────────── */
 .merval-switch-wrap {
@@ -1400,9 +1400,12 @@ body.lm .suggest-input:focus, body.lm .suggest-select:focus, body.lm .suggest-te
 
   /* Chart */
   .chart-card { padding:1rem; }
-  .chart-zone-legend { gap:.625rem; overflow-x:auto; flex-wrap:nowrap; }
+  .chart-zone-legend { gap:.5rem; overflow-x:auto; flex-wrap:nowrap; }
   .czl-item { flex-shrink:0; }
-  .chart-wrap { height:240px; }
+  .chart-wrap { height:340px; }
+  /* Toggles Merval/Presidentes — más compactos en tablet */
+  .chart-toggles { gap:.625rem; }
+  .toggle-lbl-merval, .toggle-lbl-pres { font-size:10px; }
 
   /* Pro features — 1 col */
   .pro-features { grid-template-columns:1fr; }
@@ -1430,6 +1433,16 @@ body.lm .suggest-input:focus, body.lm .suggest-select:focus, body.lm .suggest-te
   .ctx-strip { grid-template-columns:1fr; }
   .news-strip { grid-template-columns:1fr; }
   .sc-refs { flex-direction:column; gap:.375rem; }
+  /* Chart en móvil: altura mayor para que quepa el Merval */
+  .chart-wrap { height:300px; }
+  /* Leyenda de zonas: scroll horizontal para que no colapsen */
+  .chart-zone-legend { flex-wrap:nowrap; overflow-x:auto; gap:.375rem; padding:.5rem .75rem; }
+  .czl-name { font-size:10px; }
+  .czl-range { display:none; }   /* ocultar rango numérico en móvil muy chico */
+  /* Toggles: debajo de la leyenda en móvil */
+  .chart-toggles { margin-left:0; margin-top:.5rem; justify-content:flex-start; }
+  .chart-zone-legend { flex-wrap:wrap; }
+  .toggle-lbl-merval, .toggle-lbl-pres { font-size:10px; }
 }
 .btn-donate-sm {
   display:inline-flex; align-items:center; gap:5px;
@@ -5190,7 +5203,7 @@ function buildChart(from,to){
     label:'Merval USD', data:mervalNorm,
     borderColor:mervalColor, borderWidth:isLM?2.5:2, borderDash:[6,3],
     pointRadius:0, pointHoverRadius:4, pointBackgroundColor:mervalColor,
-    fill:false, tension:.4, spanGaps:true, yAxisID:'y',
+    fill:false, tension:.4, spanGaps:true, yAxisID:'y', clip:false,
   }] : [];
 
   // numLabels = [0,1,2,...] — purely numeric so Chart.js never tries to parse
