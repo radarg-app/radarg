@@ -3384,7 +3384,7 @@ function computeSubIndices(bs) {
       desc: es?'Variación real de la recaudación tributaria. Mide tanto el ciclo económico como la compliance fiscal. Caída real sostenida señala deterioro fiscal.'
              :'Real change in tax revenue. Measures both the economic cycle and fiscal compliance. Sustained real decline signals fiscal deterioration.' },
     { name: es?'Curva Soberana (GD30/GD35)':'Sovereign Curve (GD30/GD35)',
-      w:15, score: gd35YieldScore(gd35Y), src:'IOL', live: gd35Y!=null,
+      w:19, score: gd35YieldScore(gd35Y), src:'IOL', live: gd35Y!=null,
       raw: gd35Y!=null ? `GD35 TIR: ${gd35Y.toFixed(2)}%${LIVE._gd35Precio ? ' · precio USD '+LIVE._gd35Precio.toFixed(2) : ''}` : '',
       desc: es?'Pendiente de la curva soberana usando el rendimiento del GD35. Una curva invertida o muy empinada señala expectativas de stress fiscal en el mediano plazo.'
              :'Slope of the sovereign curve using GD35 yield. An inverted or very steep curve signals medium-term fiscal stress expectations.' },
@@ -3411,12 +3411,12 @@ function computeSubIndices(bs) {
   const spreadAL30 = LIVE._spread_al30_gd30;
   const seg5 = [
     { name: es?'Riesgo País (EMBI)':'Country Risk (EMBI)',
-      w:22, score: LIVE.embi.score, src:'ArgentinaDatos', live: LIVE.embi.live,
+      w:29, score: LIVE.embi.score, src:'ArgentinaDatos', live: LIVE.embi.live,
       raw: LIVE.embi.bps ? `${LIVE.embi.bps} bps · score ${LIVE.embi.score}/100` : '',
       desc: es?'Spread de la deuda soberana argentina sobre los Treasuries de EEUU. El indicador de riesgo más seguido mediáticamente. Comprimió de ~850 bps en 2025 a ~525 bps hoy.'
              :'Spread of Argentine sovereign debt over US Treasuries. The most media-followed risk indicator. Compressed from ~850 bps in 2025 to ~525 bps today.' },
     { name: es?'Merval USD (vs media 52s)':'Merval USD (vs 52w avg)',
-      w:18, score: LIVE.merval.score, src:'IOL/Yahoo', live: LIVE.merval.live,
+      w:23, score: LIVE.merval.score, src:'IOL/Yahoo', live: LIVE.merval.live,
       raw: LIVE.merval.usd ? `USD ${Math.round(LIVE.merval.usd).toLocaleString('es-AR')}` + (LIVE.merval.score!=null ? ` · score ${LIVE.merval.score}/100`:'') : (LIVE.merval.raw||''),
       desc: es?'El Merval en dólares CCL captura el apetito de riesgo en renta variable local. Máximos históricos en USD señalan codicia extrema del mercado financiero.'
              :'Merval in CCL dollars captures local equity risk appetite. Historical USD highs signal extreme financial market greed.' },
@@ -3426,7 +3426,7 @@ function computeSubIndices(bs) {
       desc: es?'Rendimiento del GD35 (bono soberano a 10 años, ley NY). Mide el costo de acceso a los mercados internacionales de capital a largo plazo.'
              :'GD35 yield (10-year sovereign bond, NY law). Measures the cost of long-term access to international capital markets.' },
     { name: es?'Amplitud Merval (semanal)':'Merval Breadth (weekly)',
-      w:12, score: LIVE.amplitud.score, src:'IOL', live: LIVE.amplitud.live,
+      w:16, score: LIVE.amplitud.score, src:'IOL', live: LIVE.amplitud.live,
       raw: (()=>{
         const up=LIVE._amplitudUp, dn=LIVE._amplitudDn, fl=LIVE._amplitudFl, tot=LIVE._amplitudTotal;
         if(up!=null && dn!=null) return `${up}↑ ${fl??''}${fl!=null?' planas ':' '}${dn}↓ de ${tot??((up||0)+(dn||0)+(fl||0))} acciones`;
@@ -3434,23 +3434,15 @@ function computeSubIndices(bs) {
       })(),
       desc: es?'% de acciones del panel con variación semanal positiva. Amplitud alta (>70%) confirma un rally genuino; amplitud baja con índice en alza señala movimiento frágil.'
              :'% of panel stocks with positive weekly change. High breadth (>70%) confirms genuine rally; low breadth with rising index signals fragile move.' },
-    { name: es?'Prima Electoral (AO28-AO27)':'Electoral Premium (AO28-AO27)',
-      w:10, score: primaElectoralScore(), src: primaElect!=null ? 'IOL (AO27/AO28)' : 'IOL (proxy)',
-      live: true,
-      raw: primaElect!=null
-        ? `AO28-AO27: ${primaElect>0?'+':''}${primaElect} bps · ${primaElect<100?'prima baja':'prima alta'}`
-        : (spreadAL30!=null ? `Proxy AL30/GD30: +${spreadAL30.toFixed(1)}%` : ''),
-      desc: es?'Spread entre rendimientos de bonos pre y post-electorales (2027). Mide el miedo del mercado a un cambio de política económica post-elecciones.'
-             :'Spread between pre and post-election bond yields (2027). Measures market fear of an economic policy change after the elections.' },
     { name: es?'Confianza en el Gobierno (ICG)':'Gov. Confidence (ICG)',
-      w:6, score: LIVE.icg!=null ? intScore((LIVE.icg/5)*100) : 40,
+      w:8, score: LIVE.icg!=null ? intScore((LIVE.icg/5)*100) : 40,
       src: LIVE.icg!=null ? 'UTDT (mensual)' : 'UTDT',
       live: LIVE.icg!=null, mensual: true,
       raw: LIVE.icg!=null ? `${LIVE.icg.toFixed(2)}/5 (${intScore((LIVE.icg/5)*100)}/100)` : '',
       desc: es?'Índice de Confianza en el Gobierno de la UTDT. Encuesta mensual que mide la aprobación de la gestión. Históricamente, caídas sostenidas del ICG preceden deterioros del clima financiero y complican la renovación del apoyo político al ajuste fiscal.'
              :'UTDT Government Confidence Index. Monthly survey measuring approval of the administration. Historically, sustained ICG declines precede financial climate deterioration and complicate political support for fiscal adjustment.' },
     { name: es?'Sentimiento de Noticias (IA)':'News Sentiment (AI)',
-      w:4, score: LIVE._sentimiento_noticias!=null ? intScore(Number(LIVE._sentimiento_noticias)) : 50,
+      w:5, score: LIVE._sentimiento_noticias!=null ? intScore(Number(LIVE._sentimiento_noticias)) : 50,
       src: LIVE._sentimiento_noticias!=null ? 'Claude AI · últimas 48h' : 'Claude AI',
       live: LIVE._sentimiento_noticias!=null,
       unavailable: LIVE._sentimiento_noticias==null,
@@ -3458,14 +3450,6 @@ function computeSubIndices(bs) {
       unavailNote: LIVE._sentimiento_noticias==null ? (es?'Se actualiza cada 2h con el GAS.':'Updated every 2h by the GAS.') : '',
       desc: es?'Análisis de sentimiento de las principales noticias económicas y políticas de las últimas 48 horas, realizado por Claude (Anthropic). Un score alto indica un flujo de noticias positivo para el mercado; uno bajo refleja noticias de riesgo o incertidumbre. Se actualiza automáticamente cada 2 horas vía Google Apps Script.'
              :'Sentiment analysis of the main economic and political news from the last 48 hours, performed by Claude (Anthropic). A high score indicates a positive news flow for the market; a low score reflects risk or uncertainty news. Updated automatically every 2 hours via Google Apps Script.' },
-    { name: es?'Volatilidad Merval (30d)':'Merval Volatility (30d)',
-      w:13, score: LIVE._mervalVol!=null ? volScore(LIVE._mervalVol) : 50,
-      src: LIVE._mervalVol!=null ? 'IOL' : NA,
-      live: LIVE._mervalVol!=null, unavailable: LIVE._mervalVol==null,
-      raw: LIVE._mervalVol!=null ? `Vol. anualizada: ${LIVE._mervalVol.toFixed(1)}%` : '',
-      unavailNote: LIVE._mervalVol==null ? (es?'Calculado desde precios IOL. En desarrollo.':'Calculated from IOL prices. In development.') : '',
-      desc: es?'Volatilidad histórica del Merval en los últimos 30 días. Alta volatilidad señala incertidumbre; baja volatilidad con precios altos = codicia extrema.'
-             :'Historical Merval volatility over the last 30 days. High volatility signals uncertainty; low volatility with high prices = extreme greed.' },
   ];
 
   const avg1 = vars => clamp(vars.reduce((s,v)=>s+v.score*(v.w||1),0) / vars.reduce((s,v)=>s+(v.w||1),0));
