@@ -5190,6 +5190,27 @@ function buildChart(from,to){
 
   // Merval normalised 0-100
   const _disp = k => window.MONTHLY_DISPLAY ? window.MONTHLY_DISPLAY(k) : k;
+  // Actualizar MERVAL_MAP con el valor real live para el mes presente.
+  // El array MERVAL_HIST tiene valores históricos que pueden estar desactualizados.
+  // El dato real (último cierre mensual o valor actual) viene de LIVE.merval.usd.
+  (function patchMervalCurrent() {
+    const usd = LIVE.merval && LIVE.merval.usd > 0 ? LIVE.merval.usd : null;
+    if (!usd) return;
+    const now = new Date();
+    // Label del mes actual en formato "May 2026"
+    const mesKey = (window.MONTHLY_DISPLAY || (k=>k))(
+      now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0')
+    );
+    // Label del mes anterior para retroalimentar también el último mes cerrado
+    const prev = new Date(now.getFullYear(), now.getMonth()-1, 1);
+    const prevKey = (window.MONTHLY_DISPLAY || (k=>k))(
+      prev.getFullYear() + '-' + String(prev.getMonth()+1).padStart(2,'0')
+    );
+    // Siempre pisar el mes presente con el dato vivo
+    MERVAL_MAP[mesKey] = usd;
+    // Si el mes anterior no tiene dato en el mapa (falta en MERVAL_HIST), usar mismo valor como fallback
+    if (!MERVAL_MAP[prevKey]) MERVAL_MAP[prevKey] = usd;
+  })();
   const mervalRaw  = rawLabels.map(lbl => MERVAL_MAP[_disp(lbl)] ?? null);
   const mervalVals = mervalRaw.filter(v => v !== null);
   const mervalMin  = mervalVals.length ? Math.min(...mervalVals) : 0;
@@ -5687,7 +5708,10 @@ async function loadDataJSON() {
     if(f('tna_pf')!==null)                LIVE.tasaReal.tna = f('tna_pf');
     if(f('ipc_mensual')!==null)           LIVE.tasaReal.ipc = f('ipc_mensual');
     if(f('reservas_mM')!==null) { const mM=f('reservas_mM'); const disp=mM>=1000?'USD '+(mM/1000).toFixed(1)+'MM':'USD '+Math.round(mM)+'M'; LIVE.reservas={mM,score:reservasToScore(mM),raw:disp+' brutas',src:'data.json',live:true}; }
-    if(f('merval_usd')!==null)  { const v=f('merval_usd'); LIVE.merval.usd=v; LIVE.merval.score=mervalToScore(v); LIVE.merval.raw=`USD ${Math.round(v).toLocaleString('es-AR')}`; LIVE.merval.src='data.json'; LIVE.merval.live=true; }
+    if(f('merval_usd')!==null)  { const v=f('merval_usd'); LIVE.merval.usd=v; LIVE.merval.score=mervalToScore(v); LIVE.merval.raw=`USD ${Math.round(v).toLocaleString('es-AR')}`; LIVE.merval.src='data.json'; LIVE.merval.live=true;
+      // Pisar MERVAL_MAP con el dato real del data.json para el mes presente
+      if(window.MONTHLY_DISPLAY){const now=new Date();const mk=window.MONTHLY_DISPLAY(now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0'));MERVAL_MAP[mk]=v;}
+    }
     if(f('soja_usd')!==null)              LIVE.soja = f('soja_usd');
     if(f('icg_utdt')!==null)              LIVE.icg = f('icg_utdt');
     if(f('rem_12m')!==null) { const r=f('rem_12m'); LIVE.tasaReal.rem12m=r; LIVE.tasaReal.remMensual=(Math.pow(1+r/100,1/12)-1)*100; }
@@ -5792,7 +5816,9 @@ function applyInjectedData() {
   if(_f('tna_pf')!==null)                LIVE.tasaReal.tna = _f('tna_pf');
   if(_f('ipc_mensual')!==null)           LIVE.tasaReal.ipc = _f('ipc_mensual');
   if(_f('reservas_mM')!==null) { var _mM=_f('reservas_mM'); var _disp=_mM>=1000?'USD '+(_mM/1000).toFixed(1)+'MM':'USD '+Math.round(_mM)+'M'; LIVE.reservas={mM:_mM,score:reservasToScore(_mM),raw:_disp+' brutas',src:'data.json',live:true}; }
-  if(_f('merval_usd')!==null)  { var _mv=_f('merval_usd'); LIVE.merval.usd=_mv; LIVE.merval.score=mervalToScore(_mv); LIVE.merval.raw='USD '+Math.round(_mv).toLocaleString('es-AR'); LIVE.merval.src='data.json'; LIVE.merval.live=true; }
+  if(_f('merval_usd')!==null)  { var _mv=_f('merval_usd'); LIVE.merval.usd=_mv; LIVE.merval.score=mervalToScore(_mv); LIVE.merval.raw='USD '+Math.round(_mv).toLocaleString('es-AR'); LIVE.merval.src='data.json'; LIVE.merval.live=true;
+    if(window.MONTHLY_DISPLAY){var _now=new Date();var _mk=window.MONTHLY_DISPLAY(_now.getFullYear()+'-'+String(_now.getMonth()+1).padStart(2,'0'));MERVAL_MAP[_mk]=_mv;}
+  }
   if(_f('soja_usd')!==null)              LIVE.soja = _f('soja_usd');
   if(_f('icg_utdt')!==null)              LIVE.icg = _f('icg_utdt');
   if(_f('rem_12m')!==null) { var _r=_f('rem_12m'); LIVE.tasaReal.rem12m=_r; LIVE.tasaReal.remMensual=(Math.pow(1+_r/100,1/12)-1)*100; }
