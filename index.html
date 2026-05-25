@@ -4950,17 +4950,7 @@ let histInst=null, sliderFrom=0, sliderTo=0;
 // TOTAL_MONTHS must be dynamic — loadSheetHistorico can update MONTHLY.labels
 const getTotalMonths=()=>window.MONTHLY.labels.length;
 let TOTAL_MONTHS=getTotalMonths(); // updated after each Sheet load
-function tickStep(n, canvasWidth){
-  // En pantallas angostas, reducir la densidad de ticks drásticamente
-  // para que los labels de año no se solapen ni desborden el canvas.
-  const w = canvasWidth || (typeof window !== 'undefined' ? window.innerWidth : 1200);
-  const isMobile  = w < 600;
-  const isTablet  = w < 900;
-  if(isMobile)  { if(n<=24)return 6;  if(n<=60)return 12; if(n<=180)return 24; return 36; }
-  if(isTablet)  { if(n<=24)return 3;  if(n<=60)return 6;  if(n<=180)return 12; return 24; }
-  // Desktop
-  if(n<=24)return 1; if(n<=48)return 3; if(n<=96)return 6; if(n<=180)return 12; return 24;
-}
+function tickStep(n){if(n<=24)return 1;if(n<=48)return 3;if(n<=96)return 6;if(n<=180)return 12;return 24;}
 
 const MILESTONES=[
   // tipo:'pais' = eventos económicos/políticos del país (se muestran en el gráfico)
@@ -5190,8 +5180,7 @@ function buildChart(from,to){
   const rawLabels = window.MONTHLY.labels.slice(from, to+1);
   const scores    = window.MONTHLY.scores.slice(from, to+1);
   const n         = rawLabels.length;
-  const canvasW   = canvasEl ? canvasEl.offsetWidth || canvasEl.clientWidth || window.innerWidth : window.innerWidth;
-  const step      = tickStep(n, canvasW);
+  const step      = tickStep(n);
   const isLM      = document.body.classList.contains('lm');
   // Guard BEFORE destroy — if range too small, keep existing chart
   if(n < 2) { console.warn('[RadARG] buildChart: rango muy corto (n='+n+'), manteniendo chart'); return; }
@@ -5302,27 +5291,14 @@ function buildChart(from,to){
           type:'linear', min:0, max:Math.max(1,n-1),
           ticks:{
             color:()=>isLM?'#6868a0':'#606080',
-            font:{family:"'JetBrains Mono',monospace",size:canvasW<600?9:10},
-            maxRotation:canvasW<600?0:45,  // sin rotación en móvil = no desborda
-            minRotation:0,
-            autoSkip:true,         // Chart.js salta ticks automáticamente si no hay espacio
-            autoSkipPadding:8,     // mínimo 8px de separación entre labels
-            maxTicksLimit:canvasW<600?6:canvasW<900?10:20,  // límite duro de ticks visibles
-            stepSize:step,
+            font:{family:"'JetBrains Mono',monospace",size:10},
+            maxRotation:45, autoSkip:false, stepSize:step,
             callback:(v)=>{
               const i=Math.round(v);
               if(i<0||i>=n||i%step!==0) return '';
               const lbl=rawLabels[i];
               if(!lbl) return '';
-              // En móvil, mostrar solo el año (no "May 2026", solo "2026")
-              try {
-                const disp = window.MONTHLY_DISPLAY(lbl);
-                if(canvasW < 600) {
-                  const yr = disp.match(/\d{4}/);
-                  return yr ? yr[0] : disp;
-                }
-                return disp;
-              } catch(e){ return ''; }
+              try { return window.MONTHLY_DISPLAY(lbl); } catch(e){ return ''; }
             },
           },
           grid:{color:()=>isLM?'rgba(0,0,0,.06)':'rgba(255,255,255,.04)'},
@@ -6232,16 +6208,7 @@ async function loadAllFromSheet() {
 
 /* ── Init ──────────────────────────────────────────────────── */
 let resizeTimer;
-window.addEventListener('resize',()=>{
-  clearTimeout(resizeTimer);
-  resizeTimer=setTimeout(()=>{
-    drawGauge(lastScore);
-    // Reconstruir el chart con el nuevo ancho — recalcula tickStep y maxTicksLimit
-    if(typeof sliderFrom!=='undefined' && typeof sliderTo!=='undefined'){
-      buildChart(sliderFrom, sliderTo);
-    }
-  },200);
-});
+window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{drawGauge(lastScore);},120);});
 document.addEventListener('DOMContentLoaded',()=>{
   const rF=$('rangeFrom'),rT=$('rangeTo');
   if(rF)rF.addEventListener('input',updateSlider);
