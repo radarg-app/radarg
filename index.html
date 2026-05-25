@@ -1610,8 +1610,8 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
 
   </section>
 
-  <!-- AI ROW: Economic + Political side by side -->
-  <div class="ai-row fade fade-1">
+  <!-- AI ROW: Economic + Political side by side — DESACTIVADO -->
+  <div class="ai-row fade fade-1" style="display:none">
 
     <!-- Economic -->
     <div class="ai-panel">
@@ -4417,6 +4417,8 @@ function renderIndicators(brechaScore) {
 
 /* ── AI Interpretation (Anthropic API) ─────────────────────── */
 async function runAI(score){
+  // DESACTIVADO — sección de análisis IA oculta
+  return;
   const eEl=$('aiEcon'), pEl=$('aiPol');
   if(!eEl||!pEl) return;
 
