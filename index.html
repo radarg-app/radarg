@@ -4582,7 +4582,7 @@ function generateSegmentSummary(key, seg){
     2020:[22,20,15,18,20,21,21,20,19,18,20,21],2021:[24,24,25,25,26,26,25,25,25,24,24,24],
     2022:[22,20,19,18,18,17,17,16,16,16,17,18],2023:[12,11,10,9,9,8,8,8,7,7,8,9],
     2024:[35,38,40,43,46,48,50,52,50,48,47,46],2025:[44,44,45,48,44,42,40,38,36,34,35,37],
-    2026:[47,51,53,46,56],
+    2026:[48,52,54,48,59],  // Actualizado a método nuevo (5 segmentos ponderados)
   };
   Object.entries(BY_YEAR).forEach(([yr,ms])=>{ms.forEach((sc,m)=>{window.MONTHLY.labels.push(`${yr}-${String(m+1).padStart(2,'0')}`);window.MONTHLY.scores.push(sc);});});
 })();
@@ -4940,20 +4940,22 @@ let TOTAL_MONTHS=getTotalMonths(); // updated after each Sheet load
 function tickStep(n){if(n<=24)return 1;if(n<=48)return 3;if(n<=96)return 6;if(n<=180)return 12;return 24;}
 
 const MILESTONES=[
-  {label:'Ene 2002',short:'Default',color:'#ef4444',score:7,desc:'Default histórico y pesificación. EMBI: 7.222 bps. Score mínimo del índice.'},
-  {label:'Jun 2005',short:'Reestruc. deuda',color:'#22c55e',score:65,desc:'Canje 76% de la deuda. EMBI cae 6.607→795 bps en un día.'},
-  {label:'Jul 2007',short:'Boom exportador',color:'#16a34a',score:74,desc:'Reservas USD 45MM, superávit récord, soja en máximos.'},
-  {label:'Oct 2008',short:'Crisis Lehman',color:'#f97316',score:43,desc:'Lehman colapsa. Merval cae ~55%.'},
-  {label:'Oct 2011',short:'Cepo cambiario',color:'#f97316',score:52,desc:'Se instala el cepo. Brecha nace en 5% y crece por 12 años.'},
-  {label:'Jul 2014',short:'Default técnico',color:'#ef4444',score:19,desc:'Fallo Griesa bloquea pagos a bonistas.'},
-  {label:'Dic 2015',short:'Fin del cepo',color:'#22c55e',score:41,desc:'Macri unifica el TC y levanta el cepo.'},
-  {label:'Sep 2018',short:'Crisis FMI',color:'#ef4444',score:22,desc:'El dólar se duplica. Préstamo FMI: USD 57MM.'},
-  {label:'Ago 2019',short:'Cepo post-PASO',color:'#ef4444',score:11,desc:'Derrota en PASO. USD sube 30% en un día. Se reimplanta el cepo.'},
-  {label:'Mar 2020',short:'COVID+Default',color:'#ef4444',score:15,desc:'Pandemia. EMBI 4.362 bps. Tercer default argentino.'},
-  {label:'Oct 2023',short:'Brecha 200%+',color:'#ef4444',score:7,desc:'Inflación 211% anual. Brecha al 214%. Mínimo post-2002.'},
-  {label:'Dic 2023',short:'Devaluación Milei',color:'#eab308',score:9,desc:'Milei asume. Devaluación 118% en el primer día.'},
-  {label:'May 2026',short:'Nueva metodología',color:'#8b5cf6',score:59,desc:'Cambio a 5 segmentos ponderados (Inflación 25%, Cambiario 25%, Actividad 15%, Fiscal 15%, Mercados 20%). Scores anteriores calculados con fórmula anterior.'},
-  {label:'May 2026',short:'Brecha negativa',color:'#16a34a',score:56,desc:'Blue bajo del oficial. BCRA +USD 7.200M. EMBI: 558 bps.'},
+  // tipo:'pais' = eventos económicos/políticos del país (se muestran en el gráfico)
+  // tipo:'indice' = cambios metodológicos del índice (ocultos del gráfico)
+  {label:'Ene 2002',short:'Default',color:'#ef4444',score:7,tipo:'pais',desc:'Default histórico y pesificación. EMBI: 7.222 bps. Score mínimo del índice.'},
+  {label:'Jun 2005',short:'Reestruc. deuda',color:'#22c55e',score:65,tipo:'pais',desc:'Canje 76% de la deuda. EMBI cae 6.607→795 bps en un día.'},
+  {label:'Jul 2007',short:'Boom exportador',color:'#16a34a',score:74,tipo:'pais',desc:'Reservas USD 45MM, superávit récord, soja en máximos.'},
+  {label:'Oct 2008',short:'Crisis Lehman',color:'#f97316',score:43,tipo:'pais',desc:'Lehman colapsa. Merval cae ~55%.'},
+  {label:'Oct 2011',short:'Cepo cambiario',color:'#f97316',score:52,tipo:'pais',desc:'Se instala el cepo. Brecha nace en 5% y crece por 12 años.'},
+  {label:'Jul 2014',short:'Default técnico',color:'#ef4444',score:19,tipo:'pais',desc:'Fallo Griesa bloquea pagos a bonistas.'},
+  {label:'Dic 2015',short:'Fin del cepo',color:'#22c55e',score:41,tipo:'pais',desc:'Macri unifica el TC y levanta el cepo.'},
+  {label:'Sep 2018',short:'Crisis FMI',color:'#ef4444',score:22,tipo:'pais',desc:'El dólar se duplica. Préstamo FMI: USD 57MM.'},
+  {label:'Ago 2019',short:'Cepo post-PASO',color:'#ef4444',score:11,tipo:'pais',desc:'Derrota en PASO. USD sube 30% en un día. Se reimplanta el cepo.'},
+  {label:'Mar 2020',short:'COVID+Default',color:'#ef4444',score:15,tipo:'pais',desc:'Pandemia. EMBI 4.362 bps. Tercer default argentino.'},
+  {label:'Oct 2023',short:'Brecha 200%+',color:'#ef4444',score:7,tipo:'pais',desc:'Inflación 211% anual. Brecha al 214%. Mínimo post-2002.'},
+  {label:'Dic 2023',short:'Devaluación Milei',color:'#eab308',score:9,tipo:'pais',desc:'Milei asume. Devaluación 118% en el primer día.'},
+  {label:'May 2026',short:'Nueva metodología',color:'#8b5cf6',score:59,tipo:'indice',desc:'Cambio a 5 segmentos ponderados (Inflación 25%, Cambiario 25%, Actividad 15%, Fiscal 15%, Mercados 20%).'},
+  {label:'May 2026',short:'Brecha negativa',color:'#16a34a',score:56,tipo:'pais',desc:'Blue bajo del oficial. BCRA +USD 7.200M. EMBI: 558 bps.'},
 ];
 
 const milestonesPlugin={
@@ -4965,12 +4967,24 @@ const milestonesPlugin={
     const rawLbls = chart._radargRawLabels || [];
     const numLabels = chart.data.labels;
     const disp = k => window.MONTHLY_DISPLAY ? window.MONTHLY_DISPLAY(k) : k;
-    const vis=MILESTONES.filter(m=>rawLbls.some(k=>disp(k)===m.label));
+    // Filtrar: solo hitos de tipo 'pais' (o sin tipo definido); excluir 'indice'
+    const visTodos=MILESTONES.filter(m=>rawLbls.some(k=>disp(k)===m.label));
+    const vis=visTodos.filter(m=>(m.tipo||'pais')!=='indice');
     if(!vis.length) return;
+    // Label del mes presente (formato YYYY-MM)
+    const now=new Date();
+    const mesActual=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    const mesActualDisp=window.MONTHLY_DISPLAY?window.MONTHLY_DISPLAY(mesActual):mesActual;
     const showLabels=numLabels.length<=120;
     vis.forEach(m=>{
       const idx=rawLbls.findIndex(k=>disp(k)===m.label);
-      const xPos=x.getPixelForValue(idx),yPos=y.getPixelForValue(m.score);
+      // Si el hito es del mes presente, usar el score real del MONTHLY (no el hardcodeado)
+      let hitoScore = m.score;
+      if(disp(rawLbls[idx])===mesActualDisp && window.MONTHLY && window.MONTHLY.scores.length){
+        const monthlyScore = window.MONTHLY.scores[idx];
+        if(monthlyScore != null && !isNaN(monthlyScore)) hitoScore = monthlyScore;
+      }
+      const xPos=x.getPixelForValue(idx),yPos=y.getPixelForValue(hitoScore);
       // dashed line
       ctx.save();ctx.beginPath();ctx.setLineDash([3,4]);
       ctx.moveTo(xPos,top);ctx.lineTo(xPos,yPos-12);
@@ -4984,7 +4998,7 @@ const milestonesPlugin={
       if(showLabels){
         const above=yPos>(top+bottom)/2;
         const ty=above?yPos-22:yPos+22;
-        const sc=String(m.score);
+        const sc=String(hitoScore);  // usar hitoScore (alineado al MONTHLY si es mes presente)
         ctx.font='700 10px "Inter",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
         const bw=ctx.measureText(sc).width+10;
         ctx.beginPath();if(ctx.roundRect)ctx.roundRect(xPos-bw/2,ty-8,bw,16,3);else ctx.rect(xPos-bw/2,ty-8,bw,16);
@@ -6080,13 +6094,18 @@ async function loadSheetHitos() {
   const _hw=$('hitosWrap');if(_hw)_hw.classList.add('open');
   const _hb=$('hitosBtn');if(_hb){const _sp=_hb.querySelector('[data-i18n]');if(_sp){_sp.setAttribute('data-i18n','milestones.hide');applyI18n();}}
 
-  // Replace MILESTONES array
-  window._sheetMilestones = active.map(r => ({
+  // Replace MILESTONES array — solo tipo 'pais' (o sin tipo definido por compatibilidad)
+  const hitosPais = active.filter(r => {
+    const tipo = (r.tipo || '').toString().toLowerCase().trim();
+    return tipo === 'pais' || tipo === '';  // sin tipo = asumir país por compatibilidad
+  });
+  window._sheetMilestones = hitosPais.map(r => ({
     label: r.fecha,
     short: r.nombre_es,
     short_en: r.nombre_en,
     score: parseInt(r.score) || 0,
     color: r.color || '#888',
+    tipo:  (r.tipo || 'pais').toLowerCase(),
     desc:  r.desc_es || '',
     desc_en: r.desc_en || '',
   }));
@@ -6094,10 +6113,10 @@ async function loadSheetHitos() {
   MILESTONES.length = 0;
   window._sheetMilestones.forEach(m => MILESTONES.push({
     label: m.label, short: LANG==='en'?m.short_en:m.short,
-    color: m.color, score: m.score,
+    color: m.color, score: m.score, tipo: m.tipo,
     desc:  LANG==='en'?m.desc_en:m.desc,
   }));
-  console.log('[Sheet] Hitos loaded:', active.length);
+  console.log('[Sheet] Hitos loaded:', active.length, '| país:', hitosPais.length);
 }
 
 /* ── Load historico from Sheet ───────────────────────────────── */
