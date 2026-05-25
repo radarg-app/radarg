@@ -1668,11 +1668,21 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
 
   <!-- CONTEXT STRIP -->
   <div class="ctx-strip fade fade-2">
-    <div class="ctx-card">
+        <div class="ctx-card">
+      <div class="ctx-lbl">Dólar Oficial</div>
+      <div class="ctx-val" id="ctx-oficial-val" style="color:var(--g)">–</div>
+      <div class="ctx-sub">Tipo de cambio oficial · dolarapi.com</div>
+    </div>
+        <div class="ctx-card">
       <div class="ctx-lbl">Dólar Blue</div>
       <div class="ctx-val" id="cx-blue" style="color:var(--g)">–</div>
       <div class="ctx-sub" id="cx-blue-sub">–</div>
       <div class="ctx-api">● dolarapi.com</div>
+    </div>
+        <div class="ctx-card">
+      <div class="ctx-lbl">Dólar MEP</div>
+      <div class="ctx-val" id="ctx-mep-val" style="color:var(--ac)">–</div>
+      <div class="ctx-sub">Dólar bolsa (AL30) · dolarapi.com</div>
     </div>
     <div class="ctx-card">
       <div class="ctx-lbl">Riesgo País</div>
@@ -1693,16 +1703,6 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
       <div class="ctx-lbl">Inflación mensual</div>
       <div class="ctx-val" id="ctx-ipc-val" style="color:var(--fe)">–</div>
       <div class="ctx-sub">INDEC vía ArgentinaDatos</div>
-    </div>
-    <div class="ctx-card">
-      <div class="ctx-lbl">Prima Ley NY</div>
-      <div class="ctx-val" id="ctx-prima-val" style="color:var(--f)">–</div>
-      <div class="ctx-sub" title="Diferencia entre bono ley NY (GD30) y ley local (AL30). Mide riesgo de reestructuración.">GD30 vs AL30 · riesgo ley local</div>
-    </div>
-    <div class="ctx-card">
-      <div class="ctx-lbl">Soja CBOT</div>
-      <div class="ctx-val" id="ctx-soja-val" style="color:var(--n)">–</div>
-      <div class="ctx-sub">Yahoo Finance ZS=F</div>
     </div>
     <div class="ctx-card">
       <div class="ctx-lbl">Confianza en el Gobierno</div>
@@ -4019,8 +4019,8 @@ function renderCtx() {
   const mv=$('ctx-merval-val'); if(mv) mv.textContent=LIVE.merval.raw;
   const rv=$('ctx-reservas-val'); if(rv) rv.textContent=LIVE.reservas.raw.replace(' brutas','');
   const iv=$('ctx-ipc-val'); if(iv){iv.textContent=LIVE.tasaReal.ipc.toFixed(1)+'%';iv.style.color=LIVE.tasaReal.ipc>6?'var(--fe)':LIVE.tasaReal.ipc>3?'var(--f)':'var(--n)';}
-  const pv=$('ctx-prima-val'); if(pv&&LIVE.prima!=null){pv.textContent=(LIVE.prima>0?'+':'')+LIVE.prima.toFixed(1)+'%';}
-  const sv=$('ctx-soja-val'); if(sv&&LIVE.soja) sv.textContent=`USD ${Math.round(LIVE.soja)}/tn`;
+  const ofv=$('ctx-oficial-val'); if(ofv&&S.oficial) ofv.textContent=fmtPeso(S.oficial);
+  const mepv=$('ctx-mep-val'); if(mepv&&S.mep) mepv.textContent=fmtPeso(S.mep);
   const igv=$('ctx-icg-val'); if(igv&&LIVE.icg) igv.textContent=LIVE.icg.toFixed(2)+'/5';
 }
 
@@ -4311,7 +4311,7 @@ function renderIndicators(brechaScore) {
           </div>
           <div class="subidx-sec-bar"><div class="subidx-sec-bar-fill" style="background:${sc};width:${s}%"></div></div>
           <div class="subidx-sec-weight" style="color:${sc};opacity:.8">${seg.w}% ${LANG==='en'?'of final score':'del score final'}</div>
-      ${(key==='actividad'||key==='fiscal') ? `<div style="margin-top:6px;display:inline-flex;align-items:center;gap:4px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.25);border-radius:4px;padding:2px 7px;font-size:9px;font-weight:700;color:#f59e0b;letter-spacing:.06em">⚠️ ${LANG==='en'?'PARTIAL DATA':'DATOS PARCIALES'}</div>` : ''}
+      ${seg.vars.some(v=>v.unavailable) ? `<div style="margin-top:6px;display:inline-flex;align-items:center;gap:4px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.25);border-radius:4px;padding:2px 7px;font-size:9px;font-weight:700;color:#f59e0b;letter-spacing:.06em">⚠️ ${LANG==='en'?'PARTIAL DATA':'DATOS PARCIALES'}</div>` : ''}
         </div>
         <div class="subidx-sec-prose">
           <div class="subidx-sec-question">${seg.question}</div>
