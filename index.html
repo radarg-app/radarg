@@ -3718,15 +3718,14 @@ function computeSubIndices(bs) {
       raw: LIVE.icg!=null ? `${LIVE.icg.toFixed(2)}/5 (${intScore((LIVE.icg/5)*100)}/100)` : '',
       desc: es?'Índice de Confianza en el Gobierno de la UTDT. Encuesta mensual que mide la aprobación de la gestión. Históricamente, caídas sostenidas del ICG preceden deterioros del clima financiero y complican la renovación del apoyo político al ajuste fiscal.'
              :'UTDT Government Confidence Index. Monthly survey measuring approval of the administration. Historically, sustained ICG declines precede financial climate deterioration and complicate political support for fiscal adjustment.' },
-    { name: es?'Sentimiento de Noticias (IA)':'News Sentiment (AI)',
+    { name: es?'Sentimiento de Noticias':'News Sentiment',
       w:4, score: LIVE._sentimiento_noticias!=null ? intScore(Number(LIVE._sentimiento_noticias)) : 50,
-      src: LIVE._sentimiento_noticias!=null ? 'Claude AI · últimas 48h' : 'Claude AI',
+      src: LIVE._sentimiento_noticias!=null ? (es?'Múltiples fuentes · últimas 72h':'Multiple sources · last 72h') : 'Google News',
       live: LIVE._sentimiento_noticias!=null,
       unavailable: LIVE._sentimiento_noticias==null,
       raw: LIVE._sentimiento_noticias!=null ? `${Math.round(LIVE._sentimiento_noticias)}/100` : '',
-      unavailNote: LIVE._sentimiento_noticias==null ? (es?'Se actualiza cada 2h con el GAS.':'Updated every 2h by the GAS.') : '',
-      desc: es?'Análisis de sentimiento de las principales noticias económicas y políticas de las últimas 48 horas, realizado por Claude (Anthropic). Un score alto indica un flujo de noticias positivo para el mercado; uno bajo refleja noticias de riesgo o incertidumbre. Se actualiza automáticamente cada 2 horas vía Google Apps Script.'
-             :'Sentiment analysis of the main economic and political news from the last 48 hours, performed by Claude (Anthropic). A high score indicates a positive news flow for the market; a low score reflects risk or uncertainty news. Updated automatically every 2 hours via Google Apps Script.' },
+      unavailNote: LIVE._sentimiento_noticias==null ? (es?'Se actualiza diariamente con el GAS.':'Updated daily by the GAS.') : '',
+      desc: es?'Análisis de sentimiento de las 15 noticias económicas y políticas más relevantes de las últimas 72 horas, agregadas de múltiples medios (La Nación, TN, Ámbito, Infobae, Crónica, A24, El Cronista, CNN, BBC, Bloomberg, entre otros). Un score alto indica un flujo de noticias positivo para el mercado; uno bajo refleja noticias de riesgo o incertidumbre. Se actualiza diariamente vía Google Apps Script.':'Sentiment analysis of the 15 most relevant economic and political news items from the last 72 hours, aggregated from multiple outlets (La Nación, TN, Ámbito, Infobae, Crónica, A24, El Cronista, CNN, BBC, Bloomberg, among others). A high score reflects a positive news flow for the market; a low one reflects risk or uncertainty. Updated daily via Google Apps Script.' },
   ];
 
   const avg1 = vars => clamp(vars.reduce((s,v)=>s+v.score*(v.w||1),0) / vars.reduce((s,v)=>s+(v.w||1),0));
