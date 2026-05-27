@@ -3072,6 +3072,12 @@ function reservasNetasScore(mM) {
   if(mM > -5000) return 30;
   return 15; // deeply negative
 }
+function spreadLeyScore(sp) {
+  if(sp==null||isNaN(sp)) return 50;
+  if(sp<1) return 85; if(sp<3) return 75; if(sp<5) return 62;
+  if(sp<8) return 50; if(sp<12) return 38; if(sp<18) return 25;
+  if(sp<25) return 15; return 8;
+}
 function gd35YieldScore(pct) {
   // Lower yield = more market confidence = greed
   if(!pct) return 50;
@@ -3367,6 +3373,7 @@ function computeSubIndices(bs) {
 
   // ── SEGMENTO 4: Fiscal y Deuda Soberana (15%) ────────────
   const gd35Y = LIVE._gd35Yield;
+  const spreadAL30GD30 = LIVE._spread_al30_gd30;
   const primarioV = LIVE._resultadoPrimario;
   const rolloverV = LIVE._rollover;
   const fmiV = LIVE._cumplFMI;
@@ -3424,12 +3431,12 @@ function computeSubIndices(bs) {
   const spreadAL30 = LIVE._spread_al30_gd30;
   const seg5 = [
     { name: es?'Riesgo País (EMBI)':'Country Risk (EMBI)',
-      w:29, score: LIVE.embi.score, src:'ArgentinaDatos', live: LIVE.embi.live,
+      w:25, score: LIVE.embi.score, src:'ArgentinaDatos', live: LIVE.embi.live,
       raw: LIVE.embi.bps ? `${LIVE.embi.bps} bps · score ${LIVE.embi.score}/100` : '',
       desc: es?'Spread de la deuda soberana argentina sobre los Treasuries de EEUU. El indicador de riesgo más seguido mediáticamente. Comprimió de ~850 bps en 2025 a ~525 bps hoy.'
              :'Spread of Argentine sovereign debt over US Treasuries. The most media-followed risk indicator. Compressed from ~850 bps in 2025 to ~525 bps today.' },
     { name: es?'Merval USD (vs media 52s)':'Merval USD (vs 52w avg)',
-      w:23, score: LIVE.merval.score, src:'IOL/Yahoo', live: LIVE.merval.live,
+      w:20, score: LIVE.merval.score, src:'IOL/Yahoo', live: LIVE.merval.live,
       raw: LIVE.merval.usd ? `USD ${Math.round(LIVE.merval.usd).toLocaleString('es-AR')}` + (LIVE.merval.score!=null ? ` · score ${LIVE.merval.score}/100`:'') : (LIVE.merval.raw||''),
       desc: es?'El Merval en dólares CCL captura el apetito de riesgo en renta variable local. Máximos históricos en USD señalan codicia extrema del mercado financiero.'
              :'Merval in CCL dollars captures local equity risk appetite. Historical USD highs signal extreme financial market greed.' },
@@ -3438,8 +3445,16 @@ function computeSubIndices(bs) {
       raw: gd35Y!=null ? `TIR: ${gd35Y.toFixed(2)}%${LIVE._gd35Precio ? ' · USD '+LIVE._gd35Precio.toFixed(2) : ''}${LIVE._gd35Var ? ' ('+( LIVE._gd35Var>0?'+':'')+LIVE._gd35Var.toFixed(2)+'% hoy)' : ''}` : '',
       desc: es?'Rendimiento del GD35 (bono soberano a 10 años, ley NY). Mide el costo de acceso a los mercados internacionales de capital a largo plazo.'
              :'GD35 yield (10-year sovereign bond, NY law). Measures the cost of long-term access to international capital markets.' },
-    { name: es?'Amplitud Merval (semanal)':'Merval Breadth (weekly)',
-      w:16, score: LIVE.amplitud.score, src:'IOL', live: LIVE.amplitud.live,
+
+    { name: es?'Spread Ley Local/NY (AL30-GD30)':'Local/NY Law Spread (AL30-GD30)',
+      w:13, score: spreadAL30GD30!=null ? spreadLeyScore(spreadAL30GD30) : 50,
+      src: spreadAL30GD30!=null ? 'IOL/Ambito' : 'N/A',
+      live: spreadAL30GD30!=null, unavailable: spreadAL30GD30==null,
+      raw: spreadAL30GD30!=null ? (spreadAL30GD30>0?'+':'')+spreadAL30GD30.toFixed(1)+'% '+(spreadAL30GD30<3?(es?'(confianza alta)':'(high confidence)'):spreadAL30GD30<6?(es?'(prima moderada)':'(moderate premium)'):spreadAL30GD30<10?(es?'(riesgo legal)':'(legal risk)'):(es?'(alarma)':'(alarm)')) : '',
+      unavailNote: spreadAL30GD30==null ? (es?'Spread AL30/GD30. Requiere precios de bonos.':'AL30/GD30 spread. Requires bond prices.') : '',
+      desc: es?'Diferencia de precio entre AL30 (ley Argentina) y GD30 (ley Nueva York). Spread amplio = mercado descuenta riesgo de reestructuracion selectiva bajo ley local.'
+             :'Price difference between AL30 (Argentine law) and GD30 (NY law). Wide spread = market pricing selective local-law restructuring risk.' },    { name: es?'Amplitud Merval (semanal)':'Merval Breadth (weekly)',
+      w:13, score: LIVE.amplitud.score, src:'IOL', live: LIVE.amplitud.live,
       raw: (()=>{
         const up=LIVE._amplitudUp, dn=LIVE._amplitudDn, fl=LIVE._amplitudFl, tot=LIVE._amplitudTotal;
         if(up!=null && dn!=null) return `${up}↑ ${fl??''}${fl!=null?' planas ':' '}${dn}↓ de ${tot??((up||0)+(dn||0)+(fl||0))} acciones`;
@@ -3448,14 +3463,14 @@ function computeSubIndices(bs) {
       desc: es?'% de acciones del panel con variación semanal positiva. Amplitud alta (>70%) confirma un rally genuino; amplitud baja con índice en alza señala movimiento frágil.'
              :'% of panel stocks with positive weekly change. High breadth (>70%) confirms genuine rally; low breadth with rising index signals fragile move.' },
     { name: es?'Confianza en el Gobierno (ICG)':'Gov. Confidence (ICG)',
-      w:8, score: LIVE.icg!=null ? intScore((LIVE.icg/5)*100) : 40,
+      w:10, score: LIVE.icg!=null ? intScore((LIVE.icg/5)*100) : 40,
       src: LIVE.icg!=null ? 'UTDT (mensual)' : 'UTDT',
       live: LIVE.icg!=null, mensual: true,
       raw: LIVE.icg!=null ? `${LIVE.icg.toFixed(2)}/5 (${intScore((LIVE.icg/5)*100)}/100)` : '',
       desc: es?'Índice de Confianza en el Gobierno de la UTDT. Encuesta mensual que mide la aprobación de la gestión. Históricamente, caídas sostenidas del ICG preceden deterioros del clima financiero y complican la renovación del apoyo político al ajuste fiscal.'
              :'UTDT Government Confidence Index. Monthly survey measuring approval of the administration. Historically, sustained ICG declines precede financial climate deterioration and complicate political support for fiscal adjustment.' },
     { name: es?'Sentimiento de Noticias (IA)':'News Sentiment (AI)',
-      w:5, score: LIVE._sentimiento_noticias!=null ? intScore(Number(LIVE._sentimiento_noticias)) : 50,
+      w:4, score: LIVE._sentimiento_noticias!=null ? intScore(Number(LIVE._sentimiento_noticias)) : 50,
       src: LIVE._sentimiento_noticias!=null ? 'Claude AI · últimas 48h' : 'Claude AI',
       live: LIVE._sentimiento_noticias!=null,
       unavailable: LIVE._sentimiento_noticias==null,
