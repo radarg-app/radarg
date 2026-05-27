@@ -293,19 +293,30 @@ nav a:hover { color:var(--text); }
 /* ── Ticker ──────────────────────────────────────────────────── */
 .ticker {
   background:var(--bg2); border-bottom:1px solid var(--border);
-  height:36px; padding:0 2rem;
-  display:flex; align-items:center; gap:0;
-  overflow-x:auto; scrollbar-width:none; z-index:1; position:relative;
+  height:36px;
+  display:flex; align-items:center;
+  overflow:hidden; z-index:1; position:relative;
 }
-.ticker::-webkit-scrollbar { display:none; }
+.ticker-track {
+  display:flex; align-items:center;
+  white-space:nowrap; flex-shrink:0;
+  animation:tickerScroll 40s linear infinite;
+  will-change:transform;
+}
+/* Mover exactamente la mitad (un set completo) para un loop sin saltos */
+@keyframes tickerScroll {
+  0%   { transform:translateX(0); }
+  100% { transform:translateX(-50%); }
+}
+/* Pausar al pasar el mouse para poder leer */
+.ticker:hover .ticker-track { animation-play-state:paused; }
 .t-item {
   display:flex; align-items:center; gap:6px;
-  padding:0 1.1rem; height:100%;
+  padding:0 1.4rem; height:36px;
   border-right:1px solid var(--border);
   white-space:nowrap; flex-shrink:0;
   font-family:'JetBrains Mono',monospace; font-size:11px;
 }
-.t-item:first-child { padding-left:0; }
 .t-lbl { color:var(--text3); font-size:10px; letter-spacing:.06em; text-transform:uppercase; }
 .t-val  { color:var(--text); font-weight:600; }
 .t-badge { padding:1px 7px; border-radius:4px; font-size:10px; font-weight:700; }
@@ -1419,7 +1430,16 @@ body.lm .suggest-input:focus, body.lm .suggest-select:focus, body.lm .suggest-te
 .ranking-title { font-size:15px; font-weight:800; letter-spacing:-.2px; display:flex; align-items:center; gap:7px; }
 .ranking-title-ico { font-size:18px; }
 .ranking-sub { font-size:11px; color:var(--text3); margin-bottom:1rem; }
-.ranking-list { display:flex; flex-direction:column; gap:.5rem; flex:1; }
+.ranking-list {
+  display:flex; flex-direction:column; gap:.5rem; flex:1;
+  max-height:340px; overflow-y:auto;
+  padding-right:4px;
+  scrollbar-width:thin; scrollbar-color:var(--border2) transparent;
+}
+.ranking-list::-webkit-scrollbar { width:6px; }
+.ranking-list::-webkit-scrollbar-track { background:transparent; }
+.ranking-list::-webkit-scrollbar-thumb { background:var(--border2); border-radius:3px; }
+.ranking-list::-webkit-scrollbar-thumb:hover { background:var(--ac); }
 .ranking-row {
   display:flex; align-items:center; gap:.75rem;
   padding:.625rem .75rem; border-radius:var(--radius-sm);
@@ -1436,7 +1456,8 @@ body.lm .suggest-input:focus, body.lm .suggest-select:focus, body.lm .suggest-te
 .ranking-row.top3 .ranking-pos { color:#cd7f50; }
 .ranking-medal { font-size:17px; flex-shrink:0; }
 .ranking-name { font-size:13px; font-weight:600; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.ranking-amount { font-size:12px; font-weight:700; color:var(--ac); font-family:'JetBrains Mono',monospace; flex-shrink:0; }
+.ranking-amount { font-size:12px; font-weight:700; color:var(--ac); font-family:'JetBrains Mono',monospace; flex-shrink:0; text-align:right; line-height:1.3; }
+.ranking-currency { display:block; font-size:9px; font-weight:600; color:var(--text3); letter-spacing:.05em; text-transform:uppercase; }
 .ranking-empty { font-size:12px; color:var(--text3); text-align:center; padding:1.5rem 0; line-height:1.6; }
 .ranking-footer { font-size:10px; color:var(--text3); margin-top:.875rem; padding-top:.75rem; border-top:1px solid var(--border); display:flex; align-items:center; gap:5px; }
 .ranking-live-dot { width:6px; height:6px; border-radius:50%; background:var(--g); box-shadow:0 0 6px var(--g); animation:rankPulse 2s infinite; flex-shrink:0; }
@@ -1663,14 +1684,24 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
 
 <!-- ═══ TICKER ══════════════════════════════════════════════════ -->
 <div class="ticker">
-  <div class="t-item"><span class="t-lbl">Oficial</span>&nbsp;<span class="t-val" id="tb-of">–</span></div>
-  <div class="t-item"><span class="t-lbl">Blue</span>&nbsp;<span class="t-val" id="tb-bl">–</span></div>
-  <div class="t-item"><span class="t-lbl">MEP</span>&nbsp;<span class="t-val" id="tb-mep">–</span></div>
-  <div class="t-item"><span class="t-lbl">CCL</span>&nbsp;<span class="t-val" id="tb-ccl">–</span></div>
-  <div class="t-item"><span class="t-lbl">Mayorista</span>&nbsp;<span class="t-val" id="tb-may">–</span></div>
-  <div class="t-item"><span class="t-lbl">Tarjeta</span>&nbsp;<span class="t-val" id="tb-tar">–</span></div>
-  <div class="t-item"><span class="t-lbl">Brecha</span>&nbsp;<span class="t-badge" id="tb-br">–</span></div>
-  <span class="t-ts" id="tb-ts"></span>
+  <div class="ticker-track" id="tickerTrack">
+    <div class="t-item"><span class="t-lbl">Oficial</span>&nbsp;<span class="t-val tk-of">–</span></div>
+    <div class="t-item"><span class="t-lbl">Blue</span>&nbsp;<span class="t-val tk-bl">–</span></div>
+    <div class="t-item"><span class="t-lbl">MEP</span>&nbsp;<span class="t-val tk-mep">–</span></div>
+    <div class="t-item"><span class="t-lbl">CCL</span>&nbsp;<span class="t-val tk-ccl">–</span></div>
+    <div class="t-item"><span class="t-lbl">Mayorista</span>&nbsp;<span class="t-val tk-may">–</span></div>
+    <div class="t-item"><span class="t-lbl">Tarjeta</span>&nbsp;<span class="t-val tk-tar">–</span></div>
+    <div class="t-item"><span class="t-lbl">Brecha</span>&nbsp;<span class="t-badge tk-br">–</span></div>
+    <div class="t-item t-item-ts"><span class="t-lbl tk-ts-lbl"></span></div>
+    <div class="t-item"><span class="t-lbl">Oficial</span>&nbsp;<span class="t-val tk-of">–</span></div>
+    <div class="t-item"><span class="t-lbl">Blue</span>&nbsp;<span class="t-val tk-bl">–</span></div>
+    <div class="t-item"><span class="t-lbl">MEP</span>&nbsp;<span class="t-val tk-mep">–</span></div>
+    <div class="t-item"><span class="t-lbl">CCL</span>&nbsp;<span class="t-val tk-ccl">–</span></div>
+    <div class="t-item"><span class="t-lbl">Mayorista</span>&nbsp;<span class="t-val tk-may">–</span></div>
+    <div class="t-item"><span class="t-lbl">Tarjeta</span>&nbsp;<span class="t-val tk-tar">–</span></div>
+    <div class="t-item"><span class="t-lbl">Brecha</span>&nbsp;<span class="t-badge tk-br">–</span></div>
+    <div class="t-item t-item-ts"><span class="t-lbl tk-ts-lbl"></span></div>
+  </div>
 </div>
 
 <!-- ═══ MAIN ════════════════════════════════════════════════════ -->
@@ -1848,16 +1879,6 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
       <div class="ctx-lbl">Confianza en el Gobierno</div>
       <div class="ctx-val" id="ctx-icg-val" style="color:var(--ac)">–</div>
       <div class="ctx-sub">ICG UTDT · mensual</div>
-    </div>
-    <div class="ctx-card">
-      <div class="ctx-lbl" data-i18n="ctx.brecha">Brecha Cambiaria</div>
-      <div class="ctx-val" id="ctx-brecha-val" style="color:var(--n)">–</div>
-      <div class="ctx-sub" data-i18n="ctx.brecha.sub">Blue vs. oficial</div>
-    </div>
-    <div class="ctx-card">
-      <div class="ctx-lbl" data-i18n="ctx.ccl">Dólar CCL</div>
-      <div class="ctx-val" id="ctx-ccl-val" style="color:var(--ac)">–</div>
-      <div class="ctx-sub" data-i18n="ctx.ccl.sub">Contado con liquidación</div>
     </div>
   </div>
   <div class="ctx-carousel-hint">← <span data-i18n="ctx.swipe">Deslizá para ver todos los datos</span> →</div>
@@ -4262,19 +4283,25 @@ async function fetchAllLive() {
 
 /* ── Render ticker ─────────────────────────────────────────── */
 function renderTicker() {
-  $('tb-of').textContent=fmtPeso(S.oficial);
-  $('tb-bl').textContent=fmtPeso(S.blue);
-  $('tb-mep').textContent=fmtPeso(S.mep);
-  $('tb-ccl').textContent=fmtPeso(S.ccl);
-  $('tb-may').textContent=fmtPeso(S.mayorista);
-  $('tb-tar').textContent=fmtPeso(S.tarjeta);
-  const bp=S.brecha, el=$('tb-br');
-  el.textContent=fmtPct(bp);
+  // El ticker duplica los items para el loop continuo, así que actualizamos
+  // TODOS los elementos de cada clase (no por id).
+  const setAll = (cls, val) => document.querySelectorAll('.'+cls).forEach(e => e.textContent = val);
+  setAll('tk-of',  fmtPeso(S.oficial));
+  setAll('tk-bl',  fmtPeso(S.blue));
+  setAll('tk-mep', fmtPeso(S.mep));
+  setAll('tk-ccl', fmtPeso(S.ccl));
+  setAll('tk-may', fmtPeso(S.mayorista));
+  setAll('tk-tar', fmtPeso(S.tarjeta));
+  const bp=S.brecha;
   const [bg,fg]=bp<0?['rgba(34,197,94,.18)','#22c55e']:bp<10?['rgba(34,197,94,.14)','#22c55e']:bp<30?['rgba(234,179,8,.14)','#eab308']:bp<80?['rgba(249,115,22,.14)','#f97316']:['rgba(239,68,68,.14)','#ef4444'];
-  el.style.cssText=`background:${bg};color:${fg};padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700`;
+  document.querySelectorAll('.tk-br').forEach(el => {
+    el.textContent = fmtPct(bp);
+    el.style.cssText = `background:${bg};color:${fg};padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700`;
+  });
   try {
     const dt=S.ts?new Date(S.ts):null;
-    $('tb-ts').textContent=dt?t('ticker.act')+' '+dt.toLocaleTimeString(LANG==='en'?'en-US':'es-AR',{hour:'2-digit',minute:'2-digit'})+' hs':'';
+    const ts = dt ? t('ticker.act')+' '+dt.toLocaleTimeString(LANG==='en'?'en-US':'es-AR',{hour:'2-digit',minute:'2-digit'})+' hs' : '';
+    setAll('tk-ts-lbl', ts);
   } catch(_){}
 }
 
@@ -4292,8 +4319,6 @@ function renderCtx() {
   const ofv=$('ctx-oficial-val'); if(ofv&&S.oficial) ofv.textContent=fmtPeso(S.oficial);
   const mepv=$('ctx-mep-val'); if(mepv&&S.mep) mepv.textContent=fmtPeso(S.mep);
   const igv=$('ctx-icg-val'); if(igv&&LIVE.icg) igv.textContent=LIVE.icg.toFixed(2)+'/5';
-  const brv=$('ctx-brecha-val'); if(brv){ brv.textContent=fmtPct(bp); brv.style.color = bp<0?'var(--g)':bp<20?'var(--n)':bp<60?'var(--f)':'var(--fe)'; }
-  const cclv=$('ctx-ccl-val'); if(cclv&&S.ccl) cclv.textContent=fmtPeso(S.ccl);
 }
 
 /* ── Gauge ──────────────────────────────────────────────────── */
@@ -5371,17 +5396,14 @@ function buildChart(from,to){
 function initSlider(){
   const ticksEl=$('rangeTicks'); if(!ticksEl) return;
   ticksEl.innerHTML='';
-  const years=[];
-  // Labels are "YYYY-MM" — detect January (month 01) for year ticks
-  window.MONTHLY.labels.forEach((lbl,i)=>{
-    if(lbl&&lbl.length===7&&lbl.slice(5)==='01') years.push({label:lbl.slice(0,4),idx:i});
-  });
-  // Add last entry if not already a Jan
   const _tot=getTotalMonths();
+  // Mostrar solo los extremos del selector: primer y último año
+  const firstLbl=window.MONTHLY.labels[0]||'';
   const lastLbl=window.MONTHLY.labels[_tot-1]||'';
-  if(!years.length||years[years.length-1].idx!==_tot-1){
-    years.push({label:window.MONTHLY_DISPLAY?window.MONTHLY_DISPLAY(lastLbl):lastLbl,idx:_tot-1});
-  }
+  const years=[
+    {label:firstLbl.length===7?firstLbl.slice(0,4):(window.MONTHLY_DISPLAY?window.MONTHLY_DISPLAY(firstLbl):firstLbl), idx:0},
+    {label:lastLbl.length===7?lastLbl.slice(0,4):(window.MONTHLY_DISPLAY?window.MONTHLY_DISPLAY(lastLbl):lastLbl), idx:_tot-1},
+  ];
   years.forEach(yr=>{
     const tick=document.createElement('span');
     tick.className='range-tick'; tick.textContent=yr.label; tick.dataset.idx=yr.idx;
@@ -5567,18 +5589,26 @@ function renderRanking(){
     list.innerHTML = '<div class="ranking-empty">' + t('ranking.empty') + '</div>';
     return;
   }
-  // Ordenar por monto descendente y tomar top 8
-  const sorted = data.slice().sort((a,b)=> (parseFloat(b.monto)||0) - (parseFloat(a.monto)||0)).slice(0,8);
+  // Ordenar por monto descendente y mostrar hasta 10 (la lista scrollea)
+  const sorted = data.slice().sort((a,b)=> (parseFloat(b.monto)||0) - (parseFloat(a.monto)||0)).slice(0,10);
   const medals = ['🥇','🥈','🥉'];
+  // Normaliza la moneda: acepta 'USD'/'ARS'/'Pesos'/'Dólares' y muestra siempre una etiqueta clara
+  const fmtMoneda = (m) => {
+    const v = (m || '').toString().trim().toUpperCase();
+    if(v === 'USD' || v === 'US$' || v === 'DOLARES' || v === 'DÓLARES' || v === 'DOLAR' || v === 'DÓLAR') return 'USD';
+    return 'Pesos';  // por defecto, pesos
+  };
   list.innerHTML = sorted.map((r,i)=>{
     const topClass = i<3 ? ' top'+(i+1) : '';
     const medal = i<3 ? '<span class="ranking-medal">'+medals[i]+'</span>' : '';
     const pos = i<3 ? '' : '<span class="ranking-pos">'+(i+1)+'</span>';
     const nombre = (r.nombre || 'Anónimo').toString().replace(/[<>]/g,'');
     const monto = r.monto_display || (r.monto != null ? '$'+r.monto : '');
+    const moneda = fmtMoneda(r.moneda);
     return '<div class="ranking-row'+topClass+'">'+pos+medal+
            '<span class="ranking-name">'+nombre+'</span>'+
-           '<span class="ranking-amount">'+monto+'</span></div>';
+           '<span class="ranking-amount">'+monto+
+           '<span class="ranking-currency">'+moneda+'</span></span></div>';
   }).join('');
 }
 
