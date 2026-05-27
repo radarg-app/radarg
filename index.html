@@ -445,6 +445,30 @@ main { position:relative; z-index:1; max-width:1440px; margin:0 auto; padding:2r
 }
 .ctx-strip::-webkit-scrollbar{display:none}
 @media(max-width:900px){.ctx-strip{grid-template-columns:repeat(2,1fr)}}
+
+/* ── Carrusel en móvil: scroll horizontal con auto-desplazamiento ── */
+@media(max-width:560px){
+  .ctx-strip{
+    display:flex; flex-wrap:nowrap;
+    grid-template-columns:none;
+    overflow-x:auto; scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
+    gap:.625rem; padding-bottom:.5rem;
+  }
+  .ctx-strip .ctx-card{
+    flex:0 0 78%; scroll-snap-align:center;
+    min-width:78%;
+  }
+  /* Animación sutil de "respiración" para indicar que hay más cards al costado */
+  .ctx-carousel-hint{
+    display:flex; align-items:center; justify-content:center;
+    gap:5px; font-size:10px; color:var(--text3);
+    margin:-1rem 0 1rem; letter-spacing:.04em;
+    animation:ctxHintFade 3s ease-in-out infinite;
+  }
+  @keyframes ctxHintFade{ 0%,100%{opacity:.4} 50%{opacity:.9} }
+}
+@media(min-width:561px){ .ctx-carousel-hint{ display:none; } }
 .ctx-card {
   background:var(--bg2); border:1px solid var(--border);
   border-radius:var(--radius); padding:.875rem 1rem;
@@ -1340,6 +1364,107 @@ body.lm .suggest-input:focus, body.lm .suggest-select:focus, body.lm .suggest-te
 .btn-donate-main:hover { background:#d97706; transform:translateY(-1px); box-shadow:0 4px 16px rgba(245,158,11,.35); }
 .donate-disclaimer { font-size:11px; color:var(--text3); }
 
+/* ════════ APOYAR / RANKING ════════════════════════════════ */
+.support-section { margin-bottom:2rem; }
+.support-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:1.25rem;
+  align-items:stretch;
+}
+@media(max-width:860px){ .support-grid { grid-template-columns:1fr; } }
+
+/* Tarjeta principal de apoyo */
+.support-card {
+  background:linear-gradient(135deg, rgba(124,108,250,.10), rgba(34,197,94,.08));
+  border:1px solid rgba(124,108,250,.30);
+  border-radius:var(--radius-lg); padding:2rem 1.75rem;
+  display:flex; flex-direction:column; justify-content:center;
+  position:relative; overflow:hidden;
+}
+.support-card::before {
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(ellipse 80% 50% at 50% -10%, rgba(124,108,250,.18), transparent);
+  pointer-events:none;
+}
+.support-emoji { font-size:38px; margin-bottom:.625rem; }
+.support-title { font-size:21px; font-weight:800; letter-spacing:-.4px; margin-bottom:.5rem; line-height:1.2; }
+.support-sub { font-size:13px; color:var(--text2); line-height:1.65; margin-bottom:1.25rem; }
+.support-btns { display:flex; gap:.625rem; flex-wrap:wrap; margin-bottom:.75rem; position:relative; z-index:1; }
+.btn-support-main {
+  display:inline-flex; align-items:center; gap:7px;
+  font-size:14px; font-weight:700; padding:12px 22px;
+  border-radius:var(--radius-sm); border:none; cursor:pointer;
+  background:linear-gradient(135deg, #7c6cfa, #6366f1); color:#fff;
+  transition:all .18s; font-family:'Inter',sans-serif;
+  box-shadow:0 4px 14px rgba(124,108,250,.3);
+}
+.btn-support-main:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(124,108,250,.45); }
+.btn-support-ghost {
+  display:inline-flex; align-items:center; gap:7px;
+  font-size:13px; font-weight:600; padding:12px 20px;
+  border-radius:var(--radius-sm); cursor:pointer;
+  background:rgba(255,255,255,.05); color:var(--text);
+  border:1px solid var(--border2); transition:all .18s;
+  font-family:'Inter',sans-serif;
+}
+.btn-support-ghost:hover { border-color:var(--ac); background:rgba(124,108,250,.1); }
+.support-disclaimer { font-size:11px; color:var(--text3); position:relative; z-index:1; }
+
+/* Tarjeta de ranking */
+.ranking-card {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:var(--radius-lg); padding:1.5rem 1.5rem 1.25rem;
+  box-shadow:var(--shadow); display:flex; flex-direction:column;
+}
+.ranking-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:.25rem; }
+.ranking-title { font-size:15px; font-weight:800; letter-spacing:-.2px; display:flex; align-items:center; gap:7px; }
+.ranking-title-ico { font-size:18px; }
+.ranking-sub { font-size:11px; color:var(--text3); margin-bottom:1rem; }
+.ranking-list { display:flex; flex-direction:column; gap:.5rem; flex:1; }
+.ranking-row {
+  display:flex; align-items:center; gap:.75rem;
+  padding:.625rem .75rem; border-radius:var(--radius-sm);
+  background:var(--bg3); border:1px solid var(--border);
+  transition:transform .14s, border-color .14s;
+}
+.ranking-row:hover { transform:translateX(2px); }
+.ranking-row.top1 { background:linear-gradient(135deg, rgba(245,200,40,.16), rgba(245,158,11,.06)); border-color:rgba(245,200,40,.45); }
+.ranking-row.top2 { background:linear-gradient(135deg, rgba(200,210,225,.14), transparent); border-color:rgba(200,210,225,.4); }
+.ranking-row.top3 { background:linear-gradient(135deg, rgba(205,127,80,.14), transparent); border-color:rgba(205,127,80,.4); }
+.ranking-pos { font-size:15px; font-weight:800; width:28px; text-align:center; flex-shrink:0; font-family:'Inter',sans-serif; }
+.ranking-row.top1 .ranking-pos { color:#f5c828; }
+.ranking-row.top2 .ranking-pos { color:#c8d2e1; }
+.ranking-row.top3 .ranking-pos { color:#cd7f50; }
+.ranking-medal { font-size:17px; flex-shrink:0; }
+.ranking-name { font-size:13px; font-weight:600; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ranking-amount { font-size:12px; font-weight:700; color:var(--ac); font-family:'JetBrains Mono',monospace; flex-shrink:0; }
+.ranking-empty { font-size:12px; color:var(--text3); text-align:center; padding:1.5rem 0; line-height:1.6; }
+.ranking-footer { font-size:10px; color:var(--text3); margin-top:.875rem; padding-top:.75rem; border-top:1px solid var(--border); display:flex; align-items:center; gap:5px; }
+.ranking-live-dot { width:6px; height:6px; border-radius:50%; background:var(--g); box-shadow:0 0 6px var(--g); animation:rankPulse 2s infinite; flex-shrink:0; }
+@keyframes rankPulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+/* Light mode — colores ajustados para legibilidad y contraste */
+body.lm .support-card {
+  background:linear-gradient(135deg, rgba(124,108,250,.10), rgba(34,197,94,.07));
+  border-color:rgba(124,108,250,.35);
+}
+body.lm .support-card::before { background:radial-gradient(ellipse 80% 50% at 50% -10%, rgba(124,108,250,.14), transparent); }
+body.lm .btn-support-ghost { background:rgba(0,0,0,.03); border-color:rgba(0,0,0,.14); }
+body.lm .btn-support-ghost:hover { background:rgba(124,108,250,.08); border-color:var(--ac); }
+body.lm .ranking-card { background:#fff; border-color:rgba(0,0,0,.1); }
+body.lm .ranking-row { background:#f6f7fa; border-color:rgba(0,0,0,.08); }
+body.lm .ranking-row.top1 { background:linear-gradient(135deg, rgba(245,180,20,.18), rgba(245,158,11,.08)); border-color:rgba(220,150,10,.5); }
+body.lm .ranking-row.top1 .ranking-pos { color:#b8860b; }
+body.lm .ranking-row.top2 { background:linear-gradient(135deg, rgba(150,160,180,.18), transparent); border-color:rgba(120,130,150,.45); }
+body.lm .ranking-row.top2 .ranking-pos { color:#6b7280; }
+body.lm .ranking-row.top3 { background:linear-gradient(135deg, rgba(180,100,55,.16), transparent); border-color:rgba(170,90,45,.45); }
+body.lm .ranking-row.top3 .ranking-pos { color:#a0522d; }
+body.lm .ranking-footer { border-top-color:rgba(0,0,0,.08); }
+
+@media(max-width:480px){
+  .support-card, .ranking-card { padding:1.5rem 1.25rem; }
+  .support-title { font-size:18px; }
+}
+
 /* ── Suggestion thank-you popup ── */
 .suggest-popup-overlay {
   display:none; position:fixed; inset:0; z-index:600;
@@ -1518,9 +1643,11 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
   </a>
   <nav><ul>
     <li><a href="#indicadores" data-i18n="nav.indicators">Indicadores</a></li>
+    <li><a href="#apoyar"      data-i18n="nav.support">Apoyar</a></li>
     <li><a href="#historico"   data-i18n="nav.historic">Histórico</a></li>
-    <li><a href="#tiers"       data-i18n="nav.tiers">Tiers</a></li>
     <li><a href="#metodologia" data-i18n="nav.methodology">Metodología</a></li>
+    <li><a href="#sugerencias" data-i18n="nav.suggest">Sugerencias</a></li>
+    <!-- Tiers oculto temporalmente — reactivar agregando: <li><a href="#tiers" data-i18n="nav.tiers">Tiers</a></li> -->
   </ul></nav>
   <div class="h-right">
     <div class="live-pill"><span class="live-dot"></span><span id="hdrDate">–</span></div>
@@ -1530,7 +1657,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
     </div>
     <button class="h-btn" onclick="shareScore()">↑ <span data-i18n="header.share">Compartir</span></button>
     <button class="h-btn" onclick="toggleMode()" id="modeBtn">🌙</button>
-    <a href="#tiers" class="h-btn h-btn-primary" style="text-decoration:none">✦ <span data-i18n="nav.tier">Tiers</span></a>
+    <a href="#apoyar" class="h-btn h-btn-primary" style="text-decoration:none">♥ <span data-i18n="nav.support">Apoyar</span></a>
   </div>
 </header>
 
@@ -1722,7 +1849,18 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
       <div class="ctx-val" id="ctx-icg-val" style="color:var(--ac)">–</div>
       <div class="ctx-sub">ICG UTDT · mensual</div>
     </div>
+    <div class="ctx-card">
+      <div class="ctx-lbl" data-i18n="ctx.brecha">Brecha Cambiaria</div>
+      <div class="ctx-val" id="ctx-brecha-val" style="color:var(--n)">–</div>
+      <div class="ctx-sub" data-i18n="ctx.brecha.sub">Blue vs. oficial</div>
+    </div>
+    <div class="ctx-card">
+      <div class="ctx-lbl" data-i18n="ctx.ccl">Dólar CCL</div>
+      <div class="ctx-val" id="ctx-ccl-val" style="color:var(--ac)">–</div>
+      <div class="ctx-sub" data-i18n="ctx.ccl.sub">Contado con liquidación</div>
+    </div>
   </div>
+  <div class="ctx-carousel-hint">← <span data-i18n="ctx.swipe">Deslizá para ver todos los datos</span> →</div>
 
   <!-- INDICATORS -->
   <section id="indicadores">
@@ -1735,6 +1873,36 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
   </section>
 
   <!-- HISTORICAL CHART -->
+  <!-- APOYAR / SUPPORT (movida arriba del histórico) -->
+  <section id="apoyar" class="support-section">
+    <div class="support-grid">
+      <!-- Tarjeta de apoyo -->
+      <div class="support-card">
+        <div class="support-emoji">♥</div>
+        <h2 class="support-title" data-i18n="support.title">RadARG es libre y gratuito</h2>
+        <p class="support-sub" data-i18n="support.sub">Sin publicidad y sin barreras de pago. Si el índice te resulta útil, podés apoyar el proyecto con una colaboración voluntaria. Cada aporte ayuda a sostener el servidor, las APIs de datos y el desarrollo de nuevas funciones.</p>
+        <div class="support-btns">
+          <button class="btn-support-main" onclick="openModal()">♥ <span data-i18n="support.cta.main">Apoyar el proyecto</span></button>
+        </div>
+        <p class="support-disclaimer" data-i18n="support.disclaimer">100% voluntario · Sin obligación · Cualquier monto suma</p>
+      </div>
+      <!-- Ranking de apoyos -->
+      <div class="ranking-card">
+        <div class="ranking-header">
+          <div class="ranking-title"><span class="ranking-title-ico">🏆</span> <span data-i18n="ranking.title">Top apoyos</span></div>
+        </div>
+        <div class="ranking-sub" data-i18n="ranking.sub">Quienes hacen posible RadARG</div>
+        <div class="ranking-list" id="rankingList">
+          <div class="ranking-empty">Todavía no hay apoyos cargados.<br>¡Podés ser el primero!</div>
+        </div>
+        <div class="ranking-footer">
+          <span class="ranking-live-dot"></span>
+          <span data-i18n="ranking.footer">El ranking se actualiza todos los días</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section id="historico">
     <div class="sec-hdr">
       <span class="sec-ttl" data-i18n="sec.historic">Evolución Histórica</span>
@@ -1809,7 +1977,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
   </section>
 
   <!-- PRO / ALERTS -->
-  <section id="tiers">
+  <section id="tiers" style="display:none"><!-- OCULTA temporalmente — quitar display:none para reactivar -->
     <div class="sec-hdr">
       <span class="sec-ttl" data-i18n="sec.tiers">Tiers</span>
       <div class="sec-line"></div>
@@ -2013,25 +2181,26 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
     <div class="meth-grid">
       <div class="meth-card"><div class="meth-q" data-i18n="meth.g.q1">¿Qué significa el número?</div><div class="meth-a" data-i18n="meth.g.a1">Va de 0 a 100. Cerca de 0: miedo extremo — la gente vende y desconfía. Cerca de 100: optimismo — la gente invierte y apuesta al crecimiento. Cerca de 50: ni pánico ni euforia.</div></div>
       <div class="meth-card"><div class="meth-q" data-i18n="meth.g.q2">¿Cómo usarlo?</div><div class="meth-a" data-i18n="meth.g.a2">En Miedo Extremo históricamente aparecieron oportunidades para inversores contrarian. En Codicia Extrema el mercado puede estar caro. Es un complemento, no una predicción.</div></div>
-      <div class="meth-card"><div class="meth-q" data-i18n="meth.g.q3">¿Qué mide?</div><div class="meth-a" data-i18n="meth.g.a3">9 señales: brecha cambiaria, EMBI, reservas BCRA, inflación, Merval en dólares, amplitud del panel, bonos soberanos, sector externo y clima político.</div></div>
-      <div class="meth-card"><div class="meth-q" data-i18n="meth.g.q4">¿Puedo confiar?</div><div class="meth-a" data-i18n="meth.g.a4">Los datos son reales y verificados. El tipo de cambio se actualiza en tiempo real desde dolarapi.com. Pero ningún índice predice el futuro. Usalo para entender el contexto.</div></div>
+      <div class="meth-card"><div class="meth-q" data-i18n="meth.g.q3">¿Qué mide?</div><div class="meth-a" data-i18n="meth.g.a3">Cinco dimensiones de la economía: inflación y política monetaria, tipo de cambio y reservas, actividad real y bienestar, situación fiscal y deuda soberana, y los mercados financieros.</div></div>
+      <div class="meth-card"><div class="meth-q" data-i18n="meth.g.q4">¿Puedo confiar?</div><div class="meth-a" data-i18n="meth.g.a4">Los datos son reales y de fuentes públicas verificadas. El tipo de cambio se actualiza en tiempo real. Pero ningún índice predice el futuro: usalo para entender el contexto, no como consejo de inversión.</div></div>
+      <div class="meth-card"><div class="meth-q" data-i18n="meth.g.q5">¿Cada cuánto se actualiza?</div><div class="meth-a" data-i18n="meth.g.a5">El índice se recalcula y publica todos los días a las 12:00. Los datos de mercado como el dólar y el Merval se refrescan dentro de la página a lo largo del día.</div></div>
     </div>
     <div class="sec-hdr" style="margin-top:2rem">
       <span class="sec-ttl" data-i18n="sec.meth.tech">Para especialistas</span>
       <div class="sec-line"></div>
     </div>
     <div class="meth-intro meth-intro-tech" style="margin-bottom:1rem">
-      <div class="meth-intro-label" style="color:var(--ac)">🔬 Metodología técnica</div>
-      <div class="meth-intro-title">Diseño del índice compuesto</div>
-      <div class="meth-intro-desc">RadARG es un índice de sentimiento construido para la economía argentina. El score final es el promedio ponderado de 9 sub-indicadores normalizados en [0,100].</div>
+      <div class="meth-intro-label" style="color:var(--ac)" data-i18n="meth.t.label">🔬 Metodología técnica</div>
+      <div class="meth-intro-title" data-i18n="meth.t.title">Diseño del índice compuesto</div>
+      <div class="meth-intro-desc" data-i18n="meth.t.desc">RadARG es un índice de sentimiento de la economía argentina. El score final (0–100) es el promedio ponderado de cinco segmentos temáticos, cada uno compuesto por sub-indicadores normalizados a [0,100].</div>
     </div>
     <div class="meth-grid">
-      <div class="meth-card"><div class="meth-q">Ponderación</div><div class="meth-a">S = Σ(wᵢ·sᵢ), Σwᵢ=100%. Político 23%, Brecha 15%, EMBI 15%, Reservas 11%, Tasa real 10%, Externo 10%, Merval 7%, Bonos 4%, Amplitud 5%.</div></div>
-      <div class="meth-card"><div class="meth-q">Brecha: mapeo no lineal</div><div class="meth-a">Brecha negativa → score ~90 (históricamente inédito). Brecha=80% → ~26. Brecha≥130% → 5. Función convexa en el extremo inferior.</div></div>
-      <div class="meth-card"><div class="meth-q">Clima Político Compuesto</div><div class="meth-a">ICG-UTDT 100%. Índice de Confianza en el Gobierno de la UTDT, escala 0–5. El dato es mensual — se actualiza la primera semana de cada mes.</div></div>
-      <div class="meth-card"><div class="meth-q">Amplitud: Open BYMA Data</div><div class="meth-a">Breadth real del panel líder via open.bymadata.com.ar/assets/leading-equity. Breadth = (subidas−bajas)/total → normalizado a [0,100].</div></div>
-      <div class="meth-card"><div class="meth-q">Limitaciones</div><div class="meth-a">Índice de sentiment, no predictivo. No incorpora flujos de capitales ni expectativas forward. Datos 2007–2015 usan estimaciones privadas de inflación por intervención del INDEC.</div></div>
-      <div class="meth-card"><div class="meth-q">Fuentes y frecuencia</div><div class="meth-a">dolarapi.com (intradiaria), ArgentinaDatos (diaria/mensual), Open BYMA Data (intradiaria), Yahoo Finance/CBOT (intradiaria). Refresh automático cada 5 minutos.</div></div>
+      <div class="meth-card"><div class="meth-q" data-i18n="meth.t.q1">Estructura de segmentos</div><div class="meth-a" data-i18n="meth.t.a1">S = Σ(wᵢ·sᵢ), con Σwᵢ = 100%. Inflación y Política Monetaria 25%, Tipo de Cambio y Reservas 25%, Mercados y Expectativas 20%, Actividad Real y Bienestar 15%, Fiscal y Deuda Soberana 15%.</div></div>
+      <div class="meth-card"><div class="meth-q" data-i18n="meth.t.q2">Inflación y Política Monetaria</div><div class="meth-a" data-i18n="meth.t.a2">Combina IPC mensual del INDEC, tasa real (plazo fijo menos inflación), y expectativas de inflación a 12 meses del REM del BCRA. Inflación a la baja y tasa real positiva elevan el score.</div></div>
+      <div class="meth-card"><div class="meth-q" data-i18n="meth.t.q3">Tipo de Cambio y Reservas</div><div class="meth-a" data-i18n="meth.t.a3">Brecha cambiaria con mapeo no lineal (brecha negativa → score ~90, históricamente inédito), reservas netas del BCRA, y un proxy de liquidación del agro. La brecha es el componente de mayor peso.</div></div>
+      <div class="meth-card"><div class="meth-q" data-i18n="meth.t.q4">Mercados y Expectativas</div><div class="meth-a" data-i18n="meth.t.a4">Riesgo País (EMBI), Merval en dólares, rendimiento del GD35, spread AL30/GD30 (ley local vs Nueva York), amplitud del panel líder y clima político (ICG-UTDT + sentimiento de noticias).</div></div>
+      <div class="meth-card"><div class="meth-q" data-i18n="meth.t.q5">Actividad y Fiscal</div><div class="meth-a" data-i18n="meth.t.a5">Actividad: EMAE, salario real (RIPTE), consumo masivo, confianza del consumidor, desempleo y patentamientos. Fiscal: resultado primario, rollover de deuda, cumplimiento de metas con el FMI y calificación soberana relativa al historial argentino.</div></div>
+      <div class="meth-card"><div class="meth-q" data-i18n="meth.t.q6">Fuentes, frecuencia y límites</div><div class="meth-a" data-i18n="meth.t.a6">Fuentes: dolarapi, ArgentinaDatos, BCRA, INDEC, Open BYMA Data, Yahoo Finance/CBOT, UTDT. El índice se recalcula a diario (12:00). Es un índice de sentimiento, no predictivo: no incorpora flujos de capitales ni expectativas forward. Datos 2007–2015 usan estimaciones privadas de inflación.</div></div>
     </div>
   </section>
 
@@ -2060,17 +2229,20 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
             <div style="display:flex;align-items:center;gap:.5rem;font-size:12px;color:var(--text2)">
               <span style="color:var(--g)">✓</span> <span data-i18n="suggest.vp2">Te notificamos si implementamos tu idea</span>
             </div>
+            <!-- Cartel "1 mes gratis" oculto temporalmente — reactivar quitando el comentario
             <div style="display:flex;align-items:center;gap:.5rem;font-size:12px;color:var(--text2)">
               <span style="color:var(--g)">✓</span> <span data-i18n="suggest.vp3">Ideas implementadas = 1 mes Plata gratis</span>
             </div>
+            -->
           </div>
         </div>
         <!-- Right: form -->
         <div id="suggestFormWrap">
-          <!-- Gift incentive badge -->
+          <!-- Gift incentive badge — oculto temporalmente, reactivar quitando el comentario
           <div class="suggest-gift-badge">
             🎁 <span data-i18n="suggest.gift.badge">Si implementamos tu idea, te regalamos 1 mes de Plata gratis</span>
           </div>
+          -->
           <form class="suggest-form" onsubmit="submitSuggest(event)" novalidate>
             <div class="suggest-row">
               <div>
@@ -2109,21 +2281,6 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
     </div>
   </section>
 
-  <!-- DONATE -->
-  <section id="donaciones">
-    <div class="donate-card">
-      <div class="donate-card-inner">
-        <div class="donate-emoji">☕</div>
-        <h2 class="donate-title" data-i18n="donate.title">RadARG es libre y gratuito</h2>
-        <p class="donate-sub" data-i18n="donate.sub">Sin publicidad, sin paywalls. Si el índice te es útil para tomar decisiones, podés apoyar el proyecto con una colaboración voluntaria.</p>
-        <div class="donate-btns">
-          <button class="btn-donate-main" onclick="openModal()">☕ Invitame un café</button>
-          <button class="btn-pro" onclick="openProModal()" style="font-size:13px;padding:10px 20px">⚡ Apoyar con más</button>
-        </div>
-        <p class="donate-disclaimer">100% voluntario · Sin obligación · Cualquier monto ayuda a mantener el servidor y la API</p>
-      </div>
-    </div>
-  </section>
 
 </main>
 
@@ -2154,7 +2311,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
   </div>
   <div class="foot-copy">
     <span>© 2026 RadARG — Todos los derechos reservados</span>
-    <span>Actualización automática cada 5 minutos</span>
+    <span data-i18n="footer.update">Índice actualizado todos los días a las 12:00</span>
   </div>
 </footer>
 
@@ -2421,7 +2578,6 @@ const T = {
     // Chart tooltip
     'chart.score':'Score','chart.sliderHint':'Drag the ends to adjust the period',
     'chart.mervalToggle':'Merval USD',
-    'chart.presToggle':'Presidents',
     'chart.presToggle':'Presidentes',
     // AI refresh title
     'ai.refresh':'Actualizar análisis',
@@ -2438,6 +2594,41 @@ const T = {
     'donate.modal.sub':'Si este índice te ayuda, cualquier colaboración ayuda a mantenerlo activo y gratuito.',
     // Ticker timestamp
     'ticker.act':'Act.',
+    // ── Nav / navegación ──
+    'nav.support':'Apoyar','nav.suggest':'Sugerencias',
+    // ── Sección Apoyar ──
+    'support.title':'RadARG es libre y gratuito',
+    'support.sub':'Sin publicidad y sin barreras de pago. Si el índice te resulta útil, podés apoyar el proyecto con una colaboración voluntaria. Cada aporte ayuda a sostener el servidor, las APIs de datos y el desarrollo de nuevas funciones.',
+    'support.cta.main':'Apoyar el proyecto',
+    'support.disclaimer':'100% voluntario · Sin obligación · Cualquier monto suma',
+    // ── Ranking ──
+    'ranking.title':'Top apoyos','ranking.sub':'Quienes hacen posible RadARG',
+    'ranking.empty':'Todavía no hay apoyos cargados.<br>¡Podés ser el primero!',
+    'ranking.footer':'El ranking se actualiza todos los días',
+    // ── ctx-strip nuevas ──
+    'ctx.brecha':'Brecha Cambiaria','ctx.brecha.sub':'Blue vs. oficial',
+    'ctx.ccl':'Dólar CCL','ctx.ccl.sub':'Contado con liquidación',
+    'ctx.swipe':'Deslizá para ver todos los datos',
+    // ── Footer ──
+    'footer.update':'Índice actualizado todos los días a las 12:00',
+    // ── Metodología: simple (nuevas) ──
+    'meth.g.q5':'¿Cada cuánto se actualiza?',
+    'meth.g.a5':'El índice se recalcula y publica todos los días a las 12:00. Los datos de mercado como el dólar y el Merval se refrescan dentro de la página a lo largo del día.',
+    // ── Metodología: técnica ──
+    'meth.t.label':'🔬 Metodología técnica','meth.t.title':'Diseño del índice compuesto',
+    'meth.t.desc':'RadARG es un índice de sentimiento de la economía argentina. El score final (0–100) es el promedio ponderado de cinco segmentos temáticos, cada uno compuesto por sub-indicadores normalizados a [0,100].',
+    'meth.t.q1':'Estructura de segmentos',
+    'meth.t.a1':'S = Σ(wᵢ·sᵢ), con Σwᵢ = 100%. Inflación y Política Monetaria 25%, Tipo de Cambio y Reservas 25%, Mercados y Expectativas 20%, Actividad Real y Bienestar 15%, Fiscal y Deuda Soberana 15%.',
+    'meth.t.q2':'Inflación y Política Monetaria',
+    'meth.t.a2':'Combina IPC mensual del INDEC, tasa real (plazo fijo menos inflación), y expectativas de inflación a 12 meses del REM del BCRA. Inflación a la baja y tasa real positiva elevan el score.',
+    'meth.t.q3':'Tipo de Cambio y Reservas',
+    'meth.t.a3':'Brecha cambiaria con mapeo no lineal (brecha negativa → score ~90, históricamente inédito), reservas netas del BCRA, y un proxy de liquidación del agro. La brecha es el componente de mayor peso.',
+    'meth.t.q4':'Mercados y Expectativas',
+    'meth.t.a4':'Riesgo País (EMBI), Merval en dólares, rendimiento del GD35, spread AL30/GD30 (ley local vs Nueva York), amplitud del panel líder y clima político (ICG-UTDT + sentimiento de noticias).',
+    'meth.t.q5':'Actividad y Fiscal',
+    'meth.t.a5':'Actividad: EMAE, salario real (RIPTE), consumo masivo, confianza del consumidor, desempleo y patentamientos. Fiscal: resultado primario, rollover de deuda, cumplimiento de metas con el FMI y calificación soberana relativa al historial argentino.',
+    'meth.t.q6':'Fuentes, frecuencia y límites',
+    'meth.t.a6':'Fuentes: dolarapi, ArgentinaDatos, BCRA, INDEC, Open BYMA Data, Yahoo Finance/CBOT, UTDT. El índice se recalcula a diario (12:00). Es un índice de sentimiento, no predictivo: no incorpora flujos de capitales ni expectativas forward. Datos 2007–2015 usan estimaciones privadas de inflación.',
   },
   en: {
     'nav.indicators':'Indicators','nav.historic':'Historical','nav.tiers':'Tiers','nav.methodology':'Methodology',
@@ -2628,7 +2819,7 @@ const T = {
     'hitos.hide':'Hide milestones',
     // Chart tooltip
     'chart.score':'Score','chart.sliderHint':'Drag the ends to adjust the period',
-    'chart.mervalToggle':'Merval USD',
+    'chart.mervalToggle':'Merval USD','chart.presToggle':'Presidents',
     // AI refresh title
     'ai.refresh':'Refresh analysis',
     // AI fallback
@@ -2644,6 +2835,41 @@ const T = {
     'donate.modal.sub':'If this index helps you, any contribution helps keep it free.',
     // Ticker timestamp
     'ticker.act':'Upd.',
+    // ── Nav ──
+    'nav.support':'Support','nav.suggest':'Suggestions',
+    // ── Support section ──
+    'support.title':'RadARG is free and open',
+    'support.sub':'No ads and no paywalls. If you find the index useful, you can support the project with a voluntary contribution. Every bit helps cover the server, data APIs and the development of new features.',
+    'support.cta.main':'Support the project',
+    'support.disclaimer':'100% voluntary · No obligation · Any amount helps',
+    // ── Ranking ──
+    'ranking.title':'Top supporters','ranking.sub':'The people who make RadARG possible',
+    'ranking.empty':'No supporters yet.<br>You could be the first!',
+    'ranking.footer':'The ranking updates every day',
+    // ── ctx-strip new ──
+    'ctx.brecha':'FX Gap','ctx.brecha.sub':'Blue vs. official',
+    'ctx.ccl':'CCL Dollar','ctx.ccl.sub':'Contado con liqui (CCL)',
+    'ctx.swipe':'Swipe to see all the data',
+    // ── Footer ──
+    'footer.update':'Index updated every day at 12:00',
+    // ── Methodology: simple (new) ──
+    'meth.g.q5':'How often is it updated?',
+    'meth.g.a5':'The index is recalculated and published every day at 12:00. Market data such as the dollar and the Merval refresh within the page throughout the day.',
+    // ── Methodology: technical ──
+    'meth.t.label':'🔬 Technical methodology','meth.t.title':'Composite index design',
+    'meth.t.desc':'RadARG is a sentiment index for the Argentine economy. The final score (0–100) is the weighted average of five thematic segments, each made up of sub-indicators normalized to [0,100].',
+    'meth.t.q1':'Segment structure',
+    'meth.t.a1':'S = Σ(wᵢ·sᵢ), with Σwᵢ = 100%. Inflation & Monetary Policy 25%, FX & Reserves 25%, Markets & Expectations 20%, Real Activity & Welfare 15%, Fiscal & Sovereign Debt 15%.',
+    'meth.t.q2':'Inflation & Monetary Policy',
+    'meth.t.a2':'Combines INDEC monthly CPI, real rate (time deposit minus inflation), and 12-month inflation expectations from the BCRA REM survey. Falling inflation and a positive real rate raise the score.',
+    'meth.t.q3':'FX & Reserves',
+    'meth.t.a3':'Exchange-rate gap with non-linear mapping (negative gap → score ~90, historically unprecedented), BCRA net reserves, and an agro-export liquidation proxy. The gap carries the most weight.',
+    'meth.t.q4':'Markets & Expectations',
+    'meth.t.a4':'Country Risk (EMBI), Merval in dollars, GD35 yield, AL30/GD30 spread (local vs New York law), leading-panel breadth and political climate (ICG-UTDT + news sentiment).',
+    'meth.t.q5':'Activity & Fiscal',
+    'meth.t.a5':'Activity: EMAE, real wages (RIPTE), mass consumption, consumer confidence, unemployment and vehicle registrations. Fiscal: primary balance, debt rollover, IMF target compliance and sovereign rating relative to Argentina\'s own history.',
+    'meth.t.q6':'Sources, frequency and limits',
+    'meth.t.a6':'Sources: dolarapi, ArgentinaDatos, BCRA, INDEC, Open BYMA Data, Yahoo Finance/CBOT, UTDT. The index is recalculated daily (12:00). It is a sentiment index, not predictive: it does not incorporate capital flows or forward expectations. 2007–2015 data uses private inflation estimates.',
   }
 };
 
@@ -2661,6 +2887,8 @@ function setLang(l) {
     const k = el.dataset.i18nPlaceholder;
     if (T[l][k]) el.placeholder = T[l][k];
   });
+  // Re-render ranking so its dynamic strings translate
+  if (typeof renderRanking === 'function') renderRanking();
   // Translate Pro modal dynamic elements
   const mpBtn=$('mpBtn'),ppBtn=$('ppBtn');
   if(mpBtn) mpBtn.textContent=t('pro.mp.btn');
@@ -4064,6 +4292,8 @@ function renderCtx() {
   const ofv=$('ctx-oficial-val'); if(ofv&&S.oficial) ofv.textContent=fmtPeso(S.oficial);
   const mepv=$('ctx-mep-val'); if(mepv&&S.mep) mepv.textContent=fmtPeso(S.mep);
   const igv=$('ctx-icg-val'); if(igv&&LIVE.icg) igv.textContent=LIVE.icg.toFixed(2)+'/5';
+  const brv=$('ctx-brecha-val'); if(brv){ brv.textContent=fmtPct(bp); brv.style.color = bp<0?'var(--g)':bp<20?'var(--n)':bp<60?'var(--f)':'var(--fe)'; }
+  const cclv=$('ctx-ccl-val'); if(cclv&&S.ccl) cclv.textContent=fmtPeso(S.ccl);
 }
 
 /* ── Gauge ──────────────────────────────────────────────────── */
@@ -5329,6 +5559,29 @@ const NEWS_EN = [
   {tag:'economy',tagLabel:'Economy',headline:'March inflation: 3.4% monthly; 2026 YTD at 9.1%, lowest since 2017',meta:'INDEC · April 2026',impact:'pos',impactLabel:'Positive',url:'#'},
 ];
 
+function renderRanking(){
+  const list = document.getElementById('rankingList');
+  if(!list) return;
+  const data = window._ranking || [];
+  if(!data.length){
+    list.innerHTML = '<div class="ranking-empty">' + t('ranking.empty') + '</div>';
+    return;
+  }
+  // Ordenar por monto descendente y tomar top 8
+  const sorted = data.slice().sort((a,b)=> (parseFloat(b.monto)||0) - (parseFloat(a.monto)||0)).slice(0,8);
+  const medals = ['🥇','🥈','🥉'];
+  list.innerHTML = sorted.map((r,i)=>{
+    const topClass = i<3 ? ' top'+(i+1) : '';
+    const medal = i<3 ? '<span class="ranking-medal">'+medals[i]+'</span>' : '';
+    const pos = i<3 ? '' : '<span class="ranking-pos">'+(i+1)+'</span>';
+    const nombre = (r.nombre || 'Anónimo').toString().replace(/[<>]/g,'');
+    const monto = r.monto_display || (r.monto != null ? '$'+r.monto : '');
+    return '<div class="ranking-row'+topClass+'">'+pos+medal+
+           '<span class="ranking-name">'+nombre+'</span>'+
+           '<span class="ranking-amount">'+monto+'</span></div>';
+  }).join('');
+}
+
 function renderNews(){
   const strip = document.getElementById('newsStrip');
   const title = document.getElementById('newsSttl');
@@ -5590,6 +5843,13 @@ async function loadDataJSON() {
       console.log('[data.json] Histórico:', d._historico.labels.length, 'meses');
     } else {
       console.log('[data.json] Histórico vacío — conservando datos hardcodeados (' + window.MONTHLY.labels.length + ' meses)');
+    }
+
+    // Apply ranking de apoyos
+    if(d._ranking && Array.isArray(d._ranking)) {
+      window._ranking = d._ranking;
+      renderRanking();
+      console.log('[data.json] Ranking:', d._ranking.length, 'apoyos');
     }
 
     return true;
