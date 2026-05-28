@@ -1865,12 +1865,18 @@ body.lm .ranking-footer { border-top-color:rgba(0,0,0,.08); }
   /* Main */
   main { padding:1rem .875rem 3rem; }
 
-  /* Hero — stack vertically */
+  /* Hero — stack vertically, gauge PRIMERO en mobile */
   .hero { grid-template-columns:1fr; gap:1rem; }
+  .hero .gauge-card { order:1; }   /* el gráfico aparece primero */
+  .hero .score-card { order:2; }   /* el detalle del score, debajo */
   .score-card { padding:1.25rem; }
   .sc-score { font-size:56px; }
   .sc-refs  { flex-direction:column; gap:.375rem; }
   .ai-card  { min-width:unset; }
+  /* El gauge arriba: menos padding superior para que entre completo en el primer pantallazo */
+  .gauge-card > div:first-child { padding-top:.25rem !important; }
+  /* Título del gauge más compacto en mobile para no empujar el semicírculo */
+  .gauge-title-txt { font-size:19px !important; margin-bottom:3px !important; line-height:1.15; }
 
   /* Context strip — 2 cols on mobile */
   .ctx-strip { grid-template-columns:repeat(2,1fr); gap:.5rem; }
@@ -2104,7 +2110,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
     <!-- Gauge -->
     <div class="gauge-card">
       <div style="text-align:center;padding:1rem 0 .25rem">
-        <div style="font-size:26px;font-weight:800;letter-spacing:-.5px;color:var(--text);margin-bottom:6px" data-i18n="gauge.title">Índice de Sentimiento del Mercado</div>
+        <div class="gauge-title-txt" style="font-size:26px;font-weight:800;letter-spacing:-.5px;color:var(--text);margin-bottom:6px" data-i18n="gauge.title">Índice de Sentimiento del Mercado</div>
         <div style="font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--text3)" class="gauge-label-txt" data-i18n="gauge.label">Argentina</div>
         <div style="font-size:10px;color:var(--text3);margin-top:2px;font-family:'JetBrains Mono',monospace" class="gauge-scale-txt" data-i18n="gauge.scale">0 = pánico total · 50 = neutral · 100 = euforia</div>
       </div>
@@ -2577,11 +2583,11 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
         <div class="sp-field">
           <label data-i18n="spform.budget">Presupuesto mensual estimado</label>
           <select name="presupuesto">
-            <option value="" data-i18n="spform.budget.select">Seleccioná una opción</option>
-            <option value="<500">Menos de USD 500</option>
+            <option value="" data-i18n="spform.budget.select">–</option>
+            <option value="<500">< USD 500</option>
             <option value="500-1500">USD 500 – 1.500</option>
             <option value="1500-5000">USD 1.500 – 5.000</option>
-            <option value=">5000">Más de USD 5.000</option>
+            <option value=">5000">> USD 5.000</option>
           </select>
         </div>
       </div>
@@ -2995,7 +3001,7 @@ const T = {
     'spform.sub':'Te respondemos en menos de 48 horas con una propuesta personalizada.',
     'spform.name':'Nombre y apellido','spform.company':'Empresa / Organización',
     'spform.email':'Email de contacto','spform.budget':'Presupuesto mensual estimado',
-    'spform.budget.select':'Seleccioná una opción','spform.message':'Contanos qué querés lograr',
+    'spform.budget.select':'–','spform.message':'Contanos qué querés lograr',
     'spform.send':'Enviar consulta',
     'spform.ok.title':'¡Consulta enviada!',
     'spform.ok.msg':'Te respondemos en menos de 48 horas. Revisá también tu carpeta de spam.',
@@ -3253,7 +3259,7 @@ const T = {
     'spform.sub':'We\'ll get back to you within 48 hours with a personalized proposal.',
     'spform.name':'Full name','spform.company':'Company / Organization',
     'spform.email':'Contact email','spform.budget':'Estimated monthly budget',
-    'spform.budget.select':'Select an option','spform.message':'Tell us what you want to achieve',
+    'spform.budget.select':'–','spform.message':'Tell us what you want to achieve',
     'spform.send':'Send inquiry',
     'spform.ok.title':'Inquiry sent!',
     'spform.ok.msg':'We\'ll get back to you within 48 hours. Also check your spam folder.',
