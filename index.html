@@ -899,19 +899,221 @@ body.lm .merval-switch.sw-pres   input:checked ~ .merval-switch-track { backgrou
 /* ════════ SPONSORS — Premium ════════════════════════════════ */
 
 /* Contenedor con borde animado tipo "shimmer" */
+/* ══════════════════════════════════════════════════════════
+   SPONSORS — Marco dorado animado
+   ══════════════════════════════════════════════════════════ */
+
+/* Capa exterior: genera el borde dorado animado */
 .sponsors-outer {
-  position:relative; padding:2px; border-radius:calc(var(--radius-lg) + 2px);
-  background:linear-gradient(135deg, #c8a84b, #f5e17a, #a87c2a, #f0d060, #c8a84b);
-  background-size:300% 300%;
-  animation:sponsorShimmer 4s linear infinite;
-  box-shadow:0 0 32px rgba(200,168,75,.35), 0 0 64px rgba(200,168,75,.15);
+  position:relative;
+  padding:2px;                                    /* grosor del borde */
+  border-radius:calc(var(--radius-lg) + 2px);
+  background:linear-gradient(90deg,
+    #7a5c1e 0%, #c8a84b 20%, #f5e17a 40%,
+    #c8a84b 60%, #7a5c1e 80%, #c8a84b 100%);
+  background-size:200% 100%;
+  animation:sponsorBorder 3s linear infinite;
+  box-shadow:
+    0 0 0 1px rgba(200,168,75,.15),
+    0 0 24px rgba(200,168,75,.25),
+    0 0 56px rgba(200,168,75,.10);
   margin-bottom:2rem;
 }
-@keyframes sponsorShimmer {
-  0%  { background-position:0% 50%; box-shadow:0 0 28px rgba(200,168,75,.40), 0 0 60px rgba(200,168,75,.18); }
-  50% { background-position:100% 50%; box-shadow:0 0 42px rgba(245,225,122,.60), 0 0 80px rgba(245,225,122,.25); }
-  100%{ background-position:0% 50%; box-shadow:0 0 28px rgba(200,168,75,.40), 0 0 60px rgba(200,168,75,.18); }
+@keyframes sponsorBorder {
+  0%   { background-position:0% 0%;   box-shadow:0 0 22px rgba(200,168,75,.30),0 0 48px rgba(200,168,75,.12); }
+  50%  { background-position:100% 0%; box-shadow:0 0 36px rgba(245,225,120,.55),0 0 72px rgba(245,225,120,.20); }
+  100% { background-position:0% 0%;   box-shadow:0 0 22px rgba(200,168,75,.30),0 0 48px rgba(200,168,75,.12); }
 }
+
+.sponsors-card {
+  position:relative; overflow:hidden;
+  background:linear-gradient(160deg, #0c0b14 0%, #121020 55%, #0b0e17 100%);
+  border-radius:var(--radius-lg);
+  padding:2.75rem 2.25rem 2.25rem; text-align:center;
+}
+.sponsors-card::before {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(ellipse 90% 55% at 50% -5%, rgba(200,168,75,.16), transparent 65%);
+}
+/* Destellos decorativos */
+.sp-star { position:absolute; pointer-events:none; color:#c8a84b; opacity:.35; animation:spStarPulse 3s ease-in-out infinite; }
+.sp-star-1 { top:18px; left:24px;  font-size:14px; animation-delay:0s; }
+.sp-star-2 { top:18px; right:24px; font-size:14px; animation-delay:1.5s; }
+@keyframes spStarPulse { 0%,100%{opacity:.25;transform:scale(1)} 50%{opacity:.65;transform:scale(1.2)} }
+
+.sponsors-eyebrow {
+  position:relative; z-index:1;
+  font-size:9px; font-weight:800; letter-spacing:.22em; text-transform:uppercase;
+  background:linear-gradient(90deg, #a07020, #e8c94a, #f5e17a, #e8c94a, #a07020);
+  background-size:250% auto; animation:spGoldText 3s linear infinite;
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  margin-bottom:.625rem;
+}
+@keyframes spGoldText {
+  0%   { background-position:0% center; }
+  100% { background-position:250% center; }
+}
+.sponsors-title {
+  position:relative; z-index:1;
+  font-size:23px; font-weight:800; letter-spacing:-.4px; line-height:1.22;
+  color:#f2edd8; margin-bottom:.875rem;
+}
+.sponsors-sub {
+  position:relative; z-index:1;
+  font-size:13.5px; color:rgba(225,210,170,.68); max-width:570px;
+  margin:0 auto 1.625rem; line-height:1.72;
+}
+.sponsors-audience {
+  position:relative; z-index:1;
+  display:flex; justify-content:center; gap:.5rem; flex-wrap:wrap; margin-bottom:1.75rem;
+}
+.audience-chip {
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:11px; font-weight:700;
+  padding:5px 13px; border-radius:20px;
+  background:rgba(200,168,75,.10); color:rgba(230,208,140,.85);
+  border:1px solid rgba(200,168,75,.25);
+}
+.btn-sponsor {
+  position:relative; z-index:1;
+  display:inline-flex; align-items:center; gap:8px;
+  font-size:14px; font-weight:800; padding:13px 30px;
+  border-radius:var(--radius-sm); border:none; cursor:pointer;
+  background:linear-gradient(90deg, #a07020, #d4a830, #f0cf50, #d4a830, #a07020);
+  background-size:250% auto; animation:spBtnGold 3s linear infinite;
+  color:#1c1000; font-family:'Inter',sans-serif; letter-spacing:.03em;
+  box-shadow:0 4px 18px rgba(200,168,75,.40);
+  transition:transform .15s, box-shadow .15s;
+  text-decoration:none;
+}
+.btn-sponsor:hover { transform:translateY(-2px); box-shadow:0 7px 28px rgba(200,168,75,.60); }
+@keyframes spBtnGold {
+  0%   { background-position:0% center; }
+  100% { background-position:250% center; }
+}
+.sponsors-benefits {
+  position:relative; z-index:1;
+  display:flex; justify-content:center; gap:1.5rem; flex-wrap:wrap;
+  margin-top:1.5rem; padding-top:1.25rem;
+  border-top:1px solid rgba(200,168,75,.18);
+}
+.benefit-item { display:flex; align-items:center; gap:7px; font-size:12px; color:rgba(215,198,155,.60); }
+
+/* ── Light mode ── */
+body.lm .sponsors-card {
+  background:linear-gradient(160deg, #fdf8ec 0%, #fff9f0 55%, #faf4e8 100%);
+}
+body.lm .sponsors-card::before {
+  background:radial-gradient(ellipse 90% 55% at 50% -5%, rgba(180,140,40,.12), transparent 65%);
+}
+body.lm .sp-star { color:#a07020; }
+body.lm .sponsors-title { color:#1a1200; }
+body.lm .sponsors-sub { color:rgba(80,60,10,.65); }
+body.lm .audience-chip { background:rgba(160,112,20,.08); color:rgba(90,65,5,.80); border-color:rgba(160,112,20,.25); }
+body.lm .benefit-item { color:rgba(80,60,10,.55); }
+body.lm .sponsors-benefits { border-top-color:rgba(160,112,20,.20); }
+
+/* ══════════════════════════════════════════════════════════
+   MODAL SPONSOR — Formulario de contacto
+   ══════════════════════════════════════════════════════════ */
+.sp-modal-backdrop {
+  position:fixed; inset:0; background:rgba(0,0,0,.65);
+  backdrop-filter:blur(4px); z-index:1100;
+  animation:spFadeIn .2s ease;
+}
+.sp-modal {
+  position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+  width:min(600px, 94vw); max-height:90vh; overflow-y:auto;
+  background:var(--bg2); border:1px solid var(--border2);
+  border-radius:var(--radius-lg); padding:2rem 2rem 1.75rem;
+  z-index:1101; animation:spSlideIn .25s ease;
+  scrollbar-width:thin; scrollbar-color:var(--border2) transparent;
+}
+.sp-modal::-webkit-scrollbar { width:5px; }
+.sp-modal::-webkit-scrollbar-thumb { background:var(--border2); border-radius:3px; }
+@keyframes spFadeIn  { from{opacity:0} to{opacity:1} }
+@keyframes spSlideIn { from{opacity:0;transform:translate(-50%,-46%)} to{opacity:1;transform:translate(-50%,-50%)} }
+
+.sp-modal-close {
+  position:absolute; top:14px; right:16px;
+  background:none; border:none; color:var(--text3); font-size:16px;
+  cursor:pointer; padding:4px 8px; border-radius:4px; transition:color .15s;
+}
+.sp-modal-close:hover { color:var(--text); }
+
+.sp-modal-header { margin-bottom:1.5rem; }
+.sp-modal-eyebrow {
+  font-size:9px; font-weight:800; letter-spacing:.22em; text-transform:uppercase;
+  background:linear-gradient(90deg, #a07020, #e8c94a, #a07020);
+  background-size:200% auto; animation:spGoldText 3s linear infinite;
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  margin-bottom:.4rem;
+}
+.sp-modal-title { font-size:20px; font-weight:800; letter-spacing:-.3px; margin-bottom:.4rem; }
+.sp-modal-sub { font-size:13px; color:var(--text2); line-height:1.6; }
+
+/* Campos */
+.sp-form-row { display:grid; grid-template-columns:1fr 1fr; gap:.875rem; }
+@media(max-width:480px){ .sp-form-row { grid-template-columns:1fr; } }
+.sp-field { display:flex; flex-direction:column; gap:5px; margin-bottom:.875rem; }
+.sp-field-full { grid-column:1/-1; }
+.sp-field label {
+  font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase;
+  color:var(--text2);
+}
+.sp-field input, .sp-field select, .sp-field textarea {
+  background:var(--bg3); border:1px solid var(--border2);
+  border-radius:var(--radius-sm); color:var(--text);
+  font-family:'Inter',sans-serif; font-size:13px; padding:9px 12px;
+  outline:none; transition:border-color .18s, box-shadow .18s;
+  resize:vertical;
+}
+.sp-field input:focus, .sp-field select:focus, .sp-field textarea:focus {
+  border-color:rgba(200,168,75,.6);
+  box-shadow:0 0 0 3px rgba(200,168,75,.10);
+}
+.sp-field select option { background:var(--bg2); }
+
+.sp-submit {
+  width:100%; margin-top:.375rem;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  font-size:14px; font-weight:800; padding:13px;
+  border-radius:var(--radius-sm); border:none; cursor:pointer;
+  background:linear-gradient(90deg, #a07020, #d4a830, #f0cf50, #d4a830, #a07020);
+  background-size:250% auto; animation:spBtnGold 3s linear infinite;
+  color:#1c1000; font-family:'Inter',sans-serif; letter-spacing:.03em;
+  transition:transform .15s, box-shadow .15s;
+}
+.sp-submit:hover { transform:translateY(-1px); box-shadow:0 5px 20px rgba(200,168,75,.45); }
+.sp-submit:disabled { opacity:.55; cursor:wait; transform:none; }
+
+/* Estados */
+.sp-success {
+  text-align:center; padding:1.5rem 0;
+}
+.sp-success-icon {
+  font-size:40px; color:#c8a84b; margin-bottom:.75rem;
+  animation:spStarPulse 2s ease-in-out infinite;
+}
+.sp-success-title { font-size:20px; font-weight:800; margin-bottom:.5rem; }
+.sp-success-msg { font-size:13px; color:var(--text2); line-height:1.65; margin-bottom:1.25rem; }
+.sp-error-msg {
+  font-size:12px; color:var(--r); text-align:center;
+  padding:.75rem; margin-top:.5rem;
+  background:rgba(239,68,68,.08); border-radius:var(--radius-sm);
+  border:1px solid rgba(239,68,68,.2);
+}
+
+/* Light mode modal */
+body.lm .sp-modal { background:#fff; border-color:rgba(0,0,0,.10); }
+body.lm .sp-field input,
+body.lm .sp-field select,
+body.lm .sp-field textarea { background:#f7f7fb; border-color:rgba(0,0,0,.14); color:#1a1a2e; }
+body.lm .sp-field input:focus,
+body.lm .sp-field select:focus,
+body.lm .sp-field textarea:focus { border-color:rgba(160,112,20,.5); box-shadow:0 0 0 3px rgba(160,112,20,.08); }
+
+@media(max-width:480px){ .sp-modal { padding:1.5rem 1.25rem; } }
 
 .sponsors-card {
   position:relative; overflow:hidden;
@@ -2275,24 +2477,113 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
     </div>
   </div>
 
-  <!-- SPONSORS -->
-  <section>
+  <!-- SPONSORS — Premium -->
+  <section id="sponsors">
     <div class="sec-hdr">
       <span class="sec-ttl" data-i18n="sec.sponsors">Sponsors</span>
       <div class="sec-line"></div>
     </div>
-    <div class="sponsors-card">
-      <div class="sponsors-eyebrow" data-i18n="sponsors.eyebrow">Aparecé en RadARG</div>
-      <div class="sponsors-title" data-i18n="sponsors.title">Llegá a inversores, traders y analistas que siguen el mercado diariamente</div>
-      <p class="sponsors-sub" data-i18n="sponsors.sub">RadARG es visitado por inversores, traders, analistas y empresarios que siguen el mercado financiero. Llegá a una audiencia altamente calificada.</p>
-      <a class="btn-sponsor" href="mailto:contacto@radarg.com">📩 <span data-i18n="sponsors.cta">Quiero publicitar</span></a>
-      <div class="sponsors-benefits">
-        <div class="benefit-item"><span>📊</span><span data-i18n="sponsors.b1">Audiencia: inversores y analistas</span></div>
-        <div class="benefit-item"><span>🖼️</span><span data-i18n="sponsors.b2">Logo en la página principal</span></div>
-        <div class="benefit-item"><span>🔗</span><span data-i18n="sponsors.b3">Link directo a tu sitio</span></div>
-      </div>
-    </div>
+
+    <!-- Marco dorado exterior -->
+    <div class="sponsors-outer">
+      <div class="sponsors-card">
+
+        <!-- Destellos decorativos -->
+        <span class="sp-star sp-star-1">✦</span>
+        <span class="sp-star sp-star-2">✦</span>
+
+        <div class="sponsors-eyebrow" data-i18n="sponsors.eyebrow">✦ &thinsp;Oportunidad exclusiva de patrocinio&thinsp; ✦</div>
+        <h2 class="sponsors-title" data-i18n="sponsors.title">Tu marca frente a quienes mueven el dinero en Argentina</h2>
+        <p class="sponsors-sub" data-i18n="sponsors.sub">RadARG es la referencia diaria de inversores, traders, analistas financieros, portfolio managers y empresarios que toman decisiones con dinero real. No es audiencia masiva — es la audiencia que actúa.</p>
+
+        <!-- Chips de audiencia -->
+        <div class="sponsors-audience">
+          <span class="audience-chip">💼 <span data-i18n="sponsors.aud1">Inversores individuales</span></span>
+          <span class="audience-chip">📈 <span data-i18n="sponsors.aud2">Traders activos</span></span>
+          <span class="audience-chip">🏦 <span data-i18n="sponsors.aud3">Analistas financieros</span></span>
+          <span class="audience-chip">🏢 <span data-i18n="sponsors.aud4">Portfolio managers</span></span>
+          <span class="audience-chip">📰 <span data-i18n="sponsors.aud5">Periodistas económicos</span></span>
+        </div>
+
+        <button class="btn-sponsor" onclick="openSponsorModal()">
+          ✦ &nbsp;<span data-i18n="sponsors.cta">Quiero ser sponsor</span>
+        </button>
+
+        <div class="sponsors-benefits">
+          <div class="benefit-item"><span>🖼️</span><span data-i18n="sponsors.b2">Logo en la página principal</span></div>
+          <div class="benefit-item"><span>📣</span><span data-i18n="sponsors.b4">Mención en publicaciones del índice</span></div>
+          <div class="benefit-item"><span>🔗</span><span data-i18n="sponsors.b3">Link directo a tu sitio</span></div>
+          <div class="benefit-item"><span>📊</span><span data-i18n="sponsors.b1">Audiencia: inversores y analistas</span></div>
+        </div>
+
+      </div><!-- /sponsors-card -->
+    </div><!-- /sponsors-outer -->
   </section>
+
+  <!-- MODAL DE CONTACTO SPONSORS -->
+  <div class="sp-modal-backdrop" id="spModalBackdrop" onclick="closeSponsorModal()" style="display:none"></div>
+  <div class="sp-modal" id="spModal" style="display:none" role="dialog" aria-modal="true">
+    <button class="sp-modal-close" onclick="closeSponsorModal()" aria-label="Cerrar">✕</button>
+
+    <div class="sp-modal-header">
+      <div class="sp-modal-eyebrow" data-i18n="spform.eyebrow">Patrocinar RadARG</div>
+      <div class="sp-modal-title" data-i18n="spform.title">Contanos sobre tu empresa</div>
+      <div class="sp-modal-sub" data-i18n="spform.sub">Te respondemos en menos de 48 horas con una propuesta personalizada.</div>
+    </div>
+
+    <!-- Estado: formulario -->
+    <form id="spForm" class="sp-form" onsubmit="submitSponsorForm(event)">
+      <div class="sp-form-row">
+        <div class="sp-field">
+          <label data-i18n="spform.name">Nombre y apellido</label>
+          <input type="text" name="nombre" required placeholder="Juan Pérez" autocomplete="name">
+        </div>
+        <div class="sp-field">
+          <label data-i18n="spform.company">Empresa / Organización</label>
+          <input type="text" name="empresa" required placeholder="Acme S.A.">
+        </div>
+      </div>
+      <div class="sp-form-row">
+        <div class="sp-field">
+          <label data-i18n="spform.email">Email de contacto</label>
+          <input type="email" name="email" required placeholder="juan@empresa.com" autocomplete="email">
+        </div>
+        <div class="sp-field">
+          <label data-i18n="spform.budget">Presupuesto mensual estimado</label>
+          <select name="presupuesto">
+            <option value="" data-i18n="spform.budget.select">Seleccioná una opción</option>
+            <option value="<500">Menos de USD 500</option>
+            <option value="500-1500">USD 500 – 1.500</option>
+            <option value="1500-5000">USD 1.500 – 5.000</option>
+            <option value=">5000">Más de USD 5.000</option>
+          </select>
+        </div>
+      </div>
+      <div class="sp-field sp-field-full">
+        <label data-i18n="spform.message">Contanos qué querés lograr</label>
+        <textarea name="mensaje" rows="4" required placeholder="Describí tu empresa, a quién querés llegar y qué objetivos tenés con este patrocinio..."></textarea>
+      </div>
+      <input type="hidden" name="_subject" value="💼 Nueva consulta de sponsor — RadARG">
+      <input type="hidden" name="_language" value="es">
+      <button type="submit" class="sp-submit" id="spSubmitBtn">
+        <span id="spSubmitTxt" data-i18n="spform.send">Enviar consulta</span>
+        <span id="spSubmitSpinner" style="display:none">⏳</span>
+      </button>
+    </form>
+
+    <!-- Estado: éxito -->
+    <div id="spSuccess" style="display:none" class="sp-success">
+      <div class="sp-success-icon">✦</div>
+      <div class="sp-success-title" data-i18n="spform.ok.title">¡Consulta enviada!</div>
+      <div class="sp-success-msg" data-i18n="spform.ok.msg">Te respondemos en menos de 48 horas. Revisá también tu carpeta de spam.</div>
+      <button class="sp-submit" onclick="closeSponsorModal()" data-i18n="spform.ok.close">Cerrar</button>
+    </div>
+
+    <!-- Estado: error -->
+    <div id="spError" style="display:none" class="sp-error-msg" data-i18n="spform.err">
+      Hubo un error al enviar. Intentá de nuevo o escribinos a contacto@radarg.com
+    </div>
+  </div>
 
   <!-- METHODOLOGY -->
   <section id="metodologia">
@@ -2666,12 +2957,23 @@ const T = {
     'pro.cta':'Suscribirse a Pro','pro.support':'Apoyar gratis','pro.note':'Pagos seguros via Mercado Pago · Cancelá en cualquier momento',
     'sponsors.eyebrow':'✦ Oportunidad exclusiva de patrocinio ✦',
     'sponsors.title':'Tu marca frente a quienes mueven el dinero en Argentina',
-    'sponsors.sub':'RadARG es la referencia diaria de inversores, traders, analistas, portfolio managers y empresarios que toman decisiones financieras. No es audiencia masiva — es audiencia que actúa.',
+    'sponsors.sub':'RadARG es la referencia diaria de inversores, traders, analistas financieros, portfolio managers y empresarios que toman decisiones con dinero real. No es audiencia masiva — es la audiencia que actúa.',
     'sponsors.cta':'Quiero ser sponsor',
     'sponsors.b1':'Audiencia: inversores y analistas','sponsors.b2':'Logo en la página principal',
     'sponsors.b3':'Link directo a tu sitio','sponsors.b4':'Mención en publicaciones del índice',
     'sponsors.aud1':'Inversores individuales','sponsors.aud2':'Traders activos',
     'sponsors.aud3':'Analistas financieros','sponsors.aud4':'Portfolio managers','sponsors.aud5':'Periodistas económicos',
+    // Formulario de sponsors
+    'spform.eyebrow':'Patrocinar RadARG','spform.title':'Contanos sobre tu empresa',
+    'spform.sub':'Te respondemos en menos de 48 horas con una propuesta personalizada.',
+    'spform.name':'Nombre y apellido','spform.company':'Empresa / Organización',
+    'spform.email':'Email de contacto','spform.budget':'Presupuesto mensual estimado',
+    'spform.budget.select':'Seleccioná una opción','spform.message':'Contanos qué querés lograr',
+    'spform.send':'Enviar consulta',
+    'spform.ok.title':'¡Consulta enviada!',
+    'spform.ok.msg':'Te respondemos en menos de 48 horas. Revisá también tu carpeta de spam.',
+    'spform.ok.close':'Cerrar',
+    'spform.err':'Hubo un error al enviar. Intentá de nuevo o escribinos a contacto@radarg.com',
     'meth.g.label':'Explicación simple','meth.g.title':'¿Para qué sirve RadARG?',
     'meth.g.desc':'RadARG te dice, de un número, si el mercado argentino está en modo pánico o en modo optimismo.',
     'meth.g.q1':'¿Qué significa el número?','meth.g.a1':'Va de 0 a 100. Cerca de 0: miedo. Cerca de 100: optimismo. Cerca de 50: neutral.',
@@ -2912,12 +3214,23 @@ const T = {
     'pro.cta':'Subscribe to Pro','pro.support':'Support for free','pro.note':'Secure payments via Mercado Pago · Cancel anytime',
     'sponsors.eyebrow':'✦ Exclusive sponsorship opportunity ✦',
     'sponsors.title':'Your brand in front of the people who move money in Argentina',
-    'sponsors.sub':'RadARG is the daily reference for investors, traders, analysts, portfolio managers and executives who make financial decisions. Not mass reach — the reach that acts.',
+    'sponsors.sub':'RadARG is the daily reference for investors, traders, financial analysts, portfolio managers and executives who make decisions with real money. Not mass reach — the reach that acts.',
     'sponsors.cta':'Become a sponsor',
     'sponsors.b1':'Audience: investors & analysts','sponsors.b2':'Logo on the homepage',
     'sponsors.b3':'Direct link to your site','sponsors.b4':'Mention in index publications',
     'sponsors.aud1':'Individual investors','sponsors.aud2':'Active traders',
     'sponsors.aud3':'Financial analysts','sponsors.aud4':'Portfolio managers','sponsors.aud5':'Financial journalists',
+    // Sponsor contact form
+    'spform.eyebrow':'Sponsor RadARG','spform.title':'Tell us about your company',
+    'spform.sub':'We\'ll get back to you within 48 hours with a personalized proposal.',
+    'spform.name':'Full name','spform.company':'Company / Organization',
+    'spform.email':'Contact email','spform.budget':'Estimated monthly budget',
+    'spform.budget.select':'Select an option','spform.message':'Tell us what you want to achieve',
+    'spform.send':'Send inquiry',
+    'spform.ok.title':'Inquiry sent!',
+    'spform.ok.msg':'We\'ll get back to you within 48 hours. Also check your spam folder.',
+    'spform.ok.close':'Close',
+    'spform.err':'There was an error sending. Please try again or contact us at contacto@radarg.com',
     'meth.g.label':'Simple explanation','meth.g.title':'What is RadARG for?',
     'meth.g.desc':'RadARG tells you, in one number, whether the Argentine market is in panic or optimism mode.',
     'meth.g.q1':'What does the number mean?','meth.g.a1':'0–100 scale. Near 0: extreme fear. Near 100: extreme greed. Near 50: neutral.',
@@ -6393,6 +6706,85 @@ async function loadAllFromSheet() {
 
 /* ── Init ──────────────────────────────────────────────────── */
 let resizeTimer;
+/* ── Modal de Sponsors ─────────────────────────────────────── */
+// ⚠️  Reemplazá FORMSPREE_ENDPOINT con tu ID de Formspree
+//     Ej: const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xbjvkpqr';
+const FORMSPREE_ENDPOINT = 'https://formspree.io/f/maqkvelg';
+
+function openSponsorModal() {
+  const backdrop = document.getElementById('spModalBackdrop');
+  const modal    = document.getElementById('spModal');
+  if (!modal) return;
+  backdrop.style.display = 'block';
+  modal.style.display    = 'block';
+  document.body.style.overflow = 'hidden';
+  // Resetear estados
+  document.getElementById('spForm').style.display    = 'block';
+  document.getElementById('spSuccess').style.display = 'none';
+  document.getElementById('spError').style.display   = 'none';
+  document.getElementById('spSubmitBtn').disabled    = false;
+  document.getElementById('spSubmitTxt').style.display    = '';
+  document.getElementById('spSubmitSpinner').style.display = 'none';
+}
+
+function closeSponsorModal() {
+  const backdrop = document.getElementById('spModalBackdrop');
+  const modal    = document.getElementById('spModal');
+  if (!modal) return;
+  backdrop.style.display = 'none';
+  modal.style.display    = 'none';
+  document.body.style.overflow = '';
+}
+
+// Cerrar con Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeSponsorModal();
+});
+
+async function submitSponsorForm(e) {
+  e.preventDefault();
+  const form    = document.getElementById('spForm');
+  const btn     = document.getElementById('spSubmitBtn');
+  const txt     = document.getElementById('spSubmitTxt');
+  const spinner = document.getElementById('spSubmitSpinner');
+  const errEl   = document.getElementById('spError');
+  const okEl    = document.getElementById('spSuccess');
+
+  btn.disabled       = true;
+  txt.style.display  = 'none';
+  spinner.style.display = '';
+  errEl.style.display   = 'none';
+
+  try {
+    const data = new FormData(form);
+    const res  = await fetch(FORMSPREE_ENDPOINT, {
+      method: 'POST',
+      body:   data,
+      headers: { 'Accept': 'application/json' }
+    });
+
+    if (res.ok) {
+      form.style.display  = 'none';
+      okEl.style.display  = 'block';
+    } else {
+      const json = await res.json().catch(()=>({}));
+      errEl.textContent = json.errors
+        ? json.errors.map(e=>e.message).join(' · ')
+        : t('spform.err');
+      errEl.style.display = 'block';
+      btn.disabled        = false;
+      txt.style.display   = '';
+      spinner.style.display = 'none';
+    }
+  } catch(err) {
+    errEl.textContent   = t('spform.err');
+    errEl.style.display = 'block';
+    btn.disabled        = false;
+    txt.style.display   = '';
+    spinner.style.display = 'none';
+  }
+}
+
 window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{drawGauge(lastScore);},120);});
 document.addEventListener('DOMContentLoaded',()=>{
   const rF=$('rangeFrom'),rT=$('rangeTo');
