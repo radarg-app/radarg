@@ -944,9 +944,10 @@ body.lm .merval-switch.sw-pres   input:checked ~ .merval-switch-track { backgrou
 .sponsors-eyebrow {
   position:relative; z-index:1;
   font-size:9px; font-weight:800; letter-spacing:.22em; text-transform:uppercase;
-  background:linear-gradient(90deg, #a07020, #e8c94a, #f5e17a, #e8c94a, #a07020);
-  background-size:250% auto; animation:spGoldText 3s linear infinite;
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  /* Dorado clarito fijo — legible sobre fondo oscuro sin depender del gradiente */
+  color:#f0d070;
+  -webkit-text-fill-color:#f0d070;
+  background:none;
   margin-bottom:.625rem;
 }
 @keyframes spGoldText {
@@ -1016,12 +1017,9 @@ body.lm .sponsors-card::before {
 }
 body.lm .sp-star { color:#8a6010; }
 body.lm .sponsors-eyebrow {
-  /* En light mode el gradiente dorado claro es invisible: sobreescribir con color sólido */
   background:none;
-  -webkit-background-clip:unset;
-  -webkit-text-fill-color:#7a5200;
-  background-clip:unset;
-  color:#7a5200;
+  -webkit-text-fill-color:#3d2600;
+  color:#3d2600;
   animation:none;
 }
 body.lm .sponsors-title  { color:#0f0d00; }
@@ -1068,10 +1066,14 @@ body.lm .sponsors-benefits { border-top-color:rgba(100,68,0,.22); }
 .sp-modal-header { margin-bottom:1.5rem; }
 .sp-modal-eyebrow {
   font-size:9px; font-weight:800; letter-spacing:.22em; text-transform:uppercase;
-  background:linear-gradient(90deg, #a07020, #e8c94a, #a07020);
-  background-size:200% auto; animation:spGoldText 3s linear infinite;
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  color:#f0d070;
+  -webkit-text-fill-color:#f0d070;
+  background:none;
   margin-bottom:.4rem;
+}
+body.lm .sp-modal-eyebrow {
+  color:#3d2600;
+  -webkit-text-fill-color:#3d2600;
 }
 .sp-modal-title { font-size:20px; font-weight:800; letter-spacing:-.3px; margin-bottom:.4rem; }
 .sp-modal-sub { font-size:13px; color:var(--text2); line-height:1.6; }
