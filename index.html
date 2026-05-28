@@ -1015,18 +1015,27 @@ body.lm .sponsors-card::before {
   background:radial-gradient(ellipse 90% 55% at 50% -5%, rgba(160,120,20,.10), transparent 65%);
 }
 body.lm .sp-star { color:#8a6010; }
-body.lm .sponsors-eyebrow { /* el gradiente dorado ya es legible en lm */ }
-body.lm .sponsors-title  { color:#0f0d00; }
-body.lm .sponsors-sub    { color:#3a2e00; }
-body.lm .sponsors-sub-cta { color:#5a4600; font-weight:800; }
-body.lm .audience-chip   {
-  background:rgba(130,90,0,.10);
-  color:#4a3600;
-  border-color:rgba(130,90,0,.30);
+body.lm .sponsors-eyebrow {
+  /* En light mode el gradiente dorado claro es invisible: sobreescribir con color sólido */
+  background:none;
+  -webkit-background-clip:unset;
+  -webkit-text-fill-color:#7a5200;
+  background-clip:unset;
+  color:#7a5200;
+  animation:none;
 }
-body.lm .btn-sponsor     { /* ya hereda el gradiente dorado, se ve bien */ }
-body.lm .benefit-item    { color:#4a3a00; }
-body.lm .sponsors-benefits { border-top-color:rgba(130,90,0,.18); }
+body.lm .sponsors-title  { color:#0f0d00; }
+body.lm .sponsors-sub    { color:#2a2000; font-weight:500; }
+body.lm .sponsors-sub-cta { color:#3d2e00; font-weight:800; }
+body.lm .audience-chip   {
+  background:rgba(100,68,0,.12);
+  color:#2e2000;
+  border-color:rgba(100,68,0,.40);
+  font-weight:700;
+}
+body.lm .benefit-item    { color:#2e2200; font-weight:600; }
+body.lm .benefit-item span:last-child { opacity:1; }
+body.lm .sponsors-benefits { border-top-color:rgba(100,68,0,.22); }
 
 /* ══════════════════════════════════════════════════════════
    MODAL SPONSOR — Formulario de contacto
