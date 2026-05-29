@@ -1721,42 +1721,130 @@ body.lm .suggest-input:focus, body.lm .suggest-select:focus, body.lm .suggest-te
 }
 @media(max-width:860px){ .support-grid { grid-template-columns:1fr; } }
 
-/* Tarjeta principal de apoyo */
+/* ── Marco exterior arcoíris animado ── */
+/* Técnica directa: el outer ES el gradiente animado (padding:2px = grosor del borde).
+   La card interior cubre el interior con su propio fondo sólido.
+   Sin pseudo-elements ni z-index: funciona en todos los browsers en dark y light. */
+.support-card-outer {
+  padding:2px;
+  border-radius:calc(var(--radius-lg) + 2px);
+  overflow:hidden;  /* evita que el gradiente se filtre por las esquinas */
+  background:linear-gradient(90deg,
+    #f97316, #eab308, #22c55e, #3b82f6, #a855f7, #ec4899, #f97316);
+  background-size:300% 100%;
+  animation:supportRainbow 5s linear infinite;
+  box-shadow:0 0 22px rgba(168,85,247,.20), 0 0 48px rgba(59,130,246,.10);
+}
+@keyframes supportRainbow {
+  0%  { background-position:0% 0%; }
+  100%{ background-position:300% 0%; }
+}
+
+/* ── Tarjeta interior de apoyo ── */
 .support-card {
-  background:linear-gradient(135deg, rgba(124,108,250,.10), rgba(34,197,94,.08));
-  border:1px solid rgba(124,108,250,.30);
-  border-radius:var(--radius-lg); padding:2rem 1.75rem;
-  display:flex; flex-direction:column; justify-content:center;
+  background:var(--bg2);  /* fondo sólido — tapa el interior del outer */
+  border-radius:var(--radius-lg);
+  padding:1.875rem 1.75rem;
+  display:flex; flex-direction:column; justify-content:flex-start;
   position:relative; overflow:hidden;
 }
 .support-card::before {
-  content:''; position:absolute; inset:0;
-  background:radial-gradient(ellipse 80% 50% at 50% -10%, rgba(124,108,250,.18), transparent);
-  pointer-events:none;
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(ellipse 80% 50% at 50% -10%,
+    rgba(168,85,247,.07), transparent 65%);
 }
-.support-emoji { font-size:38px; margin-bottom:.625rem; }
-.support-title { font-size:21px; font-weight:800; letter-spacing:-.4px; margin-bottom:.5rem; line-height:1.2; }
-.support-sub { font-size:13px; color:var(--text2); line-height:1.65; margin-bottom:1.25rem; }
-.support-btns { display:flex; gap:.625rem; flex-wrap:wrap; margin-bottom:.75rem; position:relative; z-index:1; }
+
+/* Corazón animado */
+.support-heart-wrap {
+  position:relative; width:52px; height:52px;
+  display:flex; align-items:center; justify-content:center;
+  margin-bottom:.75rem;
+}
+.support-heart {
+  font-size:30px; line-height:1;
+  animation:heartBeat 2.4s ease-in-out infinite;
+  position:relative; z-index:1;
+}
+.support-heart-ring {
+  position:absolute; inset:0; border-radius:50%;
+  border:2px solid rgba(239,68,68,.3);
+  animation:heartRing 2.4s ease-in-out infinite;
+}
+@keyframes heartBeat {
+  0%,100%{ transform:scale(1); }
+  14%    { transform:scale(1.18); }
+  28%    { transform:scale(1); }
+  42%    { transform:scale(1.12); }
+  56%    { transform:scale(1); }
+}
+@keyframes heartRing {
+  0%,100%{ transform:scale(1);   opacity:.5; }
+  14%    { transform:scale(1.4); opacity:0; }
+}
+
+.support-title {
+  font-size:19px; font-weight:800; letter-spacing:-.3px;
+  margin-bottom:.5rem; line-height:1.25; position:relative; z-index:1;
+}
+.support-sub {
+  font-size:13px; color:var(--text2); line-height:1.65;
+  margin-bottom:1.125rem; position:relative; z-index:1;
+}
+
+/* Razones: caja con borde y fondo sutil */
+.support-reason-box {
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:var(--radius-sm);
+  padding:.875rem 1rem;
+  display:flex; flex-direction:column; gap:.6rem;
+  margin-bottom:1.25rem; position:relative; z-index:1;
+}
+.support-reason {
+  display:flex; align-items:center; gap:.75rem;
+  font-size:13px; font-weight:500; color:var(--text2);
+}
+.support-reason-ico { font-size:15px; flex-shrink:0; width:22px; text-align:center; }
+
+.support-btns { margin-bottom:.625rem; position:relative; z-index:1; }
 .btn-support-main {
-  display:inline-flex; align-items:center; gap:7px;
-  font-size:14px; font-weight:700; padding:12px 22px;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  font-size:14px; font-weight:700; padding:13px 26px;
   border-radius:var(--radius-sm); border:none; cursor:pointer;
-  background:linear-gradient(135deg, #7c6cfa, #6366f1); color:#fff;
-  transition:all .18s; font-family:'Inter',sans-serif;
-  box-shadow:0 4px 14px rgba(124,108,250,.3);
+  background:linear-gradient(90deg, #f97316, #eab308, #22c55e, #3b82f6, #a855f7, #f97316);
+  background-size:300% 100%; animation:supportRainbow 5s linear infinite;
+  color:#fff; font-family:'Inter',sans-serif; width:100%;
+  box-shadow:0 4px 18px rgba(168,85,247,.30);
+  transition:transform .15s, box-shadow .15s;
+  text-shadow:0 1px 3px rgba(0,0,0,.25);
 }
-.btn-support-main:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(124,108,250,.45); }
-.btn-support-ghost {
-  display:inline-flex; align-items:center; gap:7px;
-  font-size:13px; font-weight:600; padding:12px 20px;
-  border-radius:var(--radius-sm); cursor:pointer;
-  background:rgba(255,255,255,.05); color:var(--text);
-  border:1px solid var(--border2); transition:all .18s;
-  font-family:'Inter',sans-serif;
+.btn-support-main:hover {
+  transform:translateY(-2px);
+  box-shadow:0 6px 26px rgba(168,85,247,.50);
 }
-.btn-support-ghost:hover { border-color:var(--ac); background:rgba(124,108,250,.1); }
-.support-disclaimer { font-size:11px; color:var(--text3); position:relative; z-index:1; }
+.support-disclaimer {
+  font-size:11px; color:var(--text3);
+  position:relative; z-index:1; text-align:center; margin-top:.375rem;
+}
+
+/* Light mode: solo la card interior cambia a blanco.
+   El outer conserva el gradiente animado en ambos modos. */
+body.lm .support-card { background:#fff; }
+body.lm .support-card::before { display:none; }
+body.lm .support-reason { color:rgba(0,0,0,.60); }
+body.lm .support-reason-box { background:rgba(0,0,0,.04); border-color:rgba(0,0,0,.10); }
+body.lm .support-reason-box .support-reason { color:rgba(0,0,0,.65); }
+
+/* Light mode */
+
+
+
+body.lm .support-reason { color:rgba(0,0,0,.55); }
+
+@media(max-width:480px){
+  .support-card { padding:1.5rem 1.25rem; }
+  .support-title { font-size:18px; }
+}
 
 /* Tarjeta de ranking */
 .ranking-card {
@@ -1802,11 +1890,8 @@ body.lm .suggest-input:focus, body.lm .suggest-select:focus, body.lm .suggest-te
 @keyframes rankPulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 
 /* Light mode — colores ajustados para legibilidad y contraste */
-body.lm .support-card {
-  background:linear-gradient(135deg, rgba(124,108,250,.10), rgba(34,197,94,.07));
-  border-color:rgba(124,108,250,.35);
-}
-body.lm .support-card::before { background:radial-gradient(ellipse 80% 50% at 50% -10%, rgba(124,108,250,.14), transparent); }
+
+
 body.lm .btn-support-ghost { background:rgba(0,0,0,.03); border-color:rgba(0,0,0,.14); }
 body.lm .btn-support-ghost:hover { background:rgba(124,108,250,.08); border-color:var(--ac); }
 body.lm .ranking-card { background:#fff; border-color:rgba(0,0,0,.1); }
@@ -2234,19 +2319,33 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
   </section>
 
   <!-- HISTORICAL CHART -->
-  <!-- APOYAR / SUPPORT (movida arriba del histórico) -->
+  <!-- APOYAR / SUPPORT -->
   <section id="apoyar" class="support-section">
     <div class="support-grid">
+
       <!-- Tarjeta de apoyo -->
-      <div class="support-card">
-        <div class="support-emoji">♥</div>
-        <h2 class="support-title" data-i18n="support.title">RadARG es libre y gratuito</h2>
-        <p class="support-sub" data-i18n="support.sub">Sin publicidad y sin barreras de pago. Si el índice te resulta útil, podés apoyar el proyecto con una colaboración voluntaria. Cada aporte ayuda a sostener el servidor, las APIs de datos y el desarrollo de nuevas funciones.</p>
-        <div class="support-btns">
-          <button class="btn-support-main" onclick="openModal()">♥ <span data-i18n="support.cta.main">Apoyar el proyecto</span></button>
+      <div class="support-card-outer">
+        <div class="support-card">
+          <div class="support-heart-wrap">
+            <span class="support-heart">♥</span>
+            <span class="support-heart-ring"></span>
+          </div>
+          <h2 class="support-title" data-i18n="support.title">RadARG es gratis y lo queremos mantener así</h2>
+          <p class="support-sub" data-i18n="support.sub">Para seguir online necesitamos cubrir los costos del servidor y las APIs de datos. Si el índice te resulta útil, cualquier colaboración ayuda mucho.</p>
+
+          <div class="support-reason-box">
+            <div class="support-reason"><span class="support-reason-ico">⚡</span><span data-i18n="support.r1">Servidor y APIs de datos</span></div>
+            <div class="support-reason"><span class="support-reason-ico">🛠️</span><span data-i18n="support.r2">Nuevas funciones y mejoras</span></div>
+            <div class="support-reason"><span class="support-reason-ico">🔓</span><span data-i18n="support.r3">Sin publicidad ni paywalls</span></div>
+          </div>
+
+          <button class="btn-support-main" onclick="openModal()">
+            ♥ <span data-i18n="support.cta.main">Apoyar el proyecto</span>
+          </button>
+          <p class="support-disclaimer" data-i18n="support.disclaimer">100% voluntario · Cualquier monto suma</p>
         </div>
-        <p class="support-disclaimer" data-i18n="support.disclaimer">100% voluntario · Sin obligación · Cualquier monto suma</p>
       </div>
+
       <!-- Ranking de apoyos -->
       <div class="ranking-card">
         <div class="ranking-header">
@@ -2261,6 +2360,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
           <span data-i18n="ranking.footer">El ranking se actualiza todos los días</span>
         </div>
       </div>
+
     </div>
   </section>
 
@@ -2543,9 +2643,9 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
 
         <div class="sponsors-benefits">
           <div class="benefit-item"><span>🖼️</span><span data-i18n="sponsors.b2">Logo en la página principal</span></div>
-          <div class="benefit-item"><span>📣</span><span data-i18n="sponsors.b4">Logo en publicaciones diarias del índice</span></div>
+          <div class="benefit-item"><span>📣</span><span data-i18n="sponsors.b4">Mención en publicaciones del índice</span></div>
           <div class="benefit-item"><span>🔗</span><span data-i18n="sponsors.b3">Link directo a tu sitio</span></div>
-          <div class="benefit-item"><span>📊</span><span data-i18n="sponsors.b1">Audiencia calificada</span></div>
+          <div class="benefit-item"><span>📊</span><span data-i18n="sponsors.b1">Audiencia: inversores y analistas</span></div>
         </div>
 
       </div><!-- /sponsors-card -->
@@ -3063,10 +3163,13 @@ const T = {
     // ── Nav / navegación ──
     'nav.support':'Apoyar','nav.suggest':'Sugerencias',
     // ── Sección Apoyar ──
-    'support.title':'RadARG es libre y gratuito',
-    'support.sub':'Sin publicidad y sin barreras de pago. Si el índice te resulta útil, podés apoyar el proyecto con una colaboración voluntaria. Cada aporte ayuda a sostener el servidor, las APIs de datos y el desarrollo de nuevas funciones.',
+    'support.title':'RadARG es gratis y lo queremos mantener así',
+    'support.sub':'Para seguir online necesitamos cubrir los costos del servidor y las APIs de datos. Si el índice te resulta útil, cualquier colaboración ayuda mucho.',
     'support.cta.main':'Apoyar el proyecto',
-    'support.disclaimer':'100% voluntario · Sin obligación · Cualquier monto suma',
+    'support.disclaimer':'100% voluntario · Cualquier monto suma',
+    'support.r1':'Servidor y APIs de datos',
+    'support.r2':'Nuevas funciones y mejoras',
+    'support.r3':'Sin publicidad ni paywalls',
     // ── Ranking ──
     'ranking.title':'Top apoyos','ranking.sub':'Quienes hacen posible RadARG',
     'ranking.empty':'Todavía no hay apoyos cargados.<br>¡Podés ser el primero!',
@@ -3320,10 +3423,13 @@ const T = {
     // ── Nav ──
     'nav.support':'Support','nav.suggest':'Suggestions',
     // ── Support section ──
-    'support.title':'RadARG is free and open',
-    'support.sub':'No ads and no paywalls. If you find the index useful, you can support the project with a voluntary contribution. Every bit helps cover the server, data APIs and the development of new features.',
+    'support.title':'RadARG is free and we want to keep it that way',
+    'support.sub':'To stay online we need to cover the costs of the server and data APIs. If you find it useful, any contribution helps a lot.',
     'support.cta.main':'Support the project',
-    'support.disclaimer':'100% voluntary · No obligation · Any amount helps',
+    'support.disclaimer':'100% voluntary · Any amount helps',
+    'support.r1':'Server and data APIs',
+    'support.r2':'New features and improvements',
+    'support.r3':'No ads, no paywalls',
     // ── Ranking ──
     'ranking.title':'Top supporters','ranking.sub':'The people who make RadARG possible',
     'ranking.empty':'No supporters yet.<br>You could be the first!',
@@ -6054,11 +6160,9 @@ function renderRanking(){
     const pos = i<3 ? '' : '<span class="ranking-pos">'+(i+1)+'</span>';
     const nombre = (r.nombre || 'Anónimo').toString().replace(/[<>]/g,'');
     const monto = r.monto_display || (r.monto != null ? '$'+r.monto : '');
-    const moneda = fmtMoneda(r.moneda);
     return '<div class="ranking-row'+topClass+'">'+pos+medal+
            '<span class="ranking-name">'+nombre+'</span>'+
-           '<span class="ranking-amount">'+monto+
-           '<span class="ranking-currency">'+moneda+'</span></span></div>';
+           '<span class="ranking-amount">'+monto+'</span></div>';
   }).join('');
 }
 
