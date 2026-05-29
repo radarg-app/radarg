@@ -233,6 +233,9 @@ body::before {
 .fade-3 { animation-delay:.15s; }
 
 /* ── Header ──────────────────────────────────────────────────── */
+/* Compensar el header sticky (52px) al saltar a una sección por ancla (#apoyar, #historico, etc.) */
+section[id], main section[id] { scroll-margin-top:68px; }
+
 header {
   position:sticky; top:0; z-index:200;
   background:rgba(10,10,15,.9);
