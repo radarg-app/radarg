@@ -234,7 +234,9 @@ body::before {
 
 /* ── Header ──────────────────────────────────────────────────── */
 /* Compensar el header sticky (52px) al saltar a una sección por ancla (#apoyar, #historico, etc.) */
-section[id], main section[id] { scroll-margin-top:68px; }
+section[id], main section[id] { scroll-margin-top:72px; }
+/* #apoyar tiene un marco con glow que se extiende hacia arriba: más margen para que no quede pegado */
+#apoyar { scroll-margin-top:84px; }
 
 header {
   position:sticky; top:0; z-index:200;
@@ -6966,6 +6968,23 @@ async function init(){
   const bs=brechaToScore(S.brecha), total=computeTotal(bs);
   runAI(total);
 }
+// ── Scroll preciso a secciones por ancla (compensa el header sticky) ──
+document.addEventListener('click', function(e){
+  const link = e.target.closest('a[href^="#"]');
+  if(!link) return;
+  const id = link.getAttribute('href').slice(1);
+  if(!id) return;
+  const target = document.getElementById(id);
+  if(!target) return;
+  e.preventDefault();
+  const header = document.querySelector('header');
+  const headerH = header ? header.offsetHeight : 52;
+  const top = target.getBoundingClientRect().top + window.pageYOffset - headerH - 12;
+  window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+  // Actualizar el hash sin provocar un segundo salto
+  if(history.replaceState) history.replaceState(null, '', '#'+id);
+});
+
 document.addEventListener('DOMContentLoaded',init);
 
 // Rotating word removed — badge is now static 'Más elegida'
