@@ -2840,11 +2840,11 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
             <div class="suggest-row">
               <div>
                 <label class="suggest-label" data-i18n="suggest.name">Nombre <span style="font-weight:400;opacity:.6" data-i18n="suggest.optional">(opcional)</span></label>
-                <input class="suggest-input" type="text" id="sg-name" placeholder="" data-i18n-placeholder="suggest.name.placeholder">
+                <input class="suggest-input" type="text" id="sg-name" name="Nombre" placeholder="" data-i18n-placeholder="suggest.name.placeholder">
               </div>
               <div>
                 <label class="suggest-label" data-i18n="suggest.type">Tipo <span style="color:var(--fe)">*</span></label>
-                <select class="suggest-select" id="sg-type" required>
+                <select class="suggest-select" id="sg-type" name="Tipo" required>
                   <option value="" data-i18n="suggest.type.placeholder">Seleccioná…</option>
                   <option value="indicator" data-i18n="suggest.type.indicator">Nuevo indicador</option>
                   <option value="viz"       data-i18n="suggest.type.viz">Visualización</option>
@@ -2857,11 +2857,11 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
             </div>
             <div>
               <label class="suggest-label">Email <span style="font-weight:400;opacity:.6" data-i18n="suggest.email.note">(para avisarte si implementamos tu idea)</span></label>
-              <input class="suggest-input" type="email" id="sg-email" placeholder="tu@email.com">
+              <input class="suggest-input" type="email" id="sg-email" name="email" placeholder="tu@email.com">
             </div>
             <div>
               <label class="suggest-label" data-i18n="suggest.msg.label">Tu sugerencia <span style="color:var(--fe)">*</span></label>
-              <textarea class="suggest-textarea" id="sg-msg" placeholder="" data-i18n-placeholder="suggest.msg.placeholder" required></textarea>
+              <textarea class="suggest-textarea" id="sg-msg" name="Sugerencia" placeholder="" data-i18n-placeholder="suggest.msg.placeholder" required></textarea>
             </div>
             <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
               <button type="submit" class="suggest-submit">✦ <span data-i18n="suggest.send">Enviar sugerencia</span></button>
@@ -6245,23 +6245,49 @@ function shareScore(){
     if(shareBtn){const o=shareBtn.innerHTML;shareBtn.innerHTML='✅ <span>Copiado</span>';setTimeout(()=>shareBtn.innerHTML=o,2000);}
   });}
 }
-function submitSuggest(e){
+const SUGGEST_ENDPOINT = 'https://formspree.io/f/xzdwlekq';
+async function submitSuggest(e){
   e.preventDefault();
-  // Validation
+  // Validación
   const type=($('sg-type')?.value||'').trim();
   const msg =($('sg-msg')?.value||'').trim();
   const err =$('sg-error');
   if(!type){if(err){err.textContent=t('val.selectType');err.style.display='inline';}return;}
   if(!msg) {if(err){err.textContent=t('val.writeMsg');err.style.display='inline';}return;}
   if(err) err.style.display='none';
-  // Show popup
-  const overlay=$('suggestPopup');
-  if(overlay) overlay.classList.add('open');
-  // Reset form after short delay
-  setTimeout(()=>{
-    $('sg-name').value=''; $('sg-type').value='';
-    $('sg-email') && ($('sg-email').value=''); $('sg-msg').value='';
-  },400);
+
+  const form = e.target.closest('form');
+  try {
+    const data = new FormData(form);
+    const res  = await fetch(SUGGEST_ENDPOINT, {
+      method: 'POST',
+      body:   data,
+      headers: { 'Accept': 'application/json' }
+    });
+    if (res.ok) {
+      // Popup de agradecimiento
+      const overlay=$('suggestPopup');
+      if(overlay) overlay.classList.add('open');
+      // Reset del formulario
+      $('sg-name') && ($('sg-name').value='');
+      $('sg-type') && ($('sg-type').value='');
+      $('sg-email') && ($('sg-email').value='');
+      $('sg-msg') && ($('sg-msg').value='');
+    } else {
+      const json = await res.json().catch(()=>({}));
+      if(err){
+        err.textContent = (json.errors && json.errors.length)
+          ? json.errors.map(x=>x.message).join(' · ')
+          : (LANG==='en'?'Could not send. Please try again.':'No se pudo enviar. Intentá de nuevo.');
+        err.style.display='inline';
+      }
+    }
+  } catch(_) {
+    if(err){
+      err.textContent = (LANG==='en'?'Connection error. Please try again.':'Error de conexión. Intentá de nuevo.');
+      err.style.display='inline';
+    }
+  }
 }
 function closeSuggestPopup(){
   const overlay=$('suggestPopup');
