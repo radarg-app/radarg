@@ -5406,7 +5406,17 @@ function generateSegmentSummary(key, seg){
   if(!bodyEl) return;
 
   const field = '_ai_seg_' + key + '_' + (LANG === 'en' ? 'en' : 'es');
-  const txt = (LIVE && LIVE[field]) ? String(LIVE[field]).trim() : '';
+  let txt = (LIVE && LIVE[field]) ? String(LIVE[field]).trim() : '';
+
+  // Red de seguridad: si el texto viene cortado a mitad de oración (sin
+  // puntuación final), eliminamos la última oración incompleta para que
+  // nunca se muestre algo como "...todavía no hay euforia ni señ".
+  if(txt && !/[.!?…]$/.test(txt)){
+    const lastStop = Math.max(txt.lastIndexOf('. '), txt.lastIndexOf('! '), txt.lastIndexOf('? '));
+    if(lastStop > 40){
+      txt = txt.slice(0, lastStop + 1).trim();
+    }
+  }
 
   if(txt && txt.length > 20){
     bodyEl.textContent = txt;
