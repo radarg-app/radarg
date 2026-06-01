@@ -2378,12 +2378,13 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
             <span class="support-heart-ring"></span>
           </div>
           <h2 class="support-title" data-i18n="support.title">RadARG es gratis y lo queremos mantener así</h2>
-          <p class="support-sub" data-i18n="support.sub">Para seguir online necesitamos cubrir los costos del servidor y las APIs de datos. Si el índice te resulta útil, cualquier colaboración ayuda mucho.</p>
+          <p class="support-sub" data-i18n="support.sub">Mantener el índice online tiene costos reales: el modelo de IA que analiza datos y genera los resúmenes, el servidor, las APIs de datos y las herramientas del proyecto. Si te resulta útil, cualquier colaboración ayuda mucho.</p>
 
           <div class="support-reason-box">
-            <div class="support-reason"><span class="support-reason-ico">⚡</span><span data-i18n="support.r1">Servidor y APIs de datos</span></div>
-            <div class="support-reason"><span class="support-reason-ico">🛠️</span><span data-i18n="support.r2">Nuevas funciones y mejoras</span></div>
-            <div class="support-reason"><span class="support-reason-ico">🔓</span><span data-i18n="support.r3">Sin publicidad ni paywalls</span></div>
+            <div class="support-reason"><span class="support-reason-ico">✦</span><span data-i18n="support.r1">Tokens de IA para análisis y resúmenes</span></div>
+            <div class="support-reason"><span class="support-reason-ico">📡</span><span data-i18n="support.r2">APIs de datos del mercado en tiempo real</span></div>
+            <div class="support-reason"><span class="support-reason-ico">⚡</span><span data-i18n="support.r3">Hosteo del servidor y herramientas</span></div>
+            <div class="support-reason"><span class="support-reason-ico">🔓</span><span data-i18n="support.r4">El índice siempre libre, sin publicidad ni paywalls</span></div>
           </div>
 
           <button class="btn-support-main" onclick="openModal()">
@@ -3211,12 +3212,13 @@ const T = {
     'nav.support':'Apoyar','nav.suggest':'Sugerencias',
     // ── Sección Apoyar ──
     'support.title':'RadARG es gratis y lo queremos mantener así',
-    'support.sub':'Para seguir online necesitamos cubrir los costos del servidor y las APIs de datos. Si el índice te resulta útil, cualquier colaboración ayuda mucho.',
+    'support.sub':'Mantener el índice online tiene costos reales: el modelo de IA que analiza datos y genera los resúmenes, el servidor, las APIs de datos y las herramientas del proyecto. Si te resulta útil, cualquier colaboración ayuda mucho.',
     'support.cta.main':'Apoyar el proyecto',
     'support.disclaimer':'100% voluntario · Cualquier monto suma',
-    'support.r1':'Servidor y APIs de datos',
-    'support.r2':'Nuevas funciones y mejoras',
-    'support.r3':'Sin publicidad ni paywalls',
+    'support.r1':'Tokens de IA para análisis y resúmenes',
+    'support.r2':'APIs de datos del mercado en tiempo real',
+    'support.r3':'Hosteo del servidor y herramientas',
+    'support.r4':'El índice siempre libre, sin publicidad ni paywalls',
     // ── Ranking ──
     'ranking.title':'Top apoyos','ranking.sub':'Quienes hacen posible RadARG',
     'ranking.empty':'Todavía no hay apoyos cargados.<br>¡Podés ser el primero!',
@@ -3471,12 +3473,13 @@ const T = {
     'nav.support':'Support','nav.suggest':'Suggestions',
     // ── Support section ──
     'support.title':'RadARG is free and we want to keep it that way',
-    'support.sub':'To stay online we need to cover the costs of the server and data APIs. If you find it useful, any contribution helps a lot.',
+    'support.sub':'Keeping the index online has real costs: the AI model that analyzes data and writes the summaries, the server, the data APIs and the project tools. If you find it useful, any contribution helps a lot.',
     'support.cta.main':'Support the project',
     'support.disclaimer':'100% voluntary · Any amount helps',
-    'support.r1':'Server and data APIs',
-    'support.r2':'New features and improvements',
-    'support.r3':'No ads, no paywalls',
+    'support.r1':'AI tokens for analysis and summaries',
+    'support.r2':'Real-time market data APIs',
+    'support.r3':'Server hosting and tools',
+    'support.r4':'The index always free, no ads or paywalls',
     // ── Ranking ──
     'ranking.title':'Top supporters','ranking.sub':'The people who make RadARG possible',
     'ranking.empty':'No supporters yet.<br>You could be the first!',
@@ -4080,22 +4083,22 @@ function computeSubIndices(bs) {
   const depPFV       = LIVE._depositosPF;
   const faeV         = LIVE._fae;
   const seg1 = [
-    { name: es?'IPC Mensual (INDEC)':'Monthly CPI (INDEC)',
+    { name: es?'IPC Mensual (INDEC)':'Monthly CPI (INDEC)', freq:'mensual',
       w:22, score: ipcScore2, src:'INDEC', live: LIVE.tasaReal.live,
       raw: LIVE.tasaReal.ipc ? `${LIVE.tasaReal.ipc.toFixed(1)}%/mes` : '',
       desc: es?'Inflación mensual oficial. Es la variable más sentida por el ciudadano y el termómetro principal del desequilibrio monetario.'
              :'Official monthly inflation. Most felt by citizens and the main thermometer of monetary imbalance.' },
-    { name: es?'Tasa Real ex-ante':'Real Rate ex-ante',
+    { name: es?'Tasa Real ex-ante':'Real Rate ex-ante', freq:'diario',
       w:20, score: tasaScore, src:'BCRA/INDEC+REM', live: LIVE.tasaReal.live,
       raw: LIVE.tasaReal.raw || '',
       desc: es?'Rendimiento real de un plazo fijo (TNA/12 menos inflación). Una tasa negativa castiga el ahorro en pesos y empuja a los argentinos hacia el dólar como reserva de valor.'
              :'Real return of time deposits (TNA/12 − blended CPI). Negative rate discourages peso savings and incentivizes dollarization.' },
-    { name: es?'Expectativas de Inflación 12m (REM)':'12m Inflation Expectations',
+    { name: es?'Expectativas de Inflación 12m (REM)':'12m Inflation Expectations', freq:'mensual',
       w:20, score: remScore, src:'BCRA REM', live: !!LIVE.tasaReal.rem12m,
       raw: LIVE.tasaReal.rem12m ? `REM 12m: ${LIVE.tasaReal.rem12m.toFixed(1)}% i.a.` : '',
       desc: es?'Qué espera el mercado que pase con la inflación en el próximo año. Expectativas altas reflejan desconfianza en el ancla nominal.'
              :'What the market expects inflation to do over the next year. High expectations reflect distrust in the nominal anchor.' },
-    { name: es?'Inflación Núcleo':'Core Inflation',
+    { name: es?'Inflación Núcleo':'Core Inflation', freq:'mensual',
       w:18, score: ipcNucleo!=null ? ipcScore(ipcNucleo) : 50,
       src: ipcNucleo!=null ? 'datos.gob.ar' : NA,
       live: ipcNucleo!=null, unavailable: ipcNucleo==null,
@@ -4103,7 +4106,7 @@ function computeSubIndices(bs) {
       unavailNote: ipcNucleo==null ? (es?'Dato mensual INDEC. En desarrollo.':'Monthly INDEC figure. In development.') : '',
       desc: es?'IPC sin estacionales ni regulados. Mide la inflación subyacente que el Banco Central puede realmente influir con política monetaria.'
              :'CPI excluding seasonal and regulated items. Measures underlying inflation that monetary policy can actually influence.' },
-    { name: es?'FAE · Dolarización del ahorro':'FAE · Dollarization',
+    { name: es?'FAE · Dolarización del ahorro':'FAE · Dollarization', freq:'mensual',
       w:12, score: faeV!=null ? faeScore(faeV) : 50,
       src: faeV!=null ? 'BCRA Bal. Cambiario + IA' : NA,
       live: faeV!=null, unavailable: faeV==null,
@@ -4112,7 +4115,7 @@ function computeSubIndices(bs) {
                     :'Monthly BCRA figure. Direct thermometer of peso flight. In development.') : '',
       desc: es?'Formación de Activos Externos: compra neta de billetes por parte de personas físicas. Cuando los argentinos corren al dólar, el índice cae. Niveles superiores a 1.000 millones mensuales son históricamente críticos.'
              :'Foreign Asset Formation: net banknote purchases by individuals. When Argentines rush to the dollar, the index falls (critical level ~US$1,000M/month).' },
-    { name: es?'Depósitos Plazo Fijo (var. real)':'Time Deposits (real chg.)',
+    { name: es?'Depósitos Plazo Fijo (var. real)':'Time Deposits (real chg.)', freq:'mensual',
       w:8, score: depPFV!=null ? depositosPFScore(depPFV) : 50,
       src: depPFV!=null ? 'BCRA + IPC' : NA,
       live: depPFV!=null, unavailable: depPFV==null,
@@ -4130,7 +4133,7 @@ function computeSubIndices(bs) {
   const rofexV       = LIVE._rofex;
   const cclMepSp     = (S.ccl && S.mep) ? Math.abs((S.ccl-S.mep)/S.mep)*100 : null;
   const seg2 = [
-    { name: es?'Reservas Netas BCRA':'BCRA Net Reserves',
+    { name: es?'Reservas Netas BCRA':'BCRA Net Reserves', freq:'diario',
       w:22, score: reservasNetasScore(resNetas ?? LIVE.reservas.mM), src:'BCRA', live: resNetas!=null||LIVE.reservas.live,
       raw: (()=>{
         const brutas = LIVE.reservas.mM ? `brutas USD ${(LIVE.reservas.mM/1000).toFixed(1)}bn` : '';
@@ -4139,12 +4142,12 @@ function computeSubIndices(bs) {
       })(),
       desc: es?'Reservas netas del BCRA (reservas brutas menos pasivos con el FMI y otros organismos). Son los dólares realmente disponibles para defender el tipo de cambio o cubrir vencimientos de deuda externa.'
              :'Net reserves (gross minus liabilities). The dollars actually available to defend the exchange rate or pay debt.' },
-    { name: es?'Brecha Cambiaria (MEP/Oficial)':'FX Gap (MEP/Official)',
+    { name: es?'Brecha Cambiaria (MEP/Oficial)':'FX Gap (MEP/Official)', freq:'diario',
       w:15, score: brechaScore, src:'dolarapi.com', live: true,
       raw: S.brecha!=null ? `Oficial ${fmtPeso(S.oficial)} · Blue ${fmtPeso(S.blue)} · Brecha ${fmtPct(S.brecha)}` : '',
       desc: es?'Diferencia entre el dólar MEP y el tipo de cambio oficial. Una brecha cercana a cero es históricamente inédita en Argentina y señala una consolidación sólida del esquema cambiario actual.'
              :'Gap between MEP and official rate. Near-zero gap is historically unprecedented and signals FX scheme consolidation.' },
-    { name: es?'Compras BCRA en MLC':'BCRA FX Purchases',
+    { name: es?'Compras BCRA en MLC':'BCRA FX Purchases', freq:'diario',
       w:18, score: comprasBCRA!=null ? mlcScore(comprasBCRA) : 50,
       src: comprasBCRA!=null ? 'BCRA v4' : NA,
       live: comprasBCRA!=null, unavailable: comprasBCRA==null,
@@ -4152,7 +4155,7 @@ function computeSubIndices(bs) {
       unavailNote: comprasBCRA==null ? (es?'Dato diario BCRA. En desarrollo.':'Daily BCRA figure. In development.') : '',
       desc: es?'Compras y ventas netas diarias del BCRA en el Mercado Libre de Cambios. Valores positivos indican acumulación de reservas; valores negativos revelan pérdida de reservas y presión sobre el tipo de cambio.'
              :'Daily BCRA net purchases in the FX market. Positive = reserve accumulation; negative = reserve loss.' },
-    { name: es?'Tipo de Cambio Real (TCRM)':'Real Exchange Rate (REER)',
+    { name: es?'Tipo de Cambio Real (TCRM)':'Real Exchange Rate (REER)', freq:'diario',
       w:22, score: tcrm!=null ? tcrmScore(tcrm) : 50,
       src: tcrm!=null ? 'datos.gob.ar/BCRA' : NA,
       live: tcrm!=null, unavailable: tcrm==null,
@@ -4160,7 +4163,7 @@ function computeSubIndices(bs) {
       unavailNote: tcrm==null ? (es?'Índice BCRA mensual. En desarrollo.':'Monthly BCRA index. In development.') : '',
       desc: es?'Tipo de Cambio Real Multilateral contra los principales socios comerciales. Históricamente, las apreciaciones reales excesivas precedieron todos los grandes saltos cambiarios de la historia argentina.'
              :'Real Multilateral Exchange Rate. Historically, excessive real appreciation precedes all major FX jumps in Argentina.' },
-    { name: es?'Futuros ROFEX 90 días':'ROFEX 90-day Futures',
+    { name: es?'Futuros ROFEX 90 días':'ROFEX 90-day Futures', freq:'diario',
       w:13, score: rofexV!=null ? rofexScore(rofexV) : 50,
       src: rofexV!=null ? 'datos.gob.ar (Rofex/BCRA)' : NA,
       live: rofexV!=null, unavailable: rofexV==null,
@@ -4168,7 +4171,7 @@ function computeSubIndices(bs) {
       unavailNote: rofexV==null ? (es?'Mercado ROFEX. Expectativas de devaluación implícitas en los futuros. En desarrollo.' : 'ROFEX market. Implicit devaluation expectations from futures. In development.') : '',
       desc: es?'Devaluación implícita anualizada en los futuros de dólar (ROFEX) comparada con el tipo de cambio oficial spot. Refleja directamente cuánta devaluación espera el mercado financiero en los próximos meses.'
              :'Annualized implicit devaluation in dollar futures (ROFEX) vs. the official spot. Measures how much devaluation the financial market expects.' },
-    { name: es?'Liquidación Agro (CIARA)':'Agro FX Liquidation',
+    { name: es?'Liquidación Agro (CIARA)':'Agro FX Liquidation', freq:'semanal',
       w:10, score: sojaScore(LIVE.soja), src:'Yahoo Finance', live: !!LIVE.soja,
       raw: LIVE.soja ? `Soja CBOT: USD ${Math.round(LIVE.soja)}/tn` : '',
       desc: es?'Proxy de la liquidación del agro usando el precio de la soja CBOT. El agro aporta ~65% de las exportaciones argentinas. Precio alto = más dólares.'
@@ -4183,7 +4186,7 @@ function computeSubIndices(bs) {
   const iccV    = LIVE._iccUtdt;
   const desempV = LIVE._desempleoEph;
   const seg3 = [
-    { name: es?'EMAE (actividad económica)':'EMAE (economic activity)',
+    { name: es?'EMAE (actividad económica)':'EMAE (economic activity)', freq:'mensual',
       w:20, score: emaeV!=null ? emaeScore(emaeV) : 50,
       src: emaeV!=null ? 'datos.gob.ar/INDEC' : NA,
       live: emaeV!=null, unavailable: emaeV==null,
@@ -4191,7 +4194,7 @@ function computeSubIndices(bs) {
       unavailNote: emaeV==null ? (es?'Dato mensual INDEC. En desarrollo.':'Monthly INDEC figure. In development.') : '',
       desc: es?'Estimador Mensual de Actividad Económica del INDEC. Es el indicador de mayor frecuencia que tiene Argentina para medir el crecimiento o la recesión de la economía antes de que llegue el dato oficial del PBI.'
              :'Monthly Economic Activity Estimator. The most representative high-frequency indicator of growth or recession.' },
-    { name: es?'Salario Real (RIPTE)':'Real Wage (RIPTE)',
+    { name: es?'Salario Real (RIPTE)':'Real Wage (RIPTE)', freq:'mensual',
       w:22, score: ripteV!=null ? ripteScore(ripteV) : 50,
       src: ripteV!=null ? 'datos.gob.ar' : NA,
       live: ripteV!=null, unavailable: ripteV==null,
@@ -4199,7 +4202,7 @@ function computeSubIndices(bs) {
       unavailNote: ripteV==null ? (es?'Dato mensual. En desarrollo.':'Monthly figure. In development.') : '',
       desc: es?'Variación real del salario promedio registrado (RIPTE) frente a la inflación, medida año a año. Es la variable que más directamente captura si el trabajador típico gana o pierde poder adquisitivo en el ciclo actual.'
              :'Real average wage change vs inflation (YoY). Most directly captures whether the typical worker is gaining or losing purchasing power.' },
-    { name: es?'Consumo Masivo (supermercados)':'Mass Consumption (supermarkets)',
+    { name: es?'Consumo Masivo (supermercados)':'Mass Consumption (supermarkets)', freq:'mensual',
       w:17, score: cMasV!=null ? consumoMasivoScore(cMasV) : 50,
       src: cMasV!=null ? 'INDEC datos.gob.ar' : NA,
       live: cMasV!=null, unavailable: cMasV==null,
@@ -4207,7 +4210,7 @@ function computeSubIndices(bs) {
       desc: es?'Variación real de ventas en supermercados. Proxy del consumo de bienes no durables y de primera necesidad.':'Real change in supermarket sales. Proxy for non-durable goods consumption.',
       unavailNote: cMasV==null ? (es?'Ventas supermercados INDEC en términos reales. Buscando serie en datos.gob.ar.':'INDEC supermarket sales in real terms. Sourcing series from datos.gob.ar.') : '',
     },
-    { name: es?'Confianza del Consumidor (ICC)':'Consumer Confidence (ICC)',
+    { name: es?'Confianza del Consumidor (ICC)':'Consumer Confidence (ICC)', freq:'mensual',
       w:18, score: iccV!=null ? iccScoreFn(iccV) : 50,
       src: iccV!=null ? 'UTDT' : NA,
       live: iccV!=null, unavailable: iccV==null,
@@ -4215,7 +4218,7 @@ function computeSubIndices(bs) {
       unavailNote: iccV==null ? (es?'Dato mensual UTDT (distinto del ICG). Mide predisposición al consumo. En desarrollo.' : 'Monthly UTDT figure (different from ICG). Measures consumption propensity. In development.') : '',
       desc: es?'Índice de Confianza del Consumidor UTDT. Diferente al ICG político: mide si la gente se anima a gastar, invertir o si prefiere ahorrar por precaución.'
              :'UTDT Consumer Confidence Index. Different from the political ICG: measures whether people are inclined to spend, invest, or save precautionarily.' },
-    { name: es?'Tasa de Desempleo (EPH)':'Unemployment Rate (EPH)',
+    { name: es?'Tasa de Desempleo (EPH)':'Unemployment Rate (EPH)', freq:'trimestral',
       w:13, score: desempV!=null ? desempleoScore(desempV) : 50,
       src: desempV!=null ? 'INDEC/datos.gob.ar' : NA,
       live: desempV!=null, unavailable: desempV==null,
@@ -4223,7 +4226,7 @@ function computeSubIndices(bs) {
       unavailNote: desempV==null ? (es?'Dato trimestral INDEC (EPH). Baja frecuencia. En desarrollo.' : 'Quarterly INDEC figure (EPH). Low frequency. In development.') : '',
       desc: es?'Tasa de desempleo de la Encuesta Permanente de Hogares. Indicador rezagado del ciclo pero fundamental para evaluar el costo social del ajuste.'
              :'Unemployment rate from the Permanent Household Survey. Lagging cycle indicator but fundamental for assessing the social cost of adjustment.' },
-    { name: es?'Ventas de Autos (ADEFA)':'Car Sales (ADEFA)',
+    { name: es?'Ventas de Autos (ADEFA)':'Car Sales (ADEFA)', freq:'mensual',
       w:10, score: adefaV!=null ? adefaScore(adefaV) : 50,
       src: adefaV!=null ? 'ADEFA' : NA,
       live: adefaV!=null, unavailable: adefaV==null,
@@ -4242,7 +4245,7 @@ function computeSubIndices(bs) {
   const fmiV = LIVE._cumplFMI;
   const califV = LIVE._calificacion;
   const seg4 = [
-    { name: es?'Resultado Primario':'Primary Fiscal Balance',
+    { name: es?'Resultado Primario':'Primary Fiscal Balance', freq:'mensual',
       w:28, score: primarioV!=null ? primarioScore(primarioV) : 50,
       src: primarioV!=null ? 'Min. Economía + IA' : NA,
       live: primarioV!=null, unavailable: primarioV==null,
@@ -4250,7 +4253,7 @@ function computeSubIndices(bs) {
       unavailNote: primarioV==null ? (es?'Dato mensual Ministerio de Economía. El dato más observado del programa Milei. En desarrollo.' : 'Monthly Ministry of Economy figure. The most monitored figure of the Milei program. In development.') : '',
       desc: es?'Superávit o déficit primario acumulado (sin intereses), como % del PIB. Es el pilar del programa económico y la condición sine qua non del acuerdo con el FMI.'
              :'Accumulated primary surplus or deficit (excluding interest), as % of GDP. It is the cornerstone of the economic program and the sine qua non condition of the IMF agreement.' },
-    { name: es?'Rollover de Deuda (%)':'Debt Rollover (%)',
+    { name: es?'Rollover de Deuda (%)':'Debt Rollover (%)', freq:'variable',
       w:22, score: rolloverV!=null ? rolloverScore(rolloverV) : 50,
       src: rolloverV!=null ? 'Sec. Finanzas' : NA,
       live: rolloverV!=null, unavailable: rolloverV==null,
@@ -4258,7 +4261,7 @@ function computeSubIndices(bs) {
       unavailNote: rolloverV==null ? (es?'Dato por licitación. El más informativo del corto plazo. En desarrollo.' : 'Per-auction figure. Most informative short-term indicator. In development.') : '',
       desc: es?'Porcentaje de vencimientos en pesos que el Tesoro logra renovar. Por debajo del 100% es alarma roja: el mercado no quiere renovar y el riesgo de monetización sube.'
              :'% of peso maturities the Treasury manages to roll over. Below 100% is a red alert: the market refuses to renew and monetization risk rises.' },
-    { name: es?'Recaudación Tributaria (i.a.)':'Tax Revenue (y.o.y.)',
+    { name: es?'Recaudación Tributaria (i.a.)':'Tax Revenue (y.o.y.)', freq:'mensual',
       w:18, score: LIVE._recaudVar!=null ? recaudScore(LIVE._recaudVar) : 50,
       src: LIVE._recaudVar!=null ? 'ARCA PDF + IA' : NA,
       live: LIVE._recaudVar!=null, unavailable: LIVE._recaudVar==null,
@@ -4266,12 +4269,12 @@ function computeSubIndices(bs) {
       unavailNote: LIVE._recaudVar==null ? (es?'PDF ARCA + Claude Haiku. En desarrollo.':'ARCA PDF + Claude Haiku. In development.') : '',
       desc: es?'Variación real de la recaudación tributaria. Mide tanto el ciclo económico como la compliance fiscal. Caída real sostenida señala deterioro fiscal.'
              :'Real change in tax revenue. Measures both the economic cycle and fiscal compliance. Sustained real decline signals fiscal deterioration.' },
-    { name: es?'Curva Soberana (GD30/GD35)':'Sovereign Curve (GD30/GD35)',
+    { name: es?'Curva Soberana (GD30/GD35)':'Sovereign Curve (GD30/GD35)', freq:'diario',
       w:19, score: gd35YieldScore(gd35Y), src:'IOL', live: gd35Y!=null,
       raw: gd35Y!=null ? `GD35 TIR: ${gd35Y.toFixed(2)}%${LIVE._gd35Precio ? ' · precio USD '+LIVE._gd35Precio.toFixed(2) : ''}` : '',
       desc: es?'Pendiente de la curva soberana usando el rendimiento del GD35. Una curva invertida o muy empinada señala expectativas de stress fiscal en el mediano plazo.'
              :'Slope of the sovereign curve using GD35 yield. An inverted or very steep curve signals medium-term fiscal stress expectations.' },
-    { name: es?'Cumplimiento Metas FMI':'IMF Target Compliance',
+    { name: es?'Cumplimiento Metas FMI':'IMF Target Compliance', freq:'trimestral',
       w:10, score: fmiV!=null ? fmiScore(fmiV) : 50,
       src: fmiV!=null ? 'FMI / Min. Economía' : NA,
       live: fmiV!=null, unavailable: fmiV==null,
@@ -4279,7 +4282,7 @@ function computeSubIndices(bs) {
       unavailNote: fmiV==null ? (es?'Señal cualitativa mensual basada en comunicados FMI/Economía. En desarrollo.' : 'Monthly qualitative signal based on IMF/Economy communiques. In development.') : '',
       desc: es?'Evaluación del cumplimiento de las metas cuantitativas del acuerdo con el FMI. El incumplimiento activa cláusulas de waiver y genera incertidumbre.'
              :'Assessment of compliance with IMF agreement quantitative targets. Non-compliance triggers waiver clauses and generates uncertainty.' },
-    { name: es?'Calificación Soberana':'Sovereign Rating',
+    { name: es?'Calificación Soberana':'Sovereign Rating', freq:'variable',
       w:7, score: califV!=null ? calificacionScore(califV) : 50,
       src: califV!=null ? 'Fitch/S&P/Moody\'s' : NA,
       live: califV!=null, unavailable: califV==null,
@@ -4293,30 +4296,30 @@ function computeSubIndices(bs) {
   const primaElect = LIVE._primaElectoral;
   const spreadAL30 = LIVE._spread_al30_gd30;
   const seg5 = [
-    { name: es?'Riesgo País (EMBI)':'Country Risk (EMBI)',
+    { name: es?'Riesgo País (EMBI)':'Country Risk (EMBI)', freq:'diario',
       w:25, score: LIVE.embi.score, src:'ArgentinaDatos', live: LIVE.embi.live,
       raw: LIVE.embi.bps ? `${LIVE.embi.bps} bps · score ${LIVE.embi.score}/100` : '',
       desc: es?'Spread de la deuda soberana argentina sobre los Treasuries de EEUU. El indicador de riesgo más seguido mediáticamente. Comprimió de ~850 bps en 2025 a ~525 bps hoy.'
              :'Spread of Argentine sovereign debt over US Treasuries. The most media-followed risk indicator. Compressed from ~850 bps in 2025 to ~525 bps today.' },
-    { name: es?'Merval USD (vs media 52s)':'Merval USD (vs 52w avg)',
+    { name: es?'Merval USD (vs media 52s)':'Merval USD (vs 52w avg)', freq:'diario',
       w:20, score: LIVE.merval.score, src:'IOL/Yahoo', live: LIVE.merval.live,
       raw: LIVE.merval.usd ? `USD ${Math.round(LIVE.merval.usd).toLocaleString('es-AR')}` + (LIVE.merval.score!=null ? ` · score ${LIVE.merval.score}/100`:'') : (LIVE.merval.raw||''),
       desc: es?'El Merval en dólares CCL captura el apetito de riesgo en renta variable local. Máximos históricos en USD señalan codicia extrema del mercado financiero.'
              :'Merval in CCL dollars captures local equity risk appetite. Historical USD highs signal extreme financial market greed.' },
-    { name: es?'Rendimiento GD35 (TIR)':'GD35 Yield (YTM)',
+    { name: es?'Rendimiento GD35 (TIR)':'GD35 Yield (YTM)', freq:'diario',
       w:15, score: gd35YieldScore(gd35Y), src:'IOL', live: gd35Y!=null,
       raw: gd35Y!=null ? `TIR: ${gd35Y.toFixed(2)}%${LIVE._gd35Precio ? ' · USD '+LIVE._gd35Precio.toFixed(2) : ''}${LIVE._gd35Var ? ' ('+( LIVE._gd35Var>0?'+':'')+LIVE._gd35Var.toFixed(2)+'% hoy)' : ''}` : '',
       desc: es?'Rendimiento del GD35 (bono soberano a 10 años, ley NY). Mide el costo de acceso a los mercados internacionales de capital a largo plazo.'
              :'GD35 yield (10-year sovereign bond, NY law). Measures the cost of long-term access to international capital markets.' },
 
-    { name: es?'Spread Ley Local/NY (AL30-GD30)':'Local/NY Law Spread (AL30-GD30)',
+    { name: es?'Spread Ley Local/NY (AL30-GD30)':'Local/NY Law Spread (AL30-GD30)', freq:'diario',
       w:13, score: spreadAL30GD30!=null ? spreadLeyScore(spreadAL30GD30) : 50,
       src: spreadAL30GD30!=null ? 'IOL/Ambito' : 'N/A',
       live: spreadAL30GD30!=null, unavailable: spreadAL30GD30==null,
       raw: spreadAL30GD30!=null ? (spreadAL30GD30>0?'+':'')+spreadAL30GD30.toFixed(1)+'% '+(spreadAL30GD30<3?(es?'(confianza alta)':'(high confidence)'):spreadAL30GD30<6?(es?'(prima moderada)':'(moderate premium)'):spreadAL30GD30<10?(es?'(riesgo legal)':'(legal risk)'):(es?'(alarma)':'(alarm)')) : '',
       unavailNote: spreadAL30GD30==null ? (es?'Spread AL30/GD30. Requiere precios de bonos.':'AL30/GD30 spread. Requires bond prices.') : '',
       desc: es?'Diferencia de precio entre AL30 (ley Argentina) y GD30 (ley Nueva York). Spread amplio = mercado descuenta riesgo de reestructuracion selectiva bajo ley local.'
-             :'Price difference between AL30 (Argentine law) and GD30 (NY law). Wide spread = market pricing selective local-law restructuring risk.' },    { name: es?'Amplitud Merval (semanal)':'Merval Breadth (weekly)',
+             :'Price difference between AL30 (Argentine law) and GD30 (NY law). Wide spread = market pricing selective local-law restructuring risk.' },    { name: es?'Amplitud Merval (semanal)':'Merval Breadth (weekly)', freq:'semanal',
       w:13, score: LIVE.amplitud.score, src:'IOL', live: LIVE.amplitud.live,
       raw: (()=>{
         const up=LIVE._amplitudUp, dn=LIVE._amplitudDn, fl=LIVE._amplitudFl, tot=LIVE._amplitudTotal;
@@ -4325,14 +4328,14 @@ function computeSubIndices(bs) {
       })(),
       desc: es?'% de acciones del panel con variación semanal positiva. Amplitud alta (>70%) confirma un rally genuino; amplitud baja con índice en alza señala movimiento frágil.'
              :'% of panel stocks with positive weekly change. High breadth (>70%) confirms genuine rally; low breadth with rising index signals fragile move.' },
-    { name: es?'Confianza en el Gobierno (ICG)':'Gov. Confidence (ICG)',
+    { name: es?'Confianza en el Gobierno (ICG)':'Gov. Confidence (ICG)', freq:'mensual',
       w:10, score: LIVE.icg!=null ? intScore((LIVE.icg/5)*100) : 40,
       src: LIVE.icg!=null ? 'UTDT (mensual)' : 'UTDT',
       live: LIVE.icg!=null, mensual: true,
       raw: LIVE.icg!=null ? `${LIVE.icg.toFixed(2)}/5 (${intScore((LIVE.icg/5)*100)}/100)` : '',
       desc: es?'Índice de Confianza en el Gobierno de la UTDT. Encuesta mensual que mide la aprobación de la gestión. Históricamente, caídas sostenidas del ICG preceden deterioros del clima financiero y complican la renovación del apoyo político al ajuste fiscal.'
              :'UTDT Government Confidence Index. Monthly survey measuring approval of the administration. Historically, sustained ICG declines precede financial climate deterioration and complicate political support for fiscal adjustment.' },
-    { name: es?'Sentimiento de Noticias':'News Sentiment',
+    { name: es?'Sentimiento de Noticias':'News Sentiment', freq:'diario',
       w:4, score: LIVE._sentimiento_noticias!=null ? intScore(Number(LIVE._sentimiento_noticias)) : 50,
       src: LIVE._sentimiento_noticias!=null ? (es?'Múltiples fuentes · últimas 72h':'Multiple sources · last 72h') : 'Google News',
       live: LIVE._sentimiento_noticias!=null,
@@ -5279,9 +5282,26 @@ function renderIndicators(brechaScore) {
       vcard.className = 'var-card' + (v.unavailable ? ' unavailable' : '');
       vcard.style.setProperty('--vc-color', v.unavailable ? '#6b7280' : sc);
       if(!v.unavailable) vcard.style.borderLeftColor = vc;
-      const monthBadge = v.mensual
-        ? `<span style="font-size:7.5px;background:rgba(234,179,8,.15);color:#eab308;padding:1px 5px;border-radius:2px;font-weight:700;flex-shrink:0">${LANG==='en'?'MONTHLY':'MENSUAL'}</span>`
-        : '';
+      // Badge de frecuencia: todos los indicadores muestran su cadencia.
+      // Si no tiene una frecuencia definida, se muestra "FRECUENCIA VARIABLE".
+      const freqMap = {
+        diario:   {es:'DIARIO',   en:'DAILY'},
+        semanal:  {es:'SEMANAL',  en:'WEEKLY'},
+        mensual:  {es:'MENSUAL',  en:'MONTHLY'},
+        trimestral:{es:'TRIMESTRAL', en:'QUARTERLY'},
+        variable: {es:'FREC. VARIABLE', en:'VARIABLE FREQ.'}
+      };
+      // Compatibilidad: si trae el viejo flag .mensual, lo tratamos como freq:'mensual'
+      const freqKey = v.freq || (v.mensual ? 'mensual' : 'variable');
+      const freqInfo = freqMap[freqKey] || freqMap.variable;
+      const freqColors = {
+        diario:   'background:rgba(34,197,94,.15);color:#22c55e',
+        semanal:  'background:rgba(14,165,233,.15);color:#0ea5e9',
+        mensual:  'background:rgba(234,179,8,.15);color:#eab308',
+        trimestral:'background:rgba(168,85,247,.15);color:#a855f7',
+        variable: 'background:rgba(148,163,184,.15);color:#94a3b8'
+      };
+      const monthBadge = `<span class="var-card-freq" style="font-size:7.5px;${freqColors[freqKey]||freqColors.variable};padding:1px 5px;border-radius:2px;font-weight:700;flex-shrink:0;letter-spacing:.04em">${LANG==='en'?freqInfo.en:freqInfo.es}</span>`;
       const dotColor = v.live && !v.unavailable ? 'var(--g)' : 'var(--text3)';
       const dotAnim  = v.live && !v.unavailable ? 'animation:pulse-dot 2s infinite' : '';
       vcard.innerHTML = `
