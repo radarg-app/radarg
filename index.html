@@ -5086,8 +5086,8 @@ function renderGauge(score){
   const s=intScore(score); lastScore=s;
   const col=scoreColor(s);
   drawGauge(s);
-  if($('gScore')){$('gScore').textContent=s;$('gScore').style.color=col;}
-  if($('gLbl')){$('gLbl').textContent=scoreLabel(s);$('gLbl').style.color=col;}
+  if($('gScore')){$('gScore').textContent=s;$('gScore').style.color=col;$('gScore').dataset.score=s;}
+  if($('gLbl')){$('gLbl').textContent=scoreLabel(s);$('gLbl').style.color=col;$('gLbl').dataset.score=s;}
   const now=new Date();
   if($('gDateTxt')){
     const loc = LANG==='en'?'en-US':'es-AR';
@@ -5165,8 +5165,8 @@ function renderIndicators(brechaScore) {
         <span class="strip-name" style="color:${sc}">${seg.name}</span>
       </div>
       <div class="strip-score-row">
-        <span class="strip-score" style="color:${col}">${s}</span>
-        <span class="strip-badge ind-badge" style="background:${bg};color:${col}">${lbl}</span>
+        <span class="strip-score" style="color:${col}" data-score="${s}">${s}</span>
+        <span class="strip-badge ind-badge" style="background:${bg};color:${col}" data-score="${s}">${lbl}</span>
       </div>
       <div class="strip-bar"><div class="strip-bar-fill" style="background:${sc};width:${s}%"></div></div>
       <div class="strip-weight">${seg.w}% ${LANG==='en'?'of total':'del total'}</div>
@@ -5223,7 +5223,7 @@ function renderIndicators(brechaScore) {
           <div class="subidx-sec-icon">${seg.icon}</div>
           <div class="subidx-sec-name">${seg.name}</div>
           <div class="subidx-sec-score-row">
-            <span class="subidx-sec-score" style="color:${col}">${s}</span>
+            <span class="subidx-sec-score" style="color:${col}" data-score="${s}">${s}</span>
             <span class="subidx-sec-badge ind-badge" style="background:${bg};color:${col}">${lbl}</span>
           </div>
           <div class="subidx-sec-bar"><div class="subidx-sec-bar-fill" style="background:${sc};width:${s}%"></div></div>
@@ -5316,13 +5316,13 @@ function renderIndicators(brechaScore) {
           ${v.unavailable ? '<span class="var-card-badge-unavail">'+(LANG==="en"?"PENDING":"PENDIENTE")+'</span>' : ''}
         </div>
         <div class="var-card-score-row">
-          <span class="var-card-score" style="color:${vc}">${v.unavailable ? '—' : vs}</span>
-          <span class="ind-badge" style="background:${vbg};color:${vc}">${vlbl}</span>
+          <span class="var-card-score" style="color:${vc}"${v.unavailable?'':` data-score="${vs}"`}>${v.unavailable ? '—' : vs}</span>
+          <span class="ind-badge" style="background:${vbg};color:${vc}"${v.unavailable?'':` data-score="${vs}"`}>${vlbl}</span>
         </div>
-        ${v.raw ? `<div class="var-card-raw" style="color:${vc}">${v.raw}</div>` : ''}
+        ${v.raw ? `<div class="var-card-raw" style="color:${vc}"${v.unavailable?'':` data-score="${vs}"`}>${v.raw}</div>` : ''}
         ${v.unavailNote ? `<div class="var-card-unavail-note">${v.unavailNote}</div>` : ''}
         ${v.desc ? `<div class="var-card-desc">${v.desc}</div>` : ''}
-        <div class="var-card-bar"><div class="var-card-bar-fill" style="background:${v.unavailable?'#4b5563':vc};width:${v.unavailable?0:vs}%"></div></div>
+        <div class="var-card-bar"><div class="var-card-bar-fill" style="background:${v.unavailable?'#4b5563':vc};width:${v.unavailable?0:vs}%"${v.unavailable?'':` data-score="${vs}" data-score-role="bar"`}></div></div>
         <div class="var-card-src">
           <span class="ind-source-dot" style="background:${dotColor};${dotAnim}"></span>
           ${v.live && !v.unavailable ? '⚡ ' : ''}${v.src}
@@ -6166,10 +6166,23 @@ function toggleMode(){
   try{localStorage.setItem('radarg-theme',lm?'light':'dark');}catch(_){}
   if(typeof buildChart==='function'){buildChart(sliderFrom,sliderTo);}
   drawGauge(lastScore);
-  // Re-renderizar los indicadores para que los colores de score se adapten al modo
-  if(typeof renderIndicators==='function' && typeof S!=='undefined'){
-    try{ renderIndicators(brechaToScore(S.brecha)); }catch(_){}
-  }
+  // Recolorear los scores existentes sin re-renderizar, para no cerrar las solapas abiertas.
+  recolorScores();
+}
+
+// Actualiza los colores de los scores ya pintados según el modo actual,
+// recorriendo el DOM existente (no reconstruye nada, preserva el estado de las solapas).
+function recolorScores(){
+  document.querySelectorAll('[data-score]').forEach(el => {
+    const sv = parseInt(el.dataset.score, 10);
+    if(isNaN(sv)) return;
+    const col = scoreColor(sv);
+    if(el.dataset.scoreRole === 'bar'){
+      el.style.background = col;
+    } else {
+      el.style.color = col;
+    }
+  });
 }
 (function(){try{if(localStorage.getItem('radarg-theme')==='light'){document.body.classList.add('lm');document.addEventListener('DOMContentLoaded',()=>{const b=$('modeBtn');if(b)b.textContent='☀️';});}}catch(_){}})();
 
