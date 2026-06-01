@@ -5301,7 +5301,7 @@ function renderIndicators(brechaScore) {
         trimestral:'background:rgba(168,85,247,.15);color:#a855f7',
         variable: 'background:rgba(148,163,184,.15);color:#94a3b8'
       };
-      const monthBadge = `<span class="var-card-freq" style="font-size:7.5px;${freqColors[freqKey]||freqColors.variable};padding:1px 5px;border-radius:2px;font-weight:700;flex-shrink:0;letter-spacing:.04em">${LANG==='en'?freqInfo.en:freqInfo.es}</span>`;
+      const monthBadge = `<span class="var-card-freq" style="font-size:9.5px;${freqColors[freqKey]||freqColors.variable};padding:3px 8px;border-radius:4px;font-weight:700;flex-shrink:0;letter-spacing:.05em">${LANG==='en'?freqInfo.en:freqInfo.es}</span>`;
       const dotColor = v.live && !v.unavailable ? 'var(--g)' : 'var(--text3)';
       const dotAnim  = v.live && !v.unavailable ? 'animation:pulse-dot 2s infinite' : '';
       vcard.innerHTML = `
