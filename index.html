@@ -135,7 +135,7 @@ body.lm .ctx-sub { color: #2a2a40; }
 body.lm .ctx-val { color: #0a0a14; }
 body.lm .sec-ttl { color: #484864; }
 body.lm .strip-weight { color: #484864; }
-body.lm .subidx-sec-weight { color: #484864; }
+body.lm .subidx-sec-weight { color: #2a2a40; opacity:.9; }
 body.lm .subidx-sec-question { color: #484864; }
 body.lm .subidx-sec-desc { color: #2a2a40; }
 body.lm .subidx-section { background:#ffffff; }
@@ -597,11 +597,12 @@ body.lm .subidx-section-header:hover { background:rgba(0,0,0,.018); }
 }
 .subidx-sec-left { display:flex; flex-direction:column; gap:.375rem; min-width:140px; position:relative; z-index:1; }
 .subidx-sec-icon { font-size:22px; line-height:1; margin-bottom:.125rem; }
-.subidx-sec-name { font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
+.subidx-sec-name { font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--ss-color, var(--ac)); }
+body.lm .subidx-sec-name { color:#0a0a14; }
 .subidx-sec-score-row { display:flex; align-items:center; gap:.5rem; }
 .subidx-sec-score { font-size:42px; font-weight:800; letter-spacing:-2px; line-height:1; }
 .subidx-sec-badge { font-size:9px; font-weight:700; padding:2px 8px; border-radius:4px; letter-spacing:.05em; text-transform:uppercase; align-self:center; }
-.subidx-sec-weight { font-size:9px; color:var(--text3); font-family:'JetBrains Mono',monospace; margin-top:2px; }
+.subidx-sec-weight { font-size:9px; color:var(--ss-color, var(--text3)); opacity:.8; font-family:'JetBrains Mono',monospace; margin-top:2px; }
 .subidx-sec-bar { height:3px; background:rgba(255,255,255,.1); border-radius:2px; overflow:hidden; margin-top:.5rem; width:100%; }
 body.lm .subidx-sec-bar { background:rgba(0,0,0,.1); }
 .subidx-sec-bar-fill { height:100%; border-radius:2px; transition:width .9s cubic-bezier(.4,0,.2,1); }
@@ -5203,13 +5204,13 @@ function renderIndicators(brechaScore) {
       <div class="subidx-section-header">
         <div class="subidx-sec-left">
           <div class="subidx-sec-icon">${seg.icon}</div>
-          <div class="subidx-sec-name" style="color:${sc}">${seg.name}</div>
+          <div class="subidx-sec-name">${seg.name}</div>
           <div class="subidx-sec-score-row">
             <span class="subidx-sec-score" style="color:${col}">${s}</span>
             <span class="subidx-sec-badge ind-badge" style="background:${bg};color:${col}">${lbl}</span>
           </div>
           <div class="subidx-sec-bar"><div class="subidx-sec-bar-fill" style="background:${sc};width:${s}%"></div></div>
-          <div class="subidx-sec-weight" style="color:${sc};opacity:.8">${seg.w}% ${LANG==='en'?'of final score':'del score final'}</div>
+          <div class="subidx-sec-weight">${seg.w}% ${LANG==='en'?'of final score':'del score final'}</div>
       ${seg.vars.some(v=>v.unavailable) ? `<div style="margin-top:6px;display:inline-flex;align-items:center;gap:4px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.25);border-radius:4px;padding:2px 7px;font-size:9px;font-weight:700;color:#f59e0b;letter-spacing:.06em">⚠️ ${LANG==='en'?'PARTIAL DATA':'DATOS PARCIALES'}</div>` : ''}
         </div>
         <div class="subidx-sec-prose">
