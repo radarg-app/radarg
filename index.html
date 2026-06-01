@@ -78,14 +78,14 @@ body.lm {
 }
 body.lm header { background: rgba(248,249,252,.95); border-color: rgba(0,0,0,.08); }
 body.lm .ticker { background: #f0f1f5; border-color: rgba(0,0,0,.07); }
-body.lm .tick-lbl { color: #7070a0; }
+body.lm .tick-lbl { color: #44445c; }
 body.lm .tick-val  { color: #0d0d18; }
 body.lm .live-badge { color: #44445c; }
 body.lm nav a { color: #44445c; }
 body.lm nav a:hover { color: #0d0d18; }
 body.lm .card { background:#fff; box-shadow: var(--shadow); border-color: rgba(0,0,0,.08); }
 body.lm .gauge-card { background:#fff; box-shadow: var(--shadow-lg); }
-body.lm .ind-card { background:#fff; }
+body.lm .ind-card { background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.05); border-color:rgba(0,0,0,.09); }
 body.lm .chart-card { background:#fff; }
 body.lm .ctx-card { background:#fff; }
 body.lm .sec-ttl { color: #7070a0; }
@@ -95,7 +95,7 @@ body.lm .ind-wt { color: #7070a0; background: #f0f1f5; }
 body.lm .ind-desc { color: #44445c; }
 body.lm .ind-bar-bg { background: #e4e5ec; }
 body.lm .ind-source { color: #7070a0; }
-body.lm .meth-card { background:#fff; }
+body.lm .meth-card { background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.05); border-color:rgba(0,0,0,.09); }
 body.lm .meth-q { color: #0d0d18; }
 body.lm .meth-a { color: #44445c; }
 body.lm .hito-card { background:#fff; }
@@ -106,7 +106,7 @@ body.lm .range-tick { color: #aaaacc; }
 body.lm .range-tick.in-range { color: var(--ac); }
 body.lm .modal { background:#fff; }
 body.lm .modal-opt { background: #f8f9fc; }
-body.lm .suggest-card { background:#fff; }
+body.lm .suggest-card { background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.06); border-color:rgba(0,0,0,.10); }
 body.lm .suggest-input,
 body.lm .suggest-select,
 body.lm .suggest-textarea { background:#f8f9fc; color:#0d0d18; border-color:rgba(0,0,0,.13); }
@@ -157,10 +157,15 @@ body.lm .hito-txt { color: #2a2a40; }
 body.lm .hito-key { color: #2a2a40; }
 body.lm .meth-a { color: #2a2a40; }
 body.lm .meth-intro-desc { color: #2a2a40; }
+/* Intros de metodología: fondo más definido y borde más visible en light mode */
+body.lm .meth-intro-simple { background:rgba(21,128,61,.08); border-color:rgba(21,128,61,.30); }
+body.lm .meth-intro-tech   { background:rgba(2,113,176,.07); border-color:rgba(2,113,176,.28); }
+body.lm .meth-intro-label  { font-weight:700; }
+body.lm .meth-intro-title  { color:#0a0a14; }
 body.lm .pro-sub  { color: #2a2a40; }
 body.lm .pro-feat-desc { color: #2a2a40; }
 body.lm .pro-note { color: #484864; }
-body.lm .sponsors-sub { color: #2a2a40; }
+
 body.lm .benefit-item { color: #2a2a40; }
 body.lm .tier-feat { color: #2a2a40; }
 body.lm .tier-feat-x { color: #696990; opacity:.7; }
@@ -181,7 +186,7 @@ body.lm .h-btn:hover { color: #0a0a14; }
 body.lm .lang-btn { color: #2a2a40; border-color:rgba(0,0,0,.18); }
 body.lm .lang-btn.active { color: #0a0a14; }
 body.lm .hitos-toggle-btn { color: #2a2a40; border-color:rgba(0,0,0,.18); }
-body.lm .btn-sponsor { color: #2a2a40; border-color:rgba(0,0,0,.18); }
+
 body.lm .score-card { background:#ffffff; }
 body.lm .ai-panel  { background:#ffffff; }
 body.lm .suggest-shell { background:#f4f5f8; }
@@ -204,7 +209,7 @@ body.lm .gtl-label { color: #0d0d18; }
 body.lm .gtl-period { color: #7070a0; }
 body.lm .gtl-row { border-color: rgba(0,0,0,.07); }
 body.lm .pro-card { background: linear-gradient(135deg,#eff6ff,#f0fdf4); border-color: rgba(14,165,233,.25); }
-body.lm .sponsors-card { background:#fff; }
+
 
 /* ── Reset ───────────────────────────────────────────────────── */
 *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
@@ -537,7 +542,9 @@ body.lm .strip-bar { background:rgba(0,0,0,.1); }
 .strip-bar-fill { height:100%; border-radius:1px; transition:width .9s cubic-bezier(.4,0,.2,1); }
 .strip-weight { font-size:8.5px; color:var(--text3); font-family:'JetBrains Mono',monospace; position:relative; z-index:1; }
 body.lm .strip-card { border-color:rgba(0,0,0,.14); background:#ffffff; }
-body.lm .subidx-section { background:#ffffff; border-color:rgba(0,0,0,.12); }
+body.lm .subidx-section { background:#ffffff; border-color:rgba(0,0,0,.10); box-shadow:0 1px 3px rgba(0,0,0,.06), 0 0 0 1px rgba(0,0,0,.02); }
+/* Tinte del header un poco más visible en light mode para diferenciar cada dimensión */
+body.lm .subidx-section-header::after { background:radial-gradient(ellipse 80% 120% at 10% 50%, color-mix(in srgb, var(--ss-color,var(--ac)) 13%, transparent) 0%, transparent 70%); }
 body.lm .subidx-section-header { border-bottom-color:rgba(0,0,0,.1); }
 body.lm .subidx-vars { background:#f4f5f8; }
 body.lm .var-card { background:#ffffff; border-color:rgba(0,0,0,.12); border-left-width:2px; }
@@ -1021,12 +1028,8 @@ body.lm .merval-switch.sw-pres   input:checked ~ .merval-switch-track { backgrou
 }
 
 /* ── Light mode ── */
-body.lm .sponsors-card {
-  background:linear-gradient(160deg, #fdf6e8 0%, #fef9ed 55%, #faf4e4 100%);
-}
-body.lm .sponsors-card::before {
-  background:radial-gradient(ellipse 90% 55% at 50% -5%, rgba(160,120,20,.10), transparent 65%);
-}
+
+
 body.lm .sp-star { color:#8a6010; }
 body.lm .sponsors-eyebrow {
   background:none;
@@ -1034,6 +1037,17 @@ body.lm .sponsors-eyebrow {
   color:#3d2600;
   animation:none;
 }
+/* Fondo blanco cálido + interior limpio (el marco dorado animado lo da .sponsors-outer) */
+body.lm .sponsors-card { background:#fffdf8; }
+body.lm .sponsors-card::before { background:radial-gradient(ellipse 90% 55% at 50% -5%, rgba(180,140,40,.07), transparent 65%); }
+body.lm .sp-star { color:#b8860b; opacity:.5; }
+body.lm .audience-chip {
+  background:rgba(180,130,20,.10);
+  color:#5a4200;
+  border-color:rgba(180,130,20,.35);
+  font-weight:700;
+}
+body.lm .benefit-item { color:#4a3a10; font-weight:600; }
 body.lm .sponsors-title  { color:#0f0d00; }
 body.lm .sponsors-sub    { color:#2a2000; font-weight:500; }
 body.lm .sponsors-sub-cta { color:#3d2e00; font-weight:800; }
@@ -1249,17 +1263,11 @@ body.lm .sp-field textarea:focus { border-color:rgba(160,112,20,.5); box-shadow:
 }
 
 /* ── Light mode — fondo blanco premium con marco dorado igual ── */
-body.lm .sponsors-card {
-  background:linear-gradient(135deg, #fdf9f0 0%, #fff8e8 50%, #faf5ec 100%);
-}
-body.lm .sponsors-card::before {
-  background:radial-gradient(ellipse 80% 50% at 50% -10%, rgba(200,168,75,.12), transparent 65%);
-}
-body.lm .sponsors-card::after {
-  background:radial-gradient(ellipse, rgba(180,140,40,.10) 0%, transparent 70%);
-}
-body.lm .sponsors-title  { color:#1a1400; }
-body.lm .sponsors-sub    { color:rgba(80,60,10,.7); }
+
+
+
+
+
 body.lm .audience-chip   { background:rgba(180,140,20,.10); color:rgba(100,72,10,.85); border-color:rgba(180,140,20,.3); }
 body.lm .benefit-item    { color:rgba(80,60,10,.6); }
 
