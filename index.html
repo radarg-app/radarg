@@ -118,6 +118,12 @@ body.lm .t-lbl { color: #484864; }
 body.lm .t-ts  { color: #484864; }
 body.lm .t-val { color: #0a0a14; }
 body.lm .sc-date { color: #484864; }
+.sc-date { display:inline-flex; align-items:center; gap:7px; }
+.sc-live-dot {
+  width:7px; height:7px; border-radius:50%;
+  background:var(--g); box-shadow:0 0 6px var(--g);
+  animation:rankPulse 2s infinite; flex-shrink:0;
+}
 body.lm .sc-ref-period { color: #484864; }
 body.lm .sc-refresh { color: #484864; border-top-color: rgba(0,0,0,.12); }
 body.lm .sc-refresh-next { color: #0271b0; }
@@ -2132,7 +2138,6 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
     <!-- Tiers oculto temporalmente. Reactivar agregando: <li><a href="#tiers" data-i18n="nav.tiers">Tiers</a></li> -->
   </ul></nav>
   <div class="h-right">
-    <div class="live-pill"><span class="live-dot"></span><span id="hdrDate">–</span></div>
     <div class="lang-group">
       <button class="lang-btn active" onclick="setLang('es')">ES</button>
       <button class="lang-btn" onclick="setLang('en')">EN</button>
@@ -2176,7 +2181,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
       <div style="font-size:11px;color:var(--text3);margin-bottom:.5rem;margin-top:-.5rem" class="score-subtitle-txt" data-i18n="score.subtitle">¿Cómo está el mercado argentino hoy?</div>
       <span class="sc-score" id="gScore">–</span>
       <span class="sc-label" id="gLbl">–</span>
-      <span class="sc-date"  id="gDate">–</span>
+      <span class="sc-date" id="gDate"><span class="sc-live-dot"></span><span id="gDateTxt">–</span></span>
       <div class="sc-divider"></div>
       <div class="sc-refs" id="scRefs">
         <div class="sc-ref">
@@ -5066,18 +5071,17 @@ function renderGauge(score){
   if($('gScore')){$('gScore').textContent=s;$('gScore').style.color=col;}
   if($('gLbl')){$('gLbl').textContent=scoreLabel(s);$('gLbl').style.color=col;}
   const now=new Date();
-  if($('gDate')) $('gDate').textContent=now.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})+' · '+(S.live?t('ui.realtime'):t('ui.fallback'));
-  if($('hdrDate')) $('hdrDate').textContent='LIVE · '+now.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'}).toUpperCase();
-  if($('gRefreshTime')){
+  if($('gDateTxt')){
     const loc = LANG==='en'?'en-US':'es-AR';
-    const tt = now.toLocaleTimeString(loc,{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-    $('gRefreshTime').textContent = t('ui.lastUpdate')+' '+tt;
+    const fechaStr = now.toLocaleDateString(loc,{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    const liveWord = S.live ? (LANG==='en'?'LIVE':'EN VIVO') : t('ui.fallback').toUpperCase();
+    $('gDateTxt').textContent = liveWord+' · '+fechaStr+' · '+(S.live?t('ui.realtime'):t('ui.fallback'));
+  }
+  if($('gRefreshTime')){
+    // Mostrar solo el aviso de actualización diaria (sin "última actualización: hora")
+    $('gRefreshTime').textContent = LANG==='en' ? 'Updated every day at 12:00 (Argentina time)' : 'Se actualiza todos los días a las 12:00 (hora Argentina)';
     const nextEl = $('gRefreshNext');
-    const nextTxt = $('gRefreshNextTxt');
-    if(nextEl && nextTxt){
-      nextEl.style.display='flex';
-      nextTxt.textContent = LANG==='en' ? 'Updated every day at 12:00 (Argentina time)' : 'Se actualiza todos los días a las 12:00 (hora Argentina)';
-    }
+    if(nextEl) nextEl.style.display='none';
   }
   // Historical refs — calculated from MONTHLY data (not hardcoded)
   // MONTHLY.scores is monthly, so: 1w≈current, 1m=1 month ago, 3m=3, 1y=12
