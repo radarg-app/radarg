@@ -598,7 +598,7 @@ body.lm .subidx-section-header:hover { background:rgba(0,0,0,.018); }
 .subidx-sec-left { display:flex; flex-direction:column; gap:.375rem; min-width:140px; position:relative; z-index:1; }
 .subidx-sec-icon { font-size:22px; line-height:1; margin-bottom:.125rem; }
 .subidx-sec-name { font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--ss-color, var(--ac)); }
-body.lm .subidx-sec-name { color:#0a0a14; }
+body.lm .subidx-sec-name { color:var(--ss-color-dark, #0a0a14); }
 .subidx-sec-score-row { display:flex; align-items:center; gap:.5rem; }
 .subidx-sec-score { font-size:42px; font-weight:800; letter-spacing:-2px; line-height:1; }
 .subidx-sec-badge { font-size:9px; font-weight:700; padding:2px 8px; border-radius:4px; letter-spacing:.05em; text-transform:uppercase; align-self:center; }
@@ -5182,6 +5182,15 @@ function renderIndicators(brechaScore) {
     sect.className = 'subidx-section';
     sect.id = 'seg-' + key;
     sect.style.setProperty('--ss-color', sc);
+    // Variante oscurecida del color identidad, legible sobre fondo claro tintado (light mode)
+    const SS_DARK = {
+      '#f59e0b':'#8a5a00',  // ámbar (Inflación)  → marrón ámbar oscuro
+      '#0ea5e9':'#075985',  // celeste (Cambiario) → azul profundo
+      '#22c55e':'#15803d',  // verde (Actividad)   → verde oscuro
+      '#a855f7':'#7e22ce',  // violeta (Fiscal)    → violeta oscuro
+      '#ec4899':'#be185d'   // rosa (Mercados)     → magenta oscuro
+    };
+    sect.style.setProperty('--ss-color-dark', SS_DARK[sc] || '#0a0a14');
 
     // Prose description per segment
     const proseES = {
