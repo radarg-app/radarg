@@ -316,13 +316,14 @@ nav a:hover { color:var(--text); }
 .ticker-track {
   display:flex; align-items:center;
   white-space:nowrap; flex-shrink:0;
-  animation:tickerScroll 40s linear infinite;
+  animation:tickerScroll var(--ticker-dur,40s) linear infinite;
   will-change:transform;
 }
-/* Mover exactamente la mitad (un set completo) para un loop sin saltos */
+/* Desplaza exactamente el ancho de UN set base (en px, calculado por JS).
+   Como hay varios sets idénticos seguidos, al reiniciar el loop el salto es invisible. */
 @keyframes tickerScroll {
   0%   { transform:translateX(0); }
-  100% { transform:translateX(-50%); }
+  100% { transform:translateX(var(--ticker-shift,-50%)); }
 }
 /* Pausar al pasar el mouse para poder leer */
 .ticker:hover .ticker-track { animation-play-state:paused; }
@@ -2167,12 +2168,6 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
     <div class="t-item"><span class="t-lbl">CCL</span>&nbsp;<span class="t-val tk-ccl">–</span></div>
     <div class="t-item"><span class="t-lbl">Mayorista</span>&nbsp;<span class="t-val tk-may">–</span></div>
     <div class="t-item"><span class="t-lbl">Tarjeta</span>&nbsp;<span class="t-val tk-tar">–</span></div>
-    <div class="t-item"><span class="t-lbl">Oficial</span>&nbsp;<span class="t-val tk-of">–</span></div>
-    <div class="t-item"><span class="t-lbl">Blue</span>&nbsp;<span class="t-val tk-bl">–</span></div>
-    <div class="t-item"><span class="t-lbl">MEP</span>&nbsp;<span class="t-val tk-mep">–</span></div>
-    <div class="t-item"><span class="t-lbl">CCL</span>&nbsp;<span class="t-val tk-ccl">–</span></div>
-    <div class="t-item"><span class="t-lbl">Mayorista</span>&nbsp;<span class="t-val tk-may">–</span></div>
-    <div class="t-item"><span class="t-lbl">Tarjeta</span>&nbsp;<span class="t-val tk-tar">–</span></div>
   </div>
 </div>
 
@@ -3543,7 +3538,17 @@ function setLang(l) {
   document.documentElement.lang = l;
   // Re-render dynamic components
   renderGauge(lastScore);
+  // Guardar qué secciones de subíndice están abiertas (no colapsadas) antes de re-renderizar
+  const openSegs = Array.from(document.querySelectorAll('.subidx-section'))
+    .filter(s => !s.classList.contains('collapsed'))
+    .map(s => s.id);
   renderIndicators(brechaToScore(S.brecha));
+  // Reabrir las secciones que estaban abiertas (renderIndicators las crea colapsadas).
+  // El resumen IA ya se carga dentro de renderIndicators, así que solo hay que expandirlas.
+  openSegs.forEach(id => {
+    const sect = document.getElementById(id);
+    if(sect) sect.classList.remove('collapsed');
+  });
   renderCtx();
   renderNews();
   // Rebuild chart to update axis labels
@@ -4904,17 +4909,57 @@ async function fetchAllLive() {
 
 /* ── Render ticker ─────────────────────────────────────────── */
 function renderTicker() {
-  // El ticker duplica los items para el loop continuo, así que actualizamos
-  // TODOS los elementos de cada clase (no por id).
-  const setAll = (cls, val) => document.querySelectorAll('.'+cls).forEach(e => e.textContent = val);
-  setAll('tk-of',  fmtPeso(S.oficial));
-  setAll('tk-bl',  fmtPeso(S.blue));
-  setAll('tk-mep', fmtPeso(S.mep));
-  setAll('tk-ccl', fmtPeso(S.ccl));
-  setAll('tk-may', fmtPeso(S.mayorista));
-  setAll('tk-tar', fmtPeso(S.tarjeta));
+  const track = document.getElementById('tickerTrack');
+  if(!track) return;
 
+  // Guardar el set base (6 items) la primera vez
+  if(!track.dataset.baseHtml){
+    track.dataset.baseHtml = track.innerHTML;
+  }
+  const baseHtml = track.dataset.baseHtml;
+
+  // Función que rellena los valores en todas las copias presentes
+  const fill = () => {
+    const setAll = (cls, val) => track.querySelectorAll('.'+cls).forEach(e => e.textContent = val);
+    setAll('tk-of',  fmtPeso(S.oficial));
+    setAll('tk-bl',  fmtPeso(S.blue));
+    setAll('tk-mep', fmtPeso(S.mep));
+    setAll('tk-ccl', fmtPeso(S.ccl));
+    setAll('tk-may', fmtPeso(S.mayorista));
+    setAll('tk-tar', fmtPeso(S.tarjeta));
+  };
+
+  // 1. Poner UN set con los valores reales y medir su ancho (tras el layout)
+  track.style.animation = 'none';           // pausar mientras medimos
+  track.style.setProperty('--ticker-shift', '0px');
+  track.innerHTML = baseHtml;
+  fill();
+
+  requestAnimationFrame(() => {
+    const setWidth = track.scrollWidth;       // ancho real de un set con valores
+    const viewport = (track.parentElement && track.parentElement.offsetWidth) || window.innerWidth || 1200;
+    // Cantidad de sets para cubrir holgadamente 2x el viewport (mínimo 3 para fluidez)
+    const sets = Math.max(3, Math.ceil((viewport * 2) / Math.max(setWidth, 1)) + 1);
+    track.innerHTML = baseHtml.repeat(sets);
+    fill();
+    // El loop se desplaza exactamente el ancho de UN set base
+    track.style.setProperty('--ticker-shift', '-' + setWidth + 'px');
+    // Velocidad constante (~70 px/s) → duración proporcional al ancho de un set
+    const dur = Math.max(18, Math.round(setWidth / 70));
+    track.style.setProperty('--ticker-dur', dur + 's');
+    // Reactivar la animación
+    track.style.animation = '';
+  });
 }
+
+// Recalcular el ticker al redimensionar (evita huecos en cualquier ancho/zoom)
+let _tickerResizeTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(_tickerResizeTimer);
+  _tickerResizeTimer = setTimeout(() => {
+    if(typeof S !== 'undefined' && S.oficial) renderTicker();
+  }, 200);
+});
 
 /* ── Render context cards ──────────────────────────────────── */
 function renderCtx() {
