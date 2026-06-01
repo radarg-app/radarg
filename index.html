@@ -5364,23 +5364,7 @@ function generateSegmentSummary(key, seg){
   if(!bodyEl) return;
 
   const field = '_ai_seg_' + key + '_' + (LANG === 'en' ? 'en' : 'es');
-  let txt = (LIVE && LIVE[field]) ? String(LIVE[field]).trim() : '';
-
-  // Recorte de seguridad: el recuadro aguanta cómodamente ~400 caracteres en mobile.
-  // Si el resumen de la IA es más largo, lo cortamos en la última oración o palabra completa.
-  const MAX_LEN = 400;
-  if(txt.length > MAX_LEN){
-    let cut = txt.slice(0, MAX_LEN);
-    // Preferir cortar en el final de una oración (. ! ?) si hay uno razonablemente cerca
-    const lastDot = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('! '), cut.lastIndexOf('? '));
-    if(lastDot > MAX_LEN * 0.6){
-      txt = cut.slice(0, lastDot + 1);
-    } else {
-      // Sino, cortar en la última palabra completa y agregar puntos suspensivos
-      const lastSpace = cut.lastIndexOf(' ');
-      txt = (lastSpace > 0 ? cut.slice(0, lastSpace) : cut).replace(/[.,;:\s]+$/, '') + '…';
-    }
-  }
+  const txt = (LIVE && LIVE[field]) ? String(LIVE[field]).trim() : '';
 
   if(txt && txt.length > 20){
     bodyEl.textContent = txt;
