@@ -2875,7 +2875,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
           </form>
         </div>
       </div>
-      <div class="suggest-submitted" id="suggestThanks">✅ ¡Gracias! Lo voy a leer con atención.</div>
+      <div class="suggest-submitted" id="suggestThanks" data-i18n="popup.thanks">✅ ¡Gracias por tu sugerencia!</div>
     </div>
   </section>
 
@@ -5649,20 +5649,20 @@ function tickStep(n){if(n<=24)return 1;if(n<=48)return 3;if(n<=96)return 6;if(n<
 const MILESTONES=[
   // tipo:'pais' = eventos económicos/políticos del país (se muestran en el gráfico)
   // tipo:'indice' = cambios metodológicos del índice (ocultos del gráfico)
-  {label:'Ene 2002',short:'Default',color:'#ef4444',score:7,tipo:'pais',desc:'Default histórico y pesificación. EMBI: 7.222 bps. Score mínimo del índice.'},
-  {label:'Jun 2005',short:'Reestruc. deuda',color:'#22c55e',score:65,tipo:'pais',desc:'Canje 76% de la deuda. EMBI cae 6.607→795 bps en un día.'},
-  {label:'Jul 2007',short:'Boom exportador',color:'#16a34a',score:74,tipo:'pais',desc:'Reservas USD 45MM, superávit récord, soja en máximos.'},
-  {label:'Oct 2008',short:'Crisis Lehman',color:'#f97316',score:43,tipo:'pais',desc:'Lehman colapsa. Merval cae ~55%.'},
-  {label:'Oct 2011',short:'Cepo cambiario',color:'#f97316',score:52,tipo:'pais',desc:'Se instala el cepo. Brecha nace en 5% y crece por 12 años.'},
-  {label:'Jul 2014',short:'Default técnico',color:'#ef4444',score:19,tipo:'pais',desc:'Fallo Griesa bloquea pagos a bonistas.'},
-  {label:'Dic 2015',short:'Fin del cepo',color:'#22c55e',score:41,tipo:'pais',desc:'Macri unifica el TC y levanta el cepo.'},
-  {label:'Sep 2018',short:'Crisis FMI',color:'#ef4444',score:22,tipo:'pais',desc:'El dólar se duplica. Préstamo FMI: USD 57MM.'},
-  {label:'Ago 2019',short:'Cepo post-PASO',color:'#ef4444',score:11,tipo:'pais',desc:'Derrota en PASO. USD sube 30% en un día. Se reimplanta el cepo.'},
-  {label:'Mar 2020',short:'COVID+Default',color:'#ef4444',score:15,tipo:'pais',desc:'Pandemia. EMBI 4.362 bps. Tercer default argentino.'},
-  {label:'Oct 2023',short:'Brecha 200%+',color:'#ef4444',score:7,tipo:'pais',desc:'Inflación 211% anual. Brecha al 214%. Mínimo post-2002.'},
-  {label:'Dic 2023',short:'Devaluación Milei',color:'#eab308',score:9,tipo:'pais',desc:'Milei asume. Devaluación 118% en el primer día.'},
+  {label:'Ene 2002',short:'Default',short_en:'Default',color:'#ef4444',score:7,tipo:'pais',desc:'Default histórico y pesificación. EMBI: 7.222 bps. Score mínimo del índice.',desc_en:'Historic default and forced pesification. EMBI: 7,222 bps. Lowest score on record.'},
+  {label:'Jun 2005',short:'Reestruc. deuda',short_en:'Debt restructuring',color:'#22c55e',score:65,tipo:'pais',desc:'Canje 76% de la deuda. EMBI cae 6.607→795 bps en un día.',desc_en:'76% of debt swapped. EMBI fell 6,607→795 bps in a single day.'},
+  {label:'Jul 2007',short:'Boom exportador',short_en:'Export boom',color:'#16a34a',score:74,tipo:'pais',desc:'Reservas USD 45MM, superávit récord, soja en máximos.',desc_en:'Reserves USD 45B, record surplus, soybeans at highs.'},
+  {label:'Oct 2008',short:'Crisis Lehman',short_en:'Lehman crisis',color:'#f97316',score:43,tipo:'pais',desc:'Lehman colapsa. Merval cae ~55%.',desc_en:'Lehman collapses. Merval drops ~55%.'},
+  {label:'Oct 2011',short:'Cepo cambiario',short_en:'FX controls',color:'#f97316',score:52,tipo:'pais',desc:'Se instala el cepo. Brecha nace en 5% y crece por 12 años.',desc_en:'Currency controls imposed. FX gap starts at 5% and grows for 12 years.'},
+  {label:'Jul 2014',short:'Default técnico',short_en:'Technical default',color:'#ef4444',score:19,tipo:'pais',desc:'Fallo Griesa bloquea pagos a bonistas.',desc_en:'Griesa ruling blocks payments to bondholders.'},
+  {label:'Dic 2015',short:'Fin del cepo',short_en:'FX controls lifted',color:'#22c55e',score:41,tipo:'pais',desc:'Macri unifica el TC y levanta el cepo.',desc_en:'Macri unifies the exchange rate and lifts currency controls.'},
+  {label:'Sep 2018',short:'Crisis FMI',short_en:'IMF crisis',color:'#ef4444',score:22,tipo:'pais',desc:'El dólar se duplica. Préstamo FMI: USD 57MM.',desc_en:'The dollar doubles. IMF loan: USD 57B.'},
+  {label:'Ago 2019',short:'Cepo post-PASO',short_en:'Post-PASO controls',color:'#ef4444',score:11,tipo:'pais',desc:'Derrota en PASO. USD sube 30% en un día. Se reimplanta el cepo.',desc_en:'Primary election defeat. USD jumps 30% in one day. Currency controls reinstated.'},
+  {label:'Mar 2020',short:'COVID+Default',short_en:'COVID + Default',color:'#ef4444',score:15,tipo:'pais',desc:'Pandemia. EMBI 4.362 bps. Tercer default argentino.',desc_en:'Pandemic. EMBI 4,362 bps. Argentina third default.'},
+  {label:'Oct 2023',short:'Brecha 200%+',short_en:'FX gap 200%+',color:'#ef4444',score:7,tipo:'pais',desc:'Inflación 211% anual. Brecha al 214%. Mínimo post-2002.',desc_en:'211% annual inflation. FX gap at 214%. Lowest since 2002.'},
+  {label:'Dic 2023',short:'Devaluación Milei',short_en:'Milei devaluation',color:'#eab308',score:9,tipo:'pais',desc:'Milei asume. Devaluación 118% en el primer día.',desc_en:'Milei takes office. 118% devaluation on day one.'},
 
-  {label:'May 2026',short:'Brecha negativa',color:'#16a34a',score:56,tipo:'pais',desc:'Blue bajo del oficial. BCRA +USD 7.200M. EMBI: 558 bps.'},
+  {label:'May 2026',short:'Brecha negativa',short_en:'Negative FX gap',color:'#16a34a',score:56,tipo:'pais',desc:'Blue bajo del oficial. BCRA +USD 7.200M. EMBI: 558 bps.',desc_en:'Blue dollar below official. BCRA +USD 7,200M. EMBI: 558 bps.'},
 ];
 
 const milestonesPlugin={
@@ -5965,8 +5965,10 @@ function buildChart(from,to){
               const lbl = _disp(rawLabels[items[0]?.dataIndex]||'');
               const m = MILESTONES.find(m=>m.label===lbl);
               if(!m) return undefined;
-              const out=[`\u{1F4CC}  ${m.short}`];
-              const words=m.desc.split(' '); let cur='';
+              const mShort = (LANG==='en' && m.short_en) ? m.short_en : m.short;
+              const mDesc  = (LANG==='en' && m.desc_en) ? m.desc_en : m.desc;
+              const out=[`\u{1F4CC}  ${mShort}`];
+              const words=mDesc.split(' '); let cur='';
               words.forEach(w=>{const tt=cur?cur+' '+w:w; if(tt.length<=42)cur=tt; else{if(cur)out.push(cur);cur=w;}});
               if(cur) out.push(cur);
               return out;
@@ -6102,7 +6104,8 @@ function buildHitos(){
   MILESTONES.forEach(ev=>{
     const card=document.createElement('div');
     card.className='hito-card'; card.style.setProperty('--hito-color',ev.color);
-    card.innerHTML=`<div class="hito-head"><span class="hito-yr">${ev.label}</span><span class="hito-score" style="background:${ev.color}">${ev.score}</span></div><div class="hito-txt">${ev.desc}</div>`;
+    const evDesc = (LANG==='en' && ev.desc_en) ? ev.desc_en : ev.desc;
+    card.innerHTML=`<div class="hito-head"><span class="hito-yr">${ev.label}</span><span class="hito-score" style="background:${ev.color}">${ev.score}</span></div><div class="hito-txt">${evDesc}</div>`;
     grid.appendChild(card);
   });
 }
@@ -6119,7 +6122,7 @@ function render(){
       const err = document.createElement('div');
       err.className = 'render-error';
       err.style.cssText = 'padding:1rem;color:var(--f);font-size:13px;text-align:center';
-      err.textContent = 'Error al cargar los indicadores. Recargá la página.';
+      err.textContent = LANG==='en' ? 'Error loading indicators. Please reload the page.' : 'Error al cargar los indicadores. Recargá la página.';
       sec.prepend(err);
     }
   }
