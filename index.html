@@ -385,7 +385,7 @@ main { position:relative; z-index:1; max-width:1440px; margin:0 auto; padding:2r
   font-size:13px; font-weight:600; letter-spacing:.08em; text-transform:uppercase;
   margin-bottom:.5rem; display:block;
 }
-.sc-date { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text3); }
+.sc-date { font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text3); white-space:nowrap; }
 .sc-divider { height:1px; background:var(--border); margin:1rem 0; }
 .sc-refs { display:flex; flex-direction:column; gap:.375rem; }
 .sc-ref { display:flex; align-items:center; gap:.75rem; }
@@ -396,7 +396,8 @@ main { position:relative; z-index:1; max-width:1440px; margin:0 auto; padding:2r
   font-size:11px; font-weight:700; padding:1px 6px; border-radius:4px;
   color:#fff; font-family:'JetBrains Mono',monospace;
 }
-.sc-refresh { font-size:10px; color:var(--text3); font-family:'JetBrains Mono',monospace; margin-top:.875rem; display:flex; flex-direction:column; gap:3px; padding-top:.75rem; border-top:1px solid var(--border); }
+.sc-refresh { font-size:9.5px; color:var(--text3); font-family:'JetBrains Mono',monospace; margin-top:.875rem; display:flex; flex-direction:column; gap:3px; padding-top:.75rem; border-top:1px solid var(--border); }
+.sc-refresh-row { white-space:nowrap; }
 .sc-refresh-row { display:flex; align-items:center; gap:5px; }
 .sc-refresh-next { display:flex; align-items:center; gap:5px; color:var(--ac); font-size:9.5px; }
 .sc-refresh-dot { font-size:13px; color:var(--g); line-height:1; flex-shrink:0; }
@@ -2178,7 +2179,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
         <span class="live-dot" style="background:var(--ac);box-shadow:none"></span>
         <span data-i18n="score.sentiment">Sentimiento del mercado</span>
       </div>
-      <div style="font-size:11px;color:var(--text3);margin-bottom:.5rem;margin-top:-.5rem" class="score-subtitle-txt" data-i18n="score.subtitle">¿Cómo está el mercado argentino hoy?</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:.5rem;margin-top:-.5rem;white-space:nowrap" class="score-subtitle-txt" data-i18n="score.subtitle">¿Cómo está el mercado argentino hoy?</div>
       <span class="sc-score" id="gScore">–</span>
       <span class="sc-label" id="gLbl">–</span>
       <span class="sc-date" id="gDate"><span class="sc-live-dot"></span><span id="gDateTxt">–</span></span>
@@ -5073,13 +5074,14 @@ function renderGauge(score){
   const now=new Date();
   if($('gDateTxt')){
     const loc = LANG==='en'?'en-US':'es-AR';
-    const fechaStr = now.toLocaleDateString(loc,{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    // Fecha compacta para que entre en un renglón: "EN VIVO · 31 may 2026"
+    const fechaStr = now.toLocaleDateString(loc,{day:'numeric',month:'short',year:'numeric'});
     const liveWord = S.live ? (LANG==='en'?'LIVE':'EN VIVO') : t('ui.fallback').toUpperCase();
-    $('gDateTxt').textContent = liveWord+' · '+fechaStr+' · '+(S.live?t('ui.realtime'):t('ui.fallback'));
+    $('gDateTxt').textContent = liveWord+' · '+fechaStr;
   }
   if($('gRefreshTime')){
     // Mostrar solo el aviso de actualización diaria (sin "última actualización: hora")
-    $('gRefreshTime').textContent = LANG==='en' ? 'Updated every day at 12:00 (Argentina time)' : 'Se actualiza todos los días a las 12:00 (hora Argentina)';
+    $('gRefreshTime').textContent = LANG==='en' ? 'Updated daily at 12:00 ARG' : 'Se actualiza cada día a las 12:00 ARG';
     const nextEl = $('gRefreshNext');
     if(nextEl) nextEl.style.display='none';
   }
