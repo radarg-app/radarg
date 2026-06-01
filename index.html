@@ -2307,45 +2307,45 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
   <!-- CONTEXT STRIP -->
   <div class="ctx-strip fade fade-2">
         <div class="ctx-card">
-      <div class="ctx-lbl">Dólar Oficial</div>
+      <div class="ctx-lbl" data-i18n="ctx.oficial">Dólar Oficial</div>
       <div class="ctx-val" id="ctx-oficial-val" style="color:var(--g)">–</div>
-      <div class="ctx-sub">Tipo de cambio oficial · dolarapi.com</div>
+      <div class="ctx-sub" data-i18n="ctx.oficial.sub">Tipo de cambio oficial · dolarapi.com</div>
     </div>
         <div class="ctx-card">
-      <div class="ctx-lbl">Dólar Blue</div>
+      <div class="ctx-lbl" data-i18n="ctx.blue">Dólar Blue</div>
       <div class="ctx-val" id="cx-blue" style="color:var(--g)">–</div>
       <div class="ctx-sub" id="cx-blue-sub">–</div>
       <div class="ctx-api">● dolarapi.com</div>
     </div>
         <div class="ctx-card">
-      <div class="ctx-lbl">Dólar MEP</div>
+      <div class="ctx-lbl" data-i18n="ctx.mep">Dólar MEP</div>
       <div class="ctx-val" id="ctx-mep-val" style="color:var(--ac)">–</div>
-      <div class="ctx-sub">Dólar bolsa (AL30) · dolarapi.com</div>
+      <div class="ctx-sub" data-i18n="ctx.mep.sub">Dólar bolsa (AL30) · dolarapi.com</div>
     </div>
     <div class="ctx-card">
-      <div class="ctx-lbl">Riesgo País</div>
+      <div class="ctx-lbl" data-i18n="ctx.embi">Riesgo País</div>
       <div class="ctx-val" id="ctx-embi-val" style="color:var(--n)">–</div>
       <div class="ctx-sub" id="ctx-embi-sub">–</div>
     </div>
     <div class="ctx-card">
-      <div class="ctx-lbl">Merval USD</div>
+      <div class="ctx-lbl" data-i18n="ctx.merval">Merval USD</div>
       <div class="ctx-val" id="ctx-merval-val" style="color:var(--f)">–</div>
-      <div class="ctx-sub">BYMA · Bolsa de Buenos Aires</div>
+      <div class="ctx-sub" data-i18n="ctx.merval.sub">BYMA · Bolsa de Buenos Aires</div>
     </div>
     <div class="ctx-card">
-      <div class="ctx-lbl">Reservas BCRA</div>
+      <div class="ctx-lbl" data-i18n="ctx.reservas">Reservas BCRA</div>
       <div class="ctx-val" id="ctx-reservas-val" style="color:var(--g)">–</div>
       <div class="ctx-sub" id="ctx-ipc-sub">ArgentinaDatos/BCRA</div>
     </div>
     <div class="ctx-card">
-      <div class="ctx-lbl">Inflación mensual</div>
+      <div class="ctx-lbl" data-i18n="ctx.ipc">Inflación mensual</div>
       <div class="ctx-val" id="ctx-ipc-val" style="color:var(--fe)">–</div>
-      <div class="ctx-sub">INDEC vía ArgentinaDatos</div>
+      <div class="ctx-sub" data-i18n="ctx.ipc.sub">INDEC vía ArgentinaDatos</div>
     </div>
     <div class="ctx-card">
-      <div class="ctx-lbl">Confianza en el Gobierno</div>
+      <div class="ctx-lbl" data-i18n="ctx.icg">Confianza en el Gobierno</div>
       <div class="ctx-val" id="ctx-icg-val" style="color:var(--ac)">–</div>
-      <div class="ctx-sub">ICG UTDT · mensual</div>
+      <div class="ctx-sub" data-i18n="ctx.icg.sub">ICG UTDT · mensual</div>
     </div>
   </div>
   <div class="ctx-carousel-hint">← <span data-i18n="ctx.swipe">Deslizá para ver todos los datos</span> →</div>
@@ -3222,6 +3222,14 @@ const T = {
     'ctx.brecha':'Brecha Cambiaria','ctx.brecha.sub':'Blue vs. oficial',
     'ctx.ccl':'Dólar CCL','ctx.ccl.sub':'Contado con liquidación',
     'ctx.swipe':'Deslizá para ver todos los datos',
+    'ctx.oficial':'Dólar Oficial','ctx.oficial.sub':'Tipo de cambio oficial · dolarapi.com',
+    'ctx.blue':'Dólar Blue',
+    'ctx.mep':'Dólar MEP','ctx.mep.sub':'Dólar bolsa (AL30) · dolarapi.com',
+    'ctx.embi':'Riesgo País',
+    'ctx.merval':'Merval USD','ctx.merval.sub':'BYMA · Bolsa de Buenos Aires',
+    'ctx.reservas':'Reservas BCRA',
+    'ctx.ipc':'Inflación mensual','ctx.ipc.sub':'INDEC vía ArgentinaDatos',
+    'ctx.icg':'Confianza en el Gobierno','ctx.icg.sub':'ICG UTDT · mensual',
     // ── Footer ──
     'footer.update':'Índice actualizado todos los días a las 12:00',
     // ── Metodología: simple (nuevas) ──
@@ -3483,6 +3491,14 @@ const T = {
     'ctx.brecha':'FX Gap','ctx.brecha.sub':'Blue vs. official',
     'ctx.ccl':'CCL Dollar','ctx.ccl.sub':'Contado con liqui (CCL)',
     'ctx.swipe':'Swipe to see all the data',
+    'ctx.oficial':'Official Dollar','ctx.oficial.sub':'Official exchange rate · dolarapi.com',
+    'ctx.blue':'Blue Dollar',
+    'ctx.mep':'MEP Dollar','ctx.mep.sub':'Stock-market dollar (AL30) · dolarapi.com',
+    'ctx.embi':'Country Risk',
+    'ctx.merval':'Merval USD','ctx.merval.sub':'BYMA · Buenos Aires Stock Exchange',
+    'ctx.reservas':'BCRA Reserves',
+    'ctx.ipc':'Monthly Inflation','ctx.ipc.sub':'INDEC via ArgentinaDatos',
+    'ctx.icg':'Government Confidence','ctx.icg.sub':'ICG UTDT · monthly',
     // ── Footer ──
     'footer.update':'Index updated every day at 12:00',
     // ── Methodology: simple (new) ──
@@ -4966,7 +4982,7 @@ function renderCtx() {
   const bp=S.brecha;
   const bc=bp<0?'var(--g)':bp<10?'var(--g)':bp<30?'var(--n)':bp<80?'var(--f)':'var(--fe)';
   const bv=$('cx-blue'); if(bv){bv.textContent=fmtPeso(S.blue);bv.style.color=bc;}
-  const bs=$('cx-blue-sub'); if(bs) bs.textContent=`Oficial ${fmtPeso(S.oficial)} · Brecha ${fmtPct(bp)}`;
+  const bs=$('cx-blue-sub'); if(bs) bs.textContent=(LANG==='en'?`Official ${fmtPeso(S.oficial)} · Gap ${fmtPct(bp)}`:`Oficial ${fmtPeso(S.oficial)} · Brecha ${fmtPct(bp)}`);
   const ev=$('ctx-embi-val'); if(ev){ev.textContent=LIVE.embi.bps+' bps';const c=LIVE.embi.bps<400?'var(--g)':LIVE.embi.bps<700?'var(--n)':LIVE.embi.bps<1200?'var(--f)':'var(--fe)';ev.style.color=c;}
   const es=$('ctx-embi-sub'); if(es) es.textContent=`EMBI · ArgentinaDatos`;
   const mv=$('ctx-merval-val'); if(mv) mv.textContent=LIVE.merval.raw;
