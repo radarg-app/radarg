@@ -640,7 +640,9 @@ body.lm .subidx-ai-body { color:#2a2a40; }
   gap:.75rem; padding:1rem 1.5rem 1.25rem;
 }
 @media(max-width:900px){ .subidx-vars { grid-template-columns:repeat(2,1fr); } }
-@media(max-width:520px){ .subidx-vars { grid-template-columns:1fr; } }
+@media(max-width:600px){ .subidx-vars { grid-template-columns:1fr; gap:.625rem; padding:1rem 1rem 1.25rem; } }
+@media(max-width:600px){ .subidx-close-btn { width:calc(100% - 2rem); margin:0 1rem 1.25rem; } }
+@media(max-width:600px){ .subidx-ai-summary { margin:0 1rem 1rem; } }
 
 .var-card {
   background:var(--bg3); border:1px solid var(--border);
@@ -652,7 +654,7 @@ body.lm .subidx-ai-body { color:#2a2a40; }
 .var-card:hover { transform:translateY(-1px); box-shadow:0 4px 14px rgba(0,0,0,.2); }
 .var-card.unavailable { opacity:.5; }
 .var-card-top { display:flex; justify-content:space-between; align-items:flex-start; gap:.25rem; margin-bottom:3px; }
-.var-card-name { font-size:9px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--text3); line-height:1.35; flex:1; }
+.var-card-name { font-size:10.5px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--text3); line-height:1.35; flex:1; }
 .var-card-badge-unavail {
   font-size:7.5px; font-weight:700; background:rgba(245,158,11,.12); color:#f59e0b;
   border:1px solid rgba(245,158,11,.2); padding:1px 5px; border-radius:2px; white-space:nowrap; flex-shrink:0;
@@ -661,7 +663,38 @@ body.lm .subidx-ai-body { color:#2a2a40; }
 .var-card-score { font-size:30px; font-weight:800; letter-spacing:-1px; line-height:1; }
 .ind-badge { font-size:8.5px; font-weight:700; padding:2px 6px; border-radius:3px; letter-spacing:.04em; text-transform:uppercase; flex-shrink:0; align-self:center; }
 .var-card-raw { font-size:10.5px; font-weight:600; line-height:1.4; margin-bottom:2px; font-family:'JetBrains Mono',monospace; }
-.var-card-desc { font-size:9.5px; color:var(--text3); line-height:1.5; margin-bottom:3px; }
+.var-card-desc { font-size:13.5px; color:var(--text3); line-height:1.6; margin-bottom:6px; }
+
+/* Valor del dato (arriba) — tamaño ameno, no desproporcionado */
+.var-card-value {
+  font-size:14px; font-weight:700; letter-spacing:-.2px; line-height:1.35;
+  margin-bottom:5px; font-family:'JetBrains Mono',monospace;
+  word-break:break-word;
+}
+/* Bloque del puntaje: pill a ancho completo, debajo del título */
+.var-card-score-block { margin:5px 0 7px; }
+.var-card-score-pill {
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  width:100%; padding:6px 11px; border-radius:7px; font-weight:700;
+  border:1px solid color-mix(in srgb, currentColor 28%, transparent);
+  box-sizing:border-box;
+}
+.var-card-score-num { font-size:16px; font-weight:800; letter-spacing:-.5px; line-height:1; }
+.var-card-score-lbl { font-size:9.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; opacity:.9; }
+
+/* Botón "Cerrar sección": horizontal, fino, abarca el ancho */
+.subidx-close-btn {
+  display:block; width:calc(100% - 3rem); margin:0 1.5rem 1.25rem;
+  padding:9px 0; border-radius:8px; cursor:pointer;
+  background:var(--bg3); border:1px solid var(--border);
+  color:var(--text2); font-family:'Inter',sans-serif;
+  font-size:11.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+  transition:background .15s, border-color .15s, color .15s;
+}
+.subidx-close-btn:hover { background:var(--bg4); border-color:var(--border2); color:var(--text); }
+body.lm .subidx-close-btn { background:#f0f1f5; border-color:rgba(0,0,0,.10); color:#2a2a40; }
+body.lm .subidx-close-btn:hover { background:#e6e8ef; border-color:rgba(0,0,0,.18); color:#0a0a14; }
+body.lm .var-card-desc { color:#3a3a52; }
 .var-card-unavail-note { font-size:9px; color:#f59e0b; line-height:1.5; margin-bottom:3px; font-style:italic; }
 .var-card-bar { height:2px; background:rgba(255,255,255,.07); border-radius:1px; overflow:hidden; margin:4px 0 3px; }
 body.lm .var-card-bar { background:rgba(0,0,0,.07); }
@@ -5302,10 +5335,13 @@ function renderIndicators(brechaScore) {
           <div class="subidx-ai-summary" id="ai-summary-${key}">
             <div class="subidx-ai-head">
               <span class="subidx-ai-icon">✦</span>
-              <span>${LANG==='en'?'AI summary':'Resumen con IA'}</span>
+              <span>${(LANG==='en'?'Summary of ':'Resumen de ')+seg.name}</span>
             </div>
             <div class="subidx-ai-body loading" id="ai-summary-body-${key}">${LANG==='en'?'Generating summary…':'Generando resumen…'}</div>
           </div>
+          <button class="subidx-close-btn" type="button" data-close-seg="${key}">
+            ${LANG==='en'?'Close section':'Cerrar sección'} ▴
+          </button>
         </div>
       </div>
     `;
@@ -5329,6 +5365,19 @@ function renderIndicators(brechaScore) {
         generateSegmentSummary(key, seg);
       }
     });
+
+    // Botón "Cerrar sección": colapsa y lleva el scroll al inicio de la sección
+    const closeBtn = sect.querySelector('[data-close-seg]');
+    if(closeBtn){
+      closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        sect.classList.add('collapsed');
+        const header = document.querySelector('header');
+        const headerH = header ? header.offsetHeight : 52;
+        const top = sect.getBoundingClientRect().top + window.pageYOffset - headerH - 12;
+        window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+      });
+    }
 
     sections.appendChild(sect);
 
@@ -5376,13 +5425,15 @@ function renderIndicators(brechaScore) {
           ${monthBadge}
           ${v.unavailable ? '<span class="var-card-badge-unavail">'+(LANG==="en"?"PENDING":"PENDIENTE")+'</span>' : ''}
         </div>
-        <div class="var-card-score-row">
-          <span class="var-card-score" style="color:${vc}"${v.unavailable?'':` data-score="${vs}"`}>${v.unavailable ? '—' : vs}</span>
-          <span class="ind-badge" style="background:${vbg};color:${vc}"${v.unavailable?'':` data-score="${vs}"`}>${vlbl}</span>
-        </div>
-        ${v.raw ? `<div class="var-card-raw" style="color:${vc}"${v.unavailable?'':` data-score="${vs}"`}>${v.raw}</div>` : ''}
+        ${v.raw ? `<div class="var-card-value" style="color:${vc}"${v.unavailable?'':` data-score="${vs}"`}>${v.raw}</div>` : ''}
         ${v.unavailNote ? `<div class="var-card-unavail-note">${v.unavailNote}</div>` : ''}
         ${v.desc ? `<div class="var-card-desc">${v.desc}</div>` : ''}
+        <div class="var-card-score-block">
+          <span class="var-card-score-pill" style="background:${vbg};color:${vc}"${v.unavailable?'':` data-score="${vs}" data-score-role="pill"`}>
+            <span class="var-card-score-num">${v.unavailable ? '—' : vs}</span>
+            <span class="var-card-score-lbl">${vlbl}</span>
+          </span>
+        </div>
         <div class="var-card-bar"><div class="var-card-bar-fill" style="background:${v.unavailable?'#4b5563':vc};width:${v.unavailable?0:vs}%"${v.unavailable?'':` data-score="${vs}" data-score-role="bar"`}></div></div>
         <div class="var-card-src">
           <span class="ind-source-dot" style="background:${dotColor};${dotAnim}"></span>
@@ -6243,6 +6294,10 @@ function recolorScores(){
     const col = scoreColor(sv);
     if(el.dataset.scoreRole === 'bar'){
       el.style.background = col;
+    } else if(el.dataset.scoreRole === 'pill'){
+      // El pill de puntaje: fondo translúcido + texto del color del score
+      el.style.background = scoreBg(sv);
+      el.style.color = col;
     } else {
       el.style.color = col;
     }
