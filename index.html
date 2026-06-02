@@ -665,13 +665,13 @@ body.lm .subidx-ai-body { color:#2a2a40; }
 .var-card-raw { font-size:10.5px; font-weight:600; line-height:1.4; margin-bottom:2px; font-family:'JetBrains Mono',monospace; }
 .var-card-desc { font-size:13.5px; color:var(--text3); line-height:1.6; margin-bottom:6px; }
 
-/* Valor del dato (arriba) — tamaño ameno, no desproporcionado */
+/* Valor del dato — claro y legible, con buen formato multilínea */
 .var-card-value {
-  font-size:14px; font-weight:700; letter-spacing:-.2px; line-height:1.35;
-  margin-bottom:5px; font-family:'JetBrains Mono',monospace;
+  font-size:14px; font-weight:700; letter-spacing:-.1px; line-height:1.4;
+  margin-bottom:6px; font-family:'Inter',sans-serif;
   word-break:break-word;
 }
-/* Bloque del puntaje: pill a ancho completo, debajo del título */
+/* Bloque del puntaje: pill a ancho completo */
 .var-card-score-block { margin:5px 0 7px; }
 .var-card-score-pill {
   display:flex; align-items:center; justify-content:center; gap:8px;
@@ -694,7 +694,6 @@ body.lm .subidx-ai-body { color:#2a2a40; }
 .subidx-close-btn:hover { background:var(--bg4); border-color:var(--border2); color:var(--text); }
 body.lm .subidx-close-btn { background:#f0f1f5; border-color:rgba(0,0,0,.10); color:#2a2a40; }
 body.lm .subidx-close-btn:hover { background:#e6e8ef; border-color:rgba(0,0,0,.18); color:#0a0a14; }
-body.lm .var-card-desc { color:#3a3a52; }
 .var-card-unavail-note { font-size:9px; color:#f59e0b; line-height:1.5; margin-bottom:3px; font-style:italic; }
 .var-card-bar { height:2px; background:rgba(255,255,255,.07); border-radius:1px; overflow:hidden; margin:4px 0 3px; }
 body.lm .var-card-bar { background:rgba(0,0,0,.07); }
@@ -730,6 +729,32 @@ body.lm .var-card-bar { background:rgba(0,0,0,.07); }
 .czl-name  { font-size:11px; font-weight:600; color:var(--text); }
 .czl-range { font-size:10px; color:var(--text3); font-family:'JetBrains Mono',monospace; }
 .chart-wrap { position:relative; height:420px; overflow:hidden; width:100%; }
+#histChart { cursor:pointer; }
+
+/* Panel flotante del hito (al tocar un punto en el gráfico) */
+.milestone-panel {
+  position:absolute; top:14px; left:50%; transform:translateX(-50%) translateY(-8px);
+  z-index:20; width:min(340px, calc(100% - 28px));
+  background:var(--bg2); border:1px solid var(--border2);
+  border-radius:12px; padding:14px 16px 16px;
+  box-shadow:0 10px 36px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.04);
+  opacity:0; pointer-events:none; transition:opacity .2s, transform .2s;
+}
+.milestone-panel.open { opacity:1; pointer-events:auto; transform:translateX(-50%) translateY(0); }
+body.lm .milestone-panel { box-shadow:0 10px 36px rgba(0,0,0,.18), 0 0 0 1px rgba(0,0,0,.05); }
+.milestone-panel-close {
+  position:absolute; top:8px; right:9px; width:24px; height:24px;
+  border:none; background:transparent; color:var(--text3); cursor:pointer;
+  font-size:15px; line-height:1; border-radius:6px; transition:background .15s, color .15s;
+}
+.milestone-panel-close:hover { background:var(--bg3); color:var(--text); }
+.milestone-panel-head { display:flex; align-items:center; gap:8px; margin-bottom:7px; padding-right:24px; }
+.milestone-panel-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; background:var(--mp-color,var(--ac)); box-shadow:0 0 8px var(--mp-color,var(--ac)); }
+.milestone-panel-year { font-size:11px; font-weight:700; letter-spacing:.05em; color:var(--text3); font-family:'JetBrains Mono',monospace; text-transform:uppercase; }
+.milestone-panel-score-row { display:flex; justify-content:flex-end; margin-top:10px; }
+.milestone-panel-score { font-size:13px; font-weight:800; color:#fff; background:var(--mp-color,var(--ac)); padding:3px 11px; border-radius:6px; }
+.milestone-panel-title { font-size:15px; font-weight:800; letter-spacing:-.2px; color:var(--text); margin-bottom:5px; line-height:1.25; }
+.milestone-panel-desc { font-size:12.5px; line-height:1.6; color:var(--text2); }
 
 /* ── Merval toggle switch ─────────────────────────────────── */
 .merval-switch-wrap {
@@ -2478,8 +2503,20 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
           </label>
         </div>
       </div>
-      <div class="chart-wrap">
+      <div class="chart-wrap" style="position:relative">
         <canvas id="histChart"></canvas>
+        <div id="milestonePanel" class="milestone-panel" role="dialog" aria-hidden="true">
+          <button class="milestone-panel-close" type="button" aria-label="Cerrar" onclick="closeMilestonePanel()">✕</button>
+          <div class="milestone-panel-head">
+            <span class="milestone-panel-dot"></span>
+            <span class="milestone-panel-year" id="mpYear"></span>
+          </div>
+          <div class="milestone-panel-title" id="mpTitle"></div>
+          <div class="milestone-panel-desc" id="mpDesc"></div>
+          <div class="milestone-panel-score-row">
+            <span class="milestone-panel-score" id="mpScore"></span>
+          </div>
+        </div>
       </div>
       <div class="range-wrap">
         <div style="font-size:9px;color:var(--text3);text-align:center;margin-bottom:4px;font-family:'JetBrains Mono',monospace" class="slider-hint-txt" data-i18n="chart.sliderHint">Arrastrá los extremos para ajustar el período</div>
@@ -4144,24 +4181,31 @@ function computeSubIndices(bs) {
   const seg1 = [
     { name: es?'IPC Mensual (INDEC)':'Monthly CPI (INDEC)', freq:'mensual',
       w:22, score: ipcScore2, src:'INDEC', live: LIVE.tasaReal.live,
-      raw: LIVE.tasaReal.ipc ? `${LIVE.tasaReal.ipc.toFixed(1)}%/mes` : '',
+      raw: LIVE.tasaReal.ipc ? `${es?'Inflación mensual':'Monthly inflation'}: ${LIVE.tasaReal.ipc.toFixed(1)}%` : '',
       desc: es?'Inflación mensual oficial. Es la variable más sentida por el ciudadano y el termómetro principal del desequilibrio monetario.'
              :'Official monthly inflation. Most felt by citizens and the main thermometer of monetary imbalance.' },
     { name: es?'Tasa Real ex-ante':'Real Rate ex-ante', freq:'diario',
       w:20, score: tasaScore, src:'BCRA/INDEC+REM', live: LIVE.tasaReal.live,
-      raw: LIVE.tasaReal.raw || '',
-      desc: es?'Rendimiento real de un plazo fijo (TNA/12 menos inflación). Una tasa negativa castiga el ahorro en pesos y empuja a los argentinos hacia el dólar como reserva de valor.'
-             :'Real return of time deposits (TNA/12 − blended CPI). Negative rate discourages peso savings and incentivizes dollarization.' },
+      raw: (()=>{
+        const tna = LIVE.tasaReal.tna, rem = LIVE.tasaReal.rem12m;
+        if(tna!=null && rem!=null) return es
+          ? `TNA ${tna.toFixed(1)}% vs ${rem.toFixed(1)}% (REM 12m)`
+          : `Rate ${tna.toFixed(1)}% vs ${rem.toFixed(1)}% (12m exp.)`;
+        if(tna!=null) return es ? `TNA ${tna.toFixed(1)}%` : `Rate ${tna.toFixed(1)}%`;
+        return LIVE.tasaReal.raw || '';
+      })(),
+      desc: es?'Compara la tasa de plazo fijo (TNA) con la inflación esperada a 12 meses (REM). Si la tasa le gana a la inflación esperada, conviene ahorrar en pesos; si pierde, empuja hacia el dólar.'
+             :'Compares the time-deposit rate (TNA) with expected 12-month inflation (REM). If the rate beats expected inflation, saving in pesos pays off; if it loses, it pushes toward the dollar.' },
     { name: es?'Expectativas de Inflación 12m (REM)':'12m Inflation Expectations', freq:'mensual',
       w:20, score: remScore, src:'BCRA REM', live: !!LIVE.tasaReal.rem12m,
-      raw: LIVE.tasaReal.rem12m ? `REM 12m: ${LIVE.tasaReal.rem12m.toFixed(1)}% i.a.` : '',
+      raw: LIVE.tasaReal.rem12m ? `${es?'Inflación esperada 12m':'Expected inflation 12m'}: ${LIVE.tasaReal.rem12m.toFixed(1)}%` : '',
       desc: es?'Qué espera el mercado que pase con la inflación en el próximo año. Expectativas altas reflejan desconfianza en el ancla nominal.'
              :'What the market expects inflation to do over the next year. High expectations reflect distrust in the nominal anchor.' },
     { name: es?'Inflación Núcleo':'Core Inflation', freq:'mensual',
       w:18, score: ipcNucleo!=null ? ipcScore(ipcNucleo) : 50,
       src: ipcNucleo!=null ? 'datos.gob.ar' : NA,
       live: ipcNucleo!=null, unavailable: ipcNucleo==null,
-      raw: ipcNucleo!=null ? `${ipcNucleo.toFixed(1)}%/mes` : '',
+      raw: ipcNucleo!=null ? `${es?'Núcleo mensual':'Core monthly'}: ${ipcNucleo.toFixed(1)}%` : '',
       unavailNote: ipcNucleo==null ? (es?'Dato mensual INDEC. En desarrollo.':'Monthly INDEC figure. In development.') : '',
       desc: es?'IPC sin estacionales ni regulados. Mide la inflación subyacente que el Banco Central puede realmente influir con política monetaria.'
              :'CPI excluding seasonal and regulated items. Measures underlying inflation that monetary policy can actually influence.' },
@@ -4169,7 +4213,7 @@ function computeSubIndices(bs) {
       w:12, score: faeV!=null ? faeScore(faeV) : 50,
       src: faeV!=null ? 'BCRA Bal. Cambiario + IA' : NA,
       live: faeV!=null, unavailable: faeV==null,
-      raw: faeV!=null ? `US$ ${(faeV/1000).toFixed(2)}k M` : '',
+      raw: faeV!=null ? `US$ ${Math.round(faeV).toLocaleString(es?'es-AR':'en-US')} ${es?'millones':'million'}` : '',
       unavailNote: faeV==null ? (es?'Dato mensual BCRA. Termómetro directo de fuga de pesos. En desarrollo.'
                     :'Monthly BCRA figure. Direct thermometer of peso flight. In development.') : '',
       desc: es?'Formación de Activos Externos: compra neta de billetes por parte de personas físicas. Cuando los argentinos corren al dólar, el índice cae. Niveles superiores a 1.000 millones mensuales son históricamente críticos.'
@@ -4178,7 +4222,7 @@ function computeSubIndices(bs) {
       w:8, score: depPFV!=null ? depositosPFScore(depPFV) : 50,
       src: depPFV!=null ? 'BCRA + IPC' : NA,
       live: depPFV!=null, unavailable: depPFV==null,
-      raw: depPFV!=null ? `${depPFV>0?'+':''}${depPFV.toFixed(1)}% real` : '',
+      raw: depPFV!=null ? `${es?'Variación real':'Real change'}: ${depPFV>0?'+':''}${depPFV.toFixed(1)}%` : '',
       unavailNote: depPFV==null ? (es?'Dato mensual BCRA. En desarrollo.' : 'Monthly BCRA figure. In development.') : '',
       desc: es?'Variación real mensual de los depósitos a plazo fijo. Refleja confianza en el peso: si suben, los ahorristas prefieren la moneda local.'
              :'Real monthly change in time deposits. Reflects confidence in the peso: rising deposits mean savers prefer local currency.' },
@@ -4195,9 +4239,13 @@ function computeSubIndices(bs) {
     { name: es?'Reservas Netas BCRA':'BCRA Net Reserves', freq:'diario',
       w:22, score: reservasNetasScore(resNetas ?? LIVE.reservas.mM), src:'BCRA', live: resNetas!=null||LIVE.reservas.live,
       raw: (()=>{
-        const brutas = LIVE.reservas.mM ? `brutas USD ${(LIVE.reservas.mM/1000).toFixed(1)}bn` : '';
-        const netas  = resNetas!=null ? `netas USD ${(resNetas/1000).toFixed(1)}bn` : '';
-        return [netas, brutas].filter(Boolean).join(' · ') || (LIVE.reservas.raw||'');
+        const fmtM = m => 'USD ' + Math.round(m).toLocaleString(es?'es-AR':'en-US') + (es?' millones':' million');
+        const netasLbl  = es ? 'Reservas Netas' : 'Net Reserves';
+        const brutasLbl = es ? 'Reservas Brutas' : 'Gross Reserves';
+        const lineas = [];
+        if(resNetas!=null) lineas.push(`${netasLbl}: ${fmtM(resNetas)}`);
+        if(LIVE.reservas.mM) lineas.push(`${brutasLbl}: ${fmtM(LIVE.reservas.mM)}`);
+        return lineas.length ? lineas.join('<br>') : (LIVE.reservas.raw||'');
       })(),
       desc: es?'Reservas netas del BCRA (reservas brutas menos pasivos con el FMI y otros organismos). Son los dólares realmente disponibles para defender el tipo de cambio o cubrir vencimientos de deuda externa.'
              :'Net reserves (gross minus liabilities). The dollars actually available to defend the exchange rate or pay debt.' },
@@ -4210,7 +4258,7 @@ function computeSubIndices(bs) {
       w:18, score: comprasBCRA!=null ? mlcScore(comprasBCRA) : 50,
       src: comprasBCRA!=null ? 'BCRA v4' : NA,
       live: comprasBCRA!=null, unavailable: comprasBCRA==null,
-      raw: comprasBCRA!=null ? `USD ${comprasBCRA>0?'+':''}${Math.round(comprasBCRA)}M` : '',
+      raw: comprasBCRA!=null ? `${es?'Compras netas':'Net purchases'}: USD ${comprasBCRA>0?'+':''}${Math.round(comprasBCRA)}M` : '',
       unavailNote: comprasBCRA==null ? (es?'Dato diario BCRA. En desarrollo.':'Daily BCRA figure. In development.') : '',
       desc: es?'Compras y ventas netas diarias del BCRA en el Mercado Libre de Cambios. Valores positivos indican acumulación de reservas; valores negativos revelan pérdida de reservas y presión sobre el tipo de cambio.'
              :'Daily BCRA net purchases in the FX market. Positive = reserve accumulation; negative = reserve loss.' },
@@ -4218,7 +4266,7 @@ function computeSubIndices(bs) {
       w:22, score: tcrm!=null ? tcrmScore(tcrm) : 50,
       src: tcrm!=null ? 'datos.gob.ar/BCRA' : NA,
       live: tcrm!=null, unavailable: tcrm==null,
-      raw: tcrm!=null ? `TCRM: ${tcrm.toFixed(1)} (base 100)` : '',
+      raw: tcrm!=null ? `${es?'Índice TCRM':'REER index'}: ${tcrm.toFixed(1)} ${es?'(base 100)':'(base 100)'}` : '',
       unavailNote: tcrm==null ? (es?'Índice BCRA mensual. En desarrollo.':'Monthly BCRA index. In development.') : '',
       desc: es?'Tipo de Cambio Real Multilateral contra los principales socios comerciales. Históricamente, las apreciaciones reales excesivas precedieron todos los grandes saltos cambiarios de la historia argentina.'
              :'Real Multilateral Exchange Rate. Historically, excessive real appreciation precedes all major FX jumps in Argentina.' },
@@ -4226,13 +4274,13 @@ function computeSubIndices(bs) {
       w:13, score: rofexV!=null ? rofexScore(rofexV) : 50,
       src: rofexV!=null ? 'datos.gob.ar (Rofex/BCRA)' : NA,
       live: rofexV!=null, unavailable: rofexV==null,
-      raw: rofexV!=null ? `${rofexV.toFixed(1)}% deval. impl. anual` : '',
+      raw: rofexV!=null ? `${es?'Devaluación implícita anual':'Implied annual devaluation'}: ${rofexV.toFixed(1)}%` : '',
       unavailNote: rofexV==null ? (es?'Mercado ROFEX. Expectativas de devaluación implícitas en los futuros. En desarrollo.' : 'ROFEX market. Implicit devaluation expectations from futures. In development.') : '',
       desc: es?'Devaluación implícita anualizada en los futuros de dólar (ROFEX) comparada con el tipo de cambio oficial spot. Refleja directamente cuánta devaluación espera el mercado financiero en los próximos meses.'
              :'Annualized implicit devaluation in dollar futures (ROFEX) vs. the official spot. Measures how much devaluation the financial market expects.' },
     { name: es?'Liquidación Agro (CIARA)':'Agro FX Liquidation', freq:'semanal',
       w:10, score: sojaScore(LIVE.soja), src:'Yahoo Finance', live: !!LIVE.soja,
-      raw: LIVE.soja ? `Soja CBOT: USD ${Math.round(LIVE.soja)}/tn` : '',
+      raw: LIVE.soja ? `${es?'Soja (CBOT)':'Soybean (CBOT)'}: USD ${Math.round(LIVE.soja)}/${es?'tonelada':'ton'}` : '',
       desc: es?'Proxy de la liquidación del agro usando el precio de la soja CBOT. El agro aporta ~65% de las exportaciones argentinas. Precio alto = más dólares.'
              :'Proxy for agro FX liquidation using CBOT soybean price. Agro contributes ~65% of Argentine exports. High price = more dollars.' },
   ];
@@ -4249,7 +4297,7 @@ function computeSubIndices(bs) {
       w:20, score: emaeV!=null ? emaeScore(emaeV) : 50,
       src: emaeV!=null ? 'datos.gob.ar/INDEC' : NA,
       live: emaeV!=null, unavailable: emaeV==null,
-      raw: emaeV!=null ? `Var. mensual: ${emaeV>0?'+':''}${emaeV.toFixed(1)}%` : '',
+      raw: emaeV!=null ? `${es?'Variación mensual':'Monthly change'}: ${emaeV>0?'+':''}${emaeV.toFixed(1)}%` : '',
       unavailNote: emaeV==null ? (es?'Dato mensual INDEC. En desarrollo.':'Monthly INDEC figure. In development.') : '',
       desc: es?'Estimador Mensual de Actividad Económica del INDEC. Es el indicador de mayor frecuencia que tiene Argentina para medir el crecimiento o la recesión de la economía antes de que llegue el dato oficial del PBI.'
              :'Monthly Economic Activity Estimator. The most representative high-frequency indicator of growth or recession.' },
@@ -4257,7 +4305,7 @@ function computeSubIndices(bs) {
       w:22, score: ripteV!=null ? ripteScore(ripteV) : 50,
       src: ripteV!=null ? 'datos.gob.ar' : NA,
       live: ripteV!=null, unavailable: ripteV==null,
-      raw: ripteV!=null ? `Var. real: ${ripteV>0?'+':''}${ripteV.toFixed(1)}%` : '',
+      raw: ripteV!=null ? `${es?'Variación real':'Real change'}: ${ripteV>0?'+':''}${ripteV.toFixed(1)}%` : '',
       unavailNote: ripteV==null ? (es?'Dato mensual. En desarrollo.':'Monthly figure. In development.') : '',
       desc: es?'Variación real del salario promedio registrado (RIPTE) frente a la inflación, medida año a año. Es la variable que más directamente captura si el trabajador típico gana o pierde poder adquisitivo en el ciclo actual.'
              :'Real average wage change vs inflation (YoY). Most directly captures whether the typical worker is gaining or losing purchasing power.' },
@@ -4265,7 +4313,7 @@ function computeSubIndices(bs) {
       w:17, score: cMasV!=null ? consumoMasivoScore(cMasV) : 50,
       src: cMasV!=null ? 'INDEC datos.gob.ar' : NA,
       live: cMasV!=null, unavailable: cMasV==null,
-      raw: cMasV!=null ? `Var. i.a.: ${cMasV>0?'+':''}${cMasV.toFixed(1)}%` : '',
+      raw: cMasV!=null ? `${es?'Variación interanual':'Year-over-year change'}: ${cMasV>0?'+':''}${cMasV.toFixed(1)}%` : '',
       desc: es?'Variación real de ventas en supermercados. Proxy del consumo de bienes no durables y de primera necesidad.':'Real change in supermarket sales. Proxy for non-durable goods consumption.',
       unavailNote: cMasV==null ? (es?'Ventas supermercados INDEC en términos reales. Buscando serie en datos.gob.ar.':'INDEC supermarket sales in real terms. Sourcing series from datos.gob.ar.') : '',
     },
@@ -4273,7 +4321,7 @@ function computeSubIndices(bs) {
       w:18, score: iccV!=null ? iccScoreFn(iccV) : 50,
       src: iccV!=null ? 'UTDT' : NA,
       live: iccV!=null, unavailable: iccV==null,
-      raw: iccV!=null ? `${iccV.toFixed(1)} pts` : '',
+      raw: iccV!=null ? `${es?'Índice':'Index'}: ${iccV.toFixed(1)} ${es?'puntos':'points'}` : '',
       unavailNote: iccV==null ? (es?'Dato mensual UTDT (distinto del ICG). Mide predisposición al consumo. En desarrollo.' : 'Monthly UTDT figure (different from ICG). Measures consumption propensity. In development.') : '',
       desc: es?'Índice de Confianza del Consumidor UTDT. Diferente al ICG político: mide si la gente se anima a gastar, invertir o si prefiere ahorrar por precaución.'
              :'UTDT Consumer Confidence Index. Different from the political ICG: measures whether people are inclined to spend, invest, or save precautionarily.' },
@@ -4281,7 +4329,7 @@ function computeSubIndices(bs) {
       w:13, score: desempV!=null ? desempleoScore(desempV) : 50,
       src: desempV!=null ? 'INDEC/datos.gob.ar' : NA,
       live: desempV!=null, unavailable: desempV==null,
-      raw: desempV!=null ? `${desempV.toFixed(1)}%` : '',
+      raw: desempV!=null ? `${es?'Desempleo':'Unemployment'}: ${desempV.toFixed(1)}%` : '',
       unavailNote: desempV==null ? (es?'Dato trimestral INDEC (EPH). Baja frecuencia. En desarrollo.' : 'Quarterly INDEC figure (EPH). Low frequency. In development.') : '',
       desc: es?'Tasa de desempleo de la Encuesta Permanente de Hogares. Indicador rezagado del ciclo pero fundamental para evaluar el costo social del ajuste.'
              :'Unemployment rate from the Permanent Household Survey. Lagging cycle indicator but fundamental for assessing the social cost of adjustment.' },
@@ -4289,7 +4337,7 @@ function computeSubIndices(bs) {
       w:10, score: adefaV!=null ? adefaScore(adefaV) : 50,
       src: adefaV!=null ? 'ADEFA' : NA,
       live: adefaV!=null, unavailable: adefaV==null,
-      raw: adefaV!=null ? `Var. i.a.: ${adefaV>0?'+':''}${adefaV.toFixed(1)}%` : '',
+      raw: adefaV!=null ? `${es?'Variación interanual':'Year-over-year change'}: ${adefaV>0?'+':''}${adefaV.toFixed(1)}%` : '',
       unavailNote: adefaV==null ? (es?'Dato mensual ADEFA. En desarrollo.':'Monthly ADEFA figure. In development.') : '',
       desc: es?'Variación mensual de ventas de autos. Proxy de consumo de bienes durables, que es el primer sector en caer en recesiones y el primero en recuperarse.'
              :'Monthly car sales change. Proxy for durable goods consumption, the first sector to fall in recessions and the first to recover.' },
@@ -4308,7 +4356,7 @@ function computeSubIndices(bs) {
       w:28, score: primarioV!=null ? primarioScore(primarioV) : 50,
       src: primarioV!=null ? 'Min. Economía + IA' : NA,
       live: primarioV!=null, unavailable: primarioV==null,
-      raw: primarioV!=null ? `${primarioV>0?'+':''}${primarioV.toFixed(1)}% PIB acum.` : '',
+      raw: primarioV!=null ? `${es?'Resultado acumulado':'Accumulated result'}: ${primarioV>0?'+':''}${primarioV.toFixed(1)}% ${es?'del PIB':'of GDP'}` : '',
       unavailNote: primarioV==null ? (es?'Dato mensual Ministerio de Economía. El dato más observado del programa Milei. En desarrollo.' : 'Monthly Ministry of Economy figure. The most monitored figure of the Milei program. In development.') : '',
       desc: es?'Superávit o déficit primario acumulado (sin intereses), como % del PIB. Es el pilar del programa económico y la condición sine qua non del acuerdo con el FMI.'
              :'Accumulated primary surplus or deficit (excluding interest), as % of GDP. It is the cornerstone of the economic program and the sine qua non condition of the IMF agreement.' },
@@ -4316,7 +4364,7 @@ function computeSubIndices(bs) {
       w:22, score: rolloverV!=null ? rolloverScore(rolloverV) : 50,
       src: rolloverV!=null ? 'Sec. Finanzas' : NA,
       live: rolloverV!=null, unavailable: rolloverV==null,
-      raw: rolloverV!=null ? `${rolloverV.toFixed(0)}% renovado` : '',
+      raw: rolloverV!=null ? `${es?'Deuda renovada':'Debt rolled over'}: ${rolloverV.toFixed(0)}%` : '',
       unavailNote: rolloverV==null ? (es?'Dato por licitación. El más informativo del corto plazo. En desarrollo.' : 'Per-auction figure. Most informative short-term indicator. In development.') : '',
       desc: es?'Porcentaje de vencimientos en pesos que el Tesoro logra renovar. Por debajo del 100% es alarma roja: el mercado no quiere renovar y el riesgo de monetización sube.'
              :'% of peso maturities the Treasury manages to roll over. Below 100% is a red alert: the market refuses to renew and monetization risk rises.' },
@@ -4324,20 +4372,20 @@ function computeSubIndices(bs) {
       w:18, score: LIVE._recaudVar!=null ? recaudScore(LIVE._recaudVar) : 50,
       src: LIVE._recaudVar!=null ? 'ARCA PDF + IA' : NA,
       live: LIVE._recaudVar!=null, unavailable: LIVE._recaudVar==null,
-      raw: LIVE._recaudVar!=null ? `Var. i.a.: ${LIVE._recaudVar>0?'+':''}${LIVE._recaudVar.toFixed(1)}%` : '',
+      raw: LIVE._recaudVar!=null ? `${es?'Variación interanual':'Year-over-year change'}: ${LIVE._recaudVar>0?'+':''}${LIVE._recaudVar.toFixed(1)}%` : '',
       unavailNote: LIVE._recaudVar==null ? (es?'PDF ARCA + Claude Haiku. En desarrollo.':'ARCA PDF + Claude Haiku. In development.') : '',
       desc: es?'Variación real de la recaudación tributaria. Mide tanto el ciclo económico como la compliance fiscal. Caída real sostenida señala deterioro fiscal.'
              :'Real change in tax revenue. Measures both the economic cycle and fiscal compliance. Sustained real decline signals fiscal deterioration.' },
     { name: es?'Curva Soberana (GD30/GD35)':'Sovereign Curve (GD30/GD35)', freq:'diario',
       w:19, score: gd35YieldScore(gd35Y), src:'IOL', live: gd35Y!=null,
-      raw: gd35Y!=null ? `GD35 TIR: ${gd35Y.toFixed(2)}%${LIVE._gd35Precio ? ' · precio USD '+LIVE._gd35Precio.toFixed(2) : ''}` : '',
+      raw: gd35Y!=null ? `${es?'Rendimiento GD35':'GD35 yield'}: ${gd35Y.toFixed(2)}%${LIVE._gd35Precio ? (es?' · precio USD ':' · price USD ')+LIVE._gd35Precio.toFixed(2) : ''}` : '',
       desc: es?'Pendiente de la curva soberana usando el rendimiento del GD35. Una curva invertida o muy empinada señala expectativas de stress fiscal en el mediano plazo.'
              :'Slope of the sovereign curve using GD35 yield. An inverted or very steep curve signals medium-term fiscal stress expectations.' },
     { name: es?'Cumplimiento Metas FMI':'IMF Target Compliance', freq:'trimestral',
       w:10, score: fmiV!=null ? fmiScore(fmiV) : 50,
       src: fmiV!=null ? 'FMI / Min. Economía' : NA,
       live: fmiV!=null, unavailable: fmiV==null,
-      raw: fmiV!=null ? `${fmiV.toFixed(0)}/100` : '',
+      raw: fmiV!=null ? `${es?'Cumplimiento':'Compliance'}: ${fmiV.toFixed(0)}/100` : '',
       unavailNote: fmiV==null ? (es?'Señal cualitativa mensual basada en comunicados FMI/Economía. En desarrollo.' : 'Monthly qualitative signal based on IMF/Economy communiques. In development.') : '',
       desc: es?'Evaluación del cumplimiento de las metas cuantitativas del acuerdo con el FMI. El incumplimiento activa cláusulas de waiver y genera incertidumbre.'
              :'Assessment of compliance with IMF agreement quantitative targets. Non-compliance triggers waiver clauses and generates uncertainty.' },
@@ -5795,6 +5843,7 @@ const milestonesPlugin={
     const mesActual=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
     const mesActualDisp=window.MONTHLY_DISPLAY?window.MONTHLY_DISPLAY(mesActual):mesActual;
     const showLabels=numLabels.length<=120;
+    window._milestoneHitboxes = [];
     vis.forEach(m=>{
       const idx=rawLbls.findIndex(k=>disp(k)===m.label);
       // Si el hito es del mes presente, usar el score real del MONTHLY (no el hardcodeado)
@@ -5804,6 +5853,8 @@ const milestonesPlugin={
         if(monthlyScore != null && !isNaN(monthlyScore)) hitoScore = monthlyScore;
       }
       const xPos=x.getPixelForValue(idx),yPos=y.getPixelForValue(hitoScore);
+      // Registrar la zona clickeable del hito (radio generoso para mouse y dedo)
+      window._milestoneHitboxes.push({ x:xPos, y:yPos, m:m, score:hitoScore });
       // dashed line
       ctx.save();ctx.beginPath();ctx.setLineDash([3,4]);
       ctx.moveTo(xPos,top);ctx.lineTo(xPos,yPos-12);
@@ -6150,10 +6201,100 @@ function buildChart(from,to){
     ],
   });
   histInst._radargRawLabels = rawLabels;
+  bindMilestoneClicks();
+  // Cerrar el panel de hito si estaba abierto (el rango pudo cambiar las posiciones)
+  if(typeof closeMilestonePanel==='function'){ const p=document.getElementById('milestonePanel'); if(p && !p.dataset.keepOpen) closeMilestonePanel(); }
   } catch(err) {
     console.error('[RadARG] buildChart error:', err, '| n='+n+' from='+from+' to='+to);
   }
 }
+
+// ── Selección de hitos en el gráfico ──────────────────────────
+// Los hitos se dibujan como pixeles en el canvas (no son puntos de Chart.js),
+// así que detectamos el click/tap buscando el hito más cercano dentro de un radio amplio.
+let _milestoneHandlersBound = false;
+function bindMilestoneClicks(){
+  const canvasEl = document.getElementById('histChart');
+  if(!canvasEl || _milestoneHandlersBound) return;
+  _milestoneHandlersBound = true;
+
+  const handler = (clientX, clientY) => {
+    const boxes = window._milestoneHitboxes || [];
+    if(!boxes.length) return;
+    const rect = canvasEl.getBoundingClientRect();
+    const px = clientX - rect.left;
+    const py = clientY - rect.top;
+    const HIT_RADIUS = 34; // zona generosa para mouse y dedo
+    let best = null, bestD = Infinity;
+    boxes.forEach(b => {
+      const d = Math.hypot(b.x - px, b.y - py);
+      if(d < bestD){ bestD = d; best = b; }
+    });
+    if(best && bestD <= HIT_RADIUS){
+      // Toggle: si ya está abierto el mismo hito, lo cierra
+      const panel = document.getElementById('milestonePanel');
+      if(panel && panel.classList.contains('open') && panel.dataset.openLabel === best.m.label){
+        closeMilestonePanel();
+      } else {
+        openMilestonePanel(best.m, best.score);
+      }
+    } else {
+      closeMilestonePanel();
+    }
+  };
+
+  canvasEl.addEventListener('click', (e) => handler(e.clientX, e.clientY));
+}
+
+function openMilestonePanel(m, score){
+  const panel = document.getElementById('milestonePanel');
+  if(!panel) return;
+  const isEN = LANG==='en';
+  const title = (isEN && m.short_en) ? m.short_en : m.short;
+  const desc  = (isEN && m.desc_en)  ? m.desc_en  : m.desc;
+  panel.style.setProperty('--mp-color', m.color);
+  const yEl=$('mpYear'), sEl=$('mpScore'), tEl=$('mpTitle'), dEl=$('mpDesc');
+  if(yEl) yEl.textContent = m.label;
+  if(sEl) sEl.textContent = (score!=null?score:m.score);
+  if(tEl) tEl.textContent = title || '';
+  if(dEl) dEl.textContent = desc || '';
+  panel.dataset.openLabel = m.label;
+  panel.classList.add('open');
+  panel.setAttribute('aria-hidden','false');
+}
+
+function closeMilestonePanel(){
+  const panel = document.getElementById('milestonePanel');
+  if(!panel) return;
+  panel.classList.remove('open');
+  panel.setAttribute('aria-hidden','true');
+  panel.dataset.openLabel = '';
+}
+
+// Abrir un hito específico desde la sección "Hitos": resetea el rango del gráfico,
+// scrollea al gráfico y abre el panel del hito.
+function openMilestoneFromCard(label){
+  const m = MILESTONES.find(x => x.label === label);
+  if(!m) return;
+  // 1. Resetear el rango del gráfico al completo para que el hito siempre se vea
+  sliderFrom = 0;
+  sliderTo = (typeof TOTAL_MONTHS !== 'undefined' ? TOTAL_MONTHS : (window.MONTHLY?.labels?.length || 1)) - 1;
+  if($('rangeFrom')) $('rangeFrom').value = sliderFrom;
+  if($('rangeTo'))   $('rangeTo').value   = sliderTo;
+  buildChart(sliderFrom, sliderTo);
+  if(typeof updateSlider === 'function'){ try{ updateSlider(); }catch(_){} }
+  // 2. Scrollear al gráfico
+  const chartSec = document.getElementById('histChart');
+  if(chartSec){
+    const header = document.querySelector('header');
+    const headerH = header ? header.offsetHeight : 52;
+    const top = chartSec.getBoundingClientRect().top + window.pageYOffset - headerH - 20;
+    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+  }
+  // 3. Esperar a que el chart se redibuje y abrir el panel del hito
+  setTimeout(() => { bindMilestoneClicks(); openMilestonePanel(m, m.score); }, 450);
+}
+
 function initSlider(){
   const ticksEl=$('rangeTicks'); if(!ticksEl) return;
   ticksEl.innerHTML='';
@@ -6218,6 +6359,9 @@ function buildHitos(){
     card.className='hito-card'; card.style.setProperty('--hito-color',ev.color);
     const evDesc = (LANG==='en' && ev.desc_en) ? ev.desc_en : ev.desc;
     card.innerHTML=`<div class="hito-head"><span class="hito-yr">${ev.label}</span><span class="hito-score" style="background:${ev.color}">${ev.score}</span></div><div class="hito-txt">${evDesc}</div>`;
+    card.style.cursor='pointer';
+    card.title = LANG==='en' ? 'View on chart' : 'Ver en el gráfico';
+    card.addEventListener('click', () => openMilestoneFromCard(ev.label));
     grid.appendChild(card);
   });
 }
