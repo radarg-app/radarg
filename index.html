@@ -673,6 +673,11 @@ body.lm .subidx-ai-body { color:#2a2a40; }
 }
 /* Bloque del puntaje: pill a ancho completo */
 .var-card-score-block { margin:5px 0 7px; }
+/* Vista web (grid multi-columna): empujar puntaje+barra+fuente al fondo
+   para que queden a la misma altura en todas las cards de la fila. */
+@media(min-width:601px){
+  .var-card-score-block { margin-top:auto; }
+}
 .var-card-score-pill {
   display:flex; align-items:center; justify-content:center; gap:8px;
   width:100%; padding:6px 11px; border-radius:7px; font-weight:700;
