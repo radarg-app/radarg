@@ -6846,6 +6846,26 @@ async function loadDataJSON() {
     if(f('spread_al30_gd30')!==null)      { LIVE._spread_al30_gd30 = f('spread_al30_gd30'); LIVE.prima = f('spread_al30_gd30'); }
     if(f('amplitud_fl')!==null)           LIVE._amplitudFl = f('amplitud_fl');
     if(f('amplitud_total')!==null)        LIVE._amplitudTotal = f('amplitud_total');
+    // Construir LIVE.amplitud RECALCULANDO el score desde up/dn (no usar amplitud_score,
+    // que puede venir desfasado). Breadth estándar: % en alza sobre las que se movieron.
+    // _sheetVal=true evita que fetchAmplitud() pise esto con datos de BYMA en vivo.
+    {
+      const aUp=Number(LIVE._amplitudUp), aDn=Number(LIVE._amplitudDn);
+      const aFl=Number(LIVE._amplitudFl||0), aTot=Number(LIVE._amplitudTotal||0);
+      if(aTot>0 && (aUp>=0 || aDn>=0)){
+        const moved=aUp+aDn;
+        const breadthScore = moved>0 ? Math.min(100,Math.max(0,Math.round(aUp/moved*100))) : 50;
+        const pctUp = Math.round(aUp/aTot*100);
+        LIVE.amplitud = {
+          score: breadthScore,
+          raw: LANG==='en'
+            ? `${aUp}↑ ${aFl}→ ${aDn}↓ / ${aTot} stocks (${pctUp}% weekly adv.)`
+            : `${aUp}↑ ${aFl}→ ${aDn}↓ / ${aTot} acciones (${pctUp}% alza semanal)`,
+          src:'IOL', live:true, _sheetVal:true
+        };
+        console.log('[data.json] Amplitud recalculada:', aUp+'↑', aDn+'↓', '→ score', breadthScore);
+      }
+    }
     if(f('rem_1m')!==null)                { LIVE.tasaReal.rem1m = f('rem_1m'); LIVE.tasaReal._sheetREM1 = f('rem_1m'); }
 
     // Apply noticias
