@@ -2578,11 +2578,11 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
         </div>
       </div>
       <div class="chart-zone-legend">
-        <div class="czl-item"><div class="czl-color" style="background:#ef4444"></div><div><div class="czl-name" data-i18n="zone.fe">Miedo Extremo</div><div class="czl-range">0–24</div></div></div>
-        <div class="czl-item"><div class="czl-color" style="background:#f97316"></div><div><div class="czl-name" data-i18n="zone.f">Miedo</div><div class="czl-range">25–44</div></div></div>
-        <div class="czl-item"><div class="czl-color" style="background:#eab308"></div><div><div class="czl-name" data-i18n="zone.n">Neutral</div><div class="czl-range">45–55</div></div></div>
-        <div class="czl-item"><div class="czl-color" style="background:#22c55e"></div><div><div class="czl-name" data-i18n="zone.g">Codicia</div><div class="czl-range">56–74</div></div></div>
-        <div class="czl-item"><div class="czl-color" style="background:#16a34a"></div><div><div class="czl-name" data-i18n="zone.ge">Codicia Extrema</div><div class="czl-range">75–100</div></div></div>
+        <div class="czl-item"><div class="czl-color" style="background:#ef4444"></div><div><div class="czl-name" id="czlFe" data-i18n="zone.fe">Miedo Extremo</div><div class="czl-range">0–24</div></div></div>
+        <div class="czl-item"><div class="czl-color" style="background:#f97316"></div><div><div class="czl-name" id="czlF" data-i18n="zone.f">Miedo</div><div class="czl-range">25–44</div></div></div>
+        <div class="czl-item"><div class="czl-color" style="background:#eab308"></div><div><div class="czl-name" id="czlN" data-i18n="zone.n">Neutral</div><div class="czl-range">45–55</div></div></div>
+        <div class="czl-item"><div class="czl-color" style="background:#22c55e"></div><div><div class="czl-name" id="czlG" data-i18n="zone.g">Codicia</div><div class="czl-range">56–74</div></div></div>
+        <div class="czl-item"><div class="czl-color" style="background:#16a34a"></div><div><div class="czl-name" id="czlGe" data-i18n="zone.ge">Codicia Extrema</div><div class="czl-range">75–100</div></div></div>
         <div class="chart-toggles">
           <label class="merval-switch-wrap" title="Mostrar/ocultar Merval USD en el gráfico" for="mervalToggle">
             <span data-i18n="chart.mervalToggle" class="toggle-lbl toggle-lbl-merval">📈 Merval USD</span>
@@ -4725,7 +4725,7 @@ function fgMomentum() {
   const ma = s.slice(-win).reduce((a,b)=>a+b,0) / win;
   if (!ma) return 50;
   const dev = (cur - ma) / ma;           // desvío relativo
-  return clamp(Math.round(50 + dev * 333)); // ±15% → ~0/100
+  return intScore(Math.round(50 + dev * 333)); // ±15% → ~0/100
 }
 
 /* 3. Volatilidad: nivel actual vs umbrales (invertido). Migrará a "vs media" con serie diaria. */
@@ -4741,7 +4741,7 @@ function fgSafeHaven() {
   const mervS = LIVE.merval ? LIVE.merval.score : 50;
   const bonoS = LIVE.bonos ? LIVE.bonos.score : 50;
   // Si las acciones rinden mejor que el refugio → greed; si el refugio domina → fear
-  return clamp(Math.round(50 + (mervS - bonoS) * 0.5));
+  return intScore(Math.round(50 + (mervS - bonoS) * 0.5));
 }
 
 /* 5. Apetito de riesgo crediticio: yield de bonos HY argentinos (GD35). Mayor yield = más miedo. */
@@ -5392,9 +5392,19 @@ function drawGauge(score){
     const mid=(z.f+z.t)/2, angle=Math.PI+mid*Math.PI, active=z.id===az.id;
     const fs=active?Math.round(lfs*1.15):lfs, lh=fs+3;
     ctx.font=`600 ${fs}px "Inter",sans-serif`;
+    // Etiquetas del arco según el índice activo:
+    //  - fear  → Miedo/Codicia (escala CNN)
+    //  - macro → Crítico/Frágil/Estable/Sólido/Robusto (Solidez Macroeconómica)
     const zLabels={fe:['MIEDO','EXTREMO'],f:['MIEDO'],n:['NEUTRAL'],g:['CODICIA'],ge:['CODICIA','EXTREMA']};
     const enLabels={fe:['EXTREME','FEAR'],f:['FEAR'],n:['NEUTRAL'],g:['GREED'],ge:['EXTREME','GREED']};
-    const displayLines=LANG==='en'?enLabels[z.id]:zLabels[z.id];
+    const macroLabelsEs={fe:['CRÍTICO'],f:['FRÁGIL'],n:['ESTABLE'],g:['SÓLIDO'],ge:['ROBUSTO']};
+    const macroLabelsEn={fe:['CRITICAL'],f:['FRAGILE'],n:['STABLE'],g:['SOLID'],ge:['ROBUST']};
+    let displayLines;
+    if (ACTIVE_INDEX === 'macro') {
+      displayLines = LANG==='en' ? macroLabelsEn[z.id] : macroLabelsEs[z.id];
+    } else {
+      displayLines = LANG==='en' ? enLabels[z.id] : zLabels[z.id];
+    }
     const pw2=Math.max(...displayLines.map(l=>ctx.measureText(l).width))+10;
     const ph2=displayLines.length*lh+6;
     const isExtreme = z.id==='fe' || z.id==='ge';
@@ -6577,6 +6587,11 @@ function updateIndexChrome(score){
   const scaleEl = $('gaugeScaleTxt');
   if(titleEl) titleEl.textContent = ACTIVE_INDEX==='fear' ? t('gauge.title.fear') : t('gauge.title.macro');
   if(scaleEl) scaleEl.textContent = ACTIVE_INDEX==='fear' ? t('gauge.scale.fear') : t('gauge.scale.macro');
+  // Leyenda de zonas: cambia entre escala Miedo/Codicia y Crítico..Robusto
+  const legendKeys = ACTIVE_INDEX==='macro'
+    ? {czlFe:'macroLabel.critico',czlF:'macroLabel.fragil',czlN:'macroLabel.estable',czlG:'macroLabel.solido',czlGe:'macroLabel.robusto'}
+    : {czlFe:'zone.fe',czlF:'zone.f',czlN:'zone.n',czlG:'zone.g',czlGe:'zone.ge'};
+  Object.keys(legendKeys).forEach(id => { const el=$(id); if(el) el.textContent=t(legendKeys[id]); });
 }
 
 /* ── Master render ─────────────────────────────────────────── */
@@ -6828,10 +6843,15 @@ function renderNews(){
   if(title) title.textContent = LANG==='en' ? 'Relevant news' : 'Noticias relevantes';
   if(ts) ts.textContent = LANG==='en' ? 'Curated · ' + new Date().toLocaleDateString('en') : 'Curado · ' + new Date().toLocaleDateString('es-AR');
   const impactClass = {high:'news-impact-high',med:'news-impact-med',pos:'news-impact-pos'};
+  // Convierte una fecha AAAA-MM-DD (o similar) a DD-MM-AAAA. Si no matchea, la deja igual.
+  const fmtFecha = d => {
+    const m = String(d||'').match(/(\d{4})-(\d{2})-(\d{2})/);
+    return m ? `${m[3]}-${m[2]}-${m[1]}` : d;
+  };
   strip.innerHTML = news.slice(0,4).map(n=>{
     const parts = (n.meta||'').split('·');
     const source = parts[0] ? parts[0].trim() : '';
-    const date   = parts[1] ? parts[1].trim() : '';
+    const date   = parts[1] ? fmtFecha(parts[1].trim()) : '';
     const desc   = n.desc || n.descripcion || '';
     return `
     <a class="news-card" href="${n.url||'#'}" target="${n.url&&n.url!='#'?'_blank':'_self'}" rel="noopener">
@@ -6841,7 +6861,7 @@ function renderNews(){
       </div>
       <span class="news-headline">${n.headline}</span>
       ${desc ? `<span style="font-size:12px;color:var(--text2);line-height:1.4;margin-top:2px">${desc}</span>` : ''}
-      <span class="news-meta" style="margin-top:4px">
+      <span class="news-meta" style="margin-top:auto;padding-top:8px">
         ${source ? `<strong>${source}</strong>` : ''}
         ${date   ? ` · ${date}` : ''}
       </span>
