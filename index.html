@@ -77,7 +77,6 @@ body.lm {
   --shadow-lg: 0 8px 28px rgba(0,0,0,.14), 0 0 0 1px rgba(0,0,0,.08);
 }
 body.lm header { background: rgba(248,249,252,.95); border-color: rgba(0,0,0,.08); }
-body.lm .ticker { background: #f0f1f5; border-color: rgba(0,0,0,.07); }
 body.lm .tick-lbl { color: #44445c; }
 body.lm .tick-val  { color: #0d0d18; }
 body.lm .live-badge { color: #44445c; }
@@ -305,39 +304,6 @@ nav a:hover { color:var(--text); }
   background:var(--ac); color:#fff; border-color:var(--ac);
 }
 .h-btn-primary:hover { background:var(--ac2); border-color:var(--ac2); color:#fff; }
-
-/* ── Ticker ──────────────────────────────────────────────────── */
-.ticker {
-  background:var(--bg2); border-bottom:1px solid var(--border);
-  height:36px;
-  display:flex; align-items:center;
-  overflow:hidden; z-index:1; position:relative;
-}
-.ticker-track {
-  display:flex; align-items:center;
-  white-space:nowrap; flex-shrink:0;
-  animation:tickerScroll var(--ticker-dur,40s) linear infinite;
-  will-change:transform;
-}
-/* Desplaza exactamente el ancho de UN set base (en px, calculado por JS).
-   Como hay varios sets idénticos seguidos, al reiniciar el loop el salto es invisible. */
-@keyframes tickerScroll {
-  0%   { transform:translateX(0); }
-  100% { transform:translateX(var(--ticker-shift,-50%)); }
-}
-/* Pausar al pasar el mouse para poder leer */
-.ticker:hover .ticker-track { animation-play-state:paused; }
-.t-item {
-  display:flex; align-items:center; gap:6px;
-  padding:0 1.4rem; height:36px;
-  border-right:1px solid var(--border);
-  white-space:nowrap; flex-shrink:0;
-  font-family:'JetBrains Mono',monospace; font-size:11px;
-}
-.t-lbl { color:var(--text3); font-size:10px; letter-spacing:.06em; text-transform:uppercase; }
-.t-val  { color:var(--text); font-weight:600; }
-.t-badge { padding:1px 7px; border-radius:4px; font-size:10px; font-weight:700; }
-.t-ts { margin-left:auto; flex-shrink:0; padding-left:1rem; color:var(--text3); font-size:10px; }
 
 /* ── Layout ──────────────────────────────────────────────────── */
 main { position:relative; z-index:1; max-width:1440px; margin:0 auto; padding:2rem 1.75rem 5rem; }
@@ -736,30 +702,6 @@ body.lm .var-card-bar { background:rgba(0,0,0,.07); }
 .chart-wrap { position:relative; height:420px; overflow:hidden; width:100%; }
 #histChart { cursor:pointer; }
 
-/* Panel flotante del hito (al tocar un punto en el gráfico) */
-.milestone-panel {
-  position:absolute; top:14px; left:50%; transform:translateX(-50%) translateY(-8px);
-  z-index:20; width:min(340px, calc(100% - 28px));
-  background:var(--bg2); border:1px solid var(--border2);
-  border-radius:12px; padding:14px 16px 16px;
-  box-shadow:0 10px 36px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.04);
-  opacity:0; pointer-events:none; transition:opacity .2s, transform .2s;
-}
-.milestone-panel.open { opacity:1; pointer-events:auto; transform:translateX(-50%) translateY(0); }
-body.lm .milestone-panel { box-shadow:0 10px 36px rgba(0,0,0,.18), 0 0 0 1px rgba(0,0,0,.05); }
-.milestone-panel-close {
-  position:absolute; top:8px; right:9px; width:24px; height:24px;
-  border:none; background:transparent; color:var(--text3); cursor:pointer;
-  font-size:15px; line-height:1; border-radius:6px; transition:background .15s, color .15s;
-}
-.milestone-panel-close:hover { background:var(--bg3); color:var(--text); }
-.milestone-panel-head { display:flex; align-items:center; gap:8px; margin-bottom:7px; padding-right:24px; }
-.milestone-panel-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; background:var(--mp-color,var(--ac)); box-shadow:0 0 8px var(--mp-color,var(--ac)); }
-.milestone-panel-year { font-size:11px; font-weight:700; letter-spacing:.05em; color:var(--text3); font-family:'JetBrains Mono',monospace; text-transform:uppercase; }
-.milestone-panel-score-row { display:flex; justify-content:flex-end; margin-top:10px; }
-.milestone-panel-score { font-size:13px; font-weight:800; color:#fff; background:var(--mp-color,var(--ac)); padding:3px 11px; border-radius:6px; }
-.milestone-panel-title { font-size:15px; font-weight:800; letter-spacing:-.2px; color:var(--text); margin-bottom:5px; line-height:1.25; }
-.milestone-panel-desc { font-size:12.5px; line-height:1.6; color:var(--text2); }
 
 /* ── Merval toggle switch ─────────────────────────────────── */
 .merval-switch-wrap {
@@ -1941,6 +1883,16 @@ body.lm .support-reason { color:rgba(0,0,0,.55); }
 .ranking-title { font-size:15px; font-weight:800; letter-spacing:-.2px; display:flex; align-items:center; gap:7px; }
 .ranking-title-ico { font-size:18px; }
 .ranking-sub { font-size:11px; color:var(--text3); margin-bottom:1rem; }
+.ranking-tabs { display:flex; gap:.4rem; margin-bottom:.875rem; background:var(--bg2); border:1px solid var(--border); border-radius:9px; padding:3px; }
+.ranking-tab {
+  flex:1; font-family:inherit; font-size:11.5px; font-weight:700; letter-spacing:-.1px;
+  color:var(--text3); background:transparent; border:none; border-radius:7px;
+  padding:6px 10px; cursor:pointer; transition:all .18s ease; white-space:nowrap;
+}
+.ranking-tab:hover { color:var(--text2); }
+.ranking-tab.active { background:var(--ac); color:#fff; box-shadow:0 1px 4px rgba(0,0,0,.18); }
+body.lm .ranking-tabs { background:#f0f1f5; border-color:rgba(0,0,0,.08); }
+body.lm .ranking-tab.active { color:#fff; }
 .ranking-list {
   display:flex; flex-direction:column; gap:.5rem; flex:1;
   max-height:340px; overflow-y:auto;
@@ -2044,6 +1996,7 @@ body.lm .ranking-footer { border-top-color:rgba(0,0,0,.08); }
   header .h-right { flex-shrink:0; }
   .live-pill span:not(.live-dot) { display:none; }
   .h-btn span { display:none; }
+  .h-btn-primary span { display:inline; }
 }
 
 @media (max-width:768px) {
@@ -2052,12 +2005,10 @@ body.lm .ranking-footer { border-top-color:rgba(0,0,0,.08); }
   header nav { display:none; }
   header .h-right { gap:.4rem; }
   .h-btn span { display:none; }
+  .h-btn-primary span { display:inline; }
   .h-btn { padding:5px 8px; }
   .live-pill span:not(.live-dot) { display:none; }
 
-  /* Ticker */
-  .ticker { padding:0 .75rem; }
-  .t-item { padding:0 .75rem; }
 
   /* Main */
   main { padding:1rem .875rem 3rem; }
@@ -2222,18 +2173,6 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
   </div>
 </header>
 
-<!-- ═══ TICKER ══════════════════════════════════════════════════ -->
-<div class="ticker">
-  <div class="ticker-track" id="tickerTrack">
-    <div class="t-item"><span class="t-lbl">Oficial</span>&nbsp;<span class="t-val tk-of">–</span></div>
-    <div class="t-item"><span class="t-lbl">Blue</span>&nbsp;<span class="t-val tk-bl">–</span></div>
-    <div class="t-item"><span class="t-lbl">MEP</span>&nbsp;<span class="t-val tk-mep">–</span></div>
-    <div class="t-item"><span class="t-lbl">CCL</span>&nbsp;<span class="t-val tk-ccl">–</span></div>
-    <div class="t-item"><span class="t-lbl">Mayorista</span>&nbsp;<span class="t-val tk-may">–</span></div>
-    <div class="t-item"><span class="t-lbl">Tarjeta</span>&nbsp;<span class="t-val tk-tar">–</span></div>
-  </div>
-</div>
-
 <!-- ═══ MAIN ════════════════════════════════════════════════════ -->
 <main>
 
@@ -2355,7 +2294,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
   <section>
     <div class="sec-hdr" style="margin-top:1rem">
       <span class="sec-ttl" id="newsSttl" data-i18n="sec.news">Noticias que mueven el índice</span>
-      <span style="font-size:11px;color:var(--text3);margin-left:.75rem;font-weight:400" class="news-ai-sub">Seleccionadas por IA · últimas 48hs</span>
+      <span style="font-size:11px;color:var(--text3);margin-left:.75rem;font-weight:400" class="news-ai-sub" data-i18n="news.aisub">Una noticia por cada tema relevante · últimas 48hs</span>
       <div class="sec-line"></div>
       <span style="font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace" id="newsTs"></span>
     </div>
@@ -2458,6 +2397,10 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
           <div class="ranking-title"><span class="ranking-title-ico">🏆</span> <span data-i18n="ranking.title">Top apoyos</span></div>
         </div>
         <div class="ranking-sub" data-i18n="ranking.sub">Quienes hacen posible RadARG</div>
+        <div class="ranking-tabs" role="tablist">
+          <button class="ranking-tab active" id="rankingTabMensual" role="tab" onclick="setRankingTab('mensual')" data-i18n="ranking.tab.monthly">Este mes</button>
+          <button class="ranking-tab" id="rankingTabHistorico" role="tab" onclick="setRankingTab('historico')" data-i18n="ranking.tab.alltime">Histórico</button>
+        </div>
         <div class="ranking-list" id="rankingList">
           <div class="ranking-empty">Todavía no hay apoyos cargados.<br>¡Podés ser el primero!</div>
         </div>
@@ -2510,18 +2453,6 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
       </div>
       <div class="chart-wrap" style="position:relative">
         <canvas id="histChart"></canvas>
-        <div id="milestonePanel" class="milestone-panel" role="dialog" aria-hidden="true">
-          <button class="milestone-panel-close" type="button" aria-label="Cerrar" onclick="closeMilestonePanel()">✕</button>
-          <div class="milestone-panel-head">
-            <span class="milestone-panel-dot"></span>
-            <span class="milestone-panel-year" id="mpYear"></span>
-          </div>
-          <div class="milestone-panel-title" id="mpTitle"></div>
-          <div class="milestone-panel-desc" id="mpDesc"></div>
-          <div class="milestone-panel-score-row">
-            <span class="milestone-panel-score" id="mpScore"></span>
-          </div>
-        </div>
       </div>
       <div class="range-wrap">
         <div style="font-size:9px;color:var(--text3);text-align:center;margin-bottom:4px;font-family:'JetBrains Mono',monospace" class="slider-hint-txt" data-i18n="chart.sliderHint">Arrastrá los extremos para ajustar el período</div>
@@ -2744,7 +2675,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
 
         <div class="sponsors-eyebrow" data-i18n="sponsors.eyebrow">✦ &thinsp;Oportunidad exclusiva de patrocinio&thinsp; ✦</div>
         <h2 class="sponsors-title" data-i18n="sponsors.title">Tu marca frente a quienes mueven el dinero en Argentina</h2>
-        <p class="sponsors-sub">RadARG es la referencia diaria de inversores, traders, analistas financieros, portfolio managers y empresarios que toman decisiones con dinero real.<br><span class="sponsors-sub-cta" data-i18n="sponsors.subcta">No es audiencia masiva: es la audiencia que actúa.</span></p>
+        <p class="sponsors-sub"><span data-i18n="sponsors.sub">RadARG es la referencia diaria de inversores, traders, analistas financieros, portfolio managers y empresarios que toman decisiones con dinero real.</span><br><span class="sponsors-sub-cta" data-i18n="sponsors.subcta">No es audiencia masiva: es la audiencia que actúa.</span></p>
 
         <!-- Chips de audiencia -->
         <div class="sponsors-audience">
@@ -2960,11 +2891,11 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
         <img src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAQABAADASIAAhEBAxEB/8QAHQABAAEEAwEAAAAAAAAAAAAAAAECBgcIAwQFCf/EAF8QAAIBAwIEAgYECAYOBwUHBQABAgMEEQUGBxIhMUFRCBMiYXGBFDJCkRUjUnKSobHBFzNigqKyFiQ1N0NTVIOTlMLR0tMlRGNzdOHwCRg0VbM2ZGWEo7TDRlZmdfH/xAAcAQEAAgMBAQEAAAAAAAAAAAAAAQUDBAYCBwj/xABCEQEAAQICBAsGAwYGAgMAAAAAAQIDBBEFEiExBjJBUWFxgZGhsdETIlLB4fAUFUIHIzM0cvEWVGKCksIkQ6Ky0v/aAAwDAQACEQMRAD8A0yAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA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AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH/2Q==" alt="RadARG" style="width:22px;height:22px;border-radius:5px;object-fit:cover;flex-shrink:0">
         <span class="foot-logo-text">Rad<span>ARG</span></span>
       </div>
-      <p class="foot-tagline">El termómetro del mercado financiero argentino</p>
-      <p class="foot-disc">Datos de fuentes públicas verificadas. Índice informativo. No constituye asesoramiento financiero. Datos 2007–2015 usan estimaciones privadas de inflación.</p>
+      <p class="foot-tagline" data-i18n="footer.tagline">El termómetro del mercado financiero argentino</p>
+      <p class="foot-disc" data-i18n="footer.disc">Datos de fuentes públicas verificadas. Índice informativo. No constituye asesoramiento financiero. Datos 2007–2015 usan estimaciones privadas de inflación.</p>
     </div>
     <div>
-      <div class="foot-tags-title">Fuentes de datos</div>
+      <div class="foot-tags-title" data-i18n="footer.sources">Fuentes de datos</div>
       <div class="foot-tags">
         <span class="foot-tag">dolarapi.com</span>
         <span class="foot-tag">JP Morgan EMBI+</span>
@@ -2978,7 +2909,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
     </div>
   </div>
   <div class="foot-copy">
-    <span>© 2026 RadARG · Todos los derechos reservados</span>
+    <span data-i18n="footer.rights">© 2026 RadARG · Todos los derechos reservados</span>
     <span data-i18n="footer.update">Índice actualizado todos los días a las 12:00</span>
   </div>
 </footer>
@@ -3064,11 +2995,13 @@ const T = {
     'nav.indicators':'Indicadores','nav.historic':'Histórico','nav.tiers':'Tiers','nav.methodology':'Metodología',
     'header.share':'Compartir',
     'score.sentiment':'Sentimiento del mercado',
+    'score.subtitle':'¿Cómo está el mercado argentino hoy?',
     'gauge.label':'Argentina','gauge.title':'Índice de Sentimiento del Mercado','gauge.scale':'0 = pánico total · 50 = neutral · 100 = euforia','score.1w':'Hace 1 semana','score.1m':'Hace 1 mes',
     'score.3m':'Hace 3 meses','score.1y':'Hace 1 año','score.updating':'Actualizando…',
     'ai.title':'Interpretación IA','ai.sub':'Análisis automático en tiempo real',
     'ai.economic':'Situación Económica','ai.political':'Situación Política',
     'ai.sub.political':'Basado en ICG UTDT y noticias de las últimas 48hs',
+    'news.aisub':'Una noticia por cada tema relevante · últimas 48hs',
     'ai.loading':'Analizando…','ai.disclaimer':'Generado con IA. No constituye asesoramiento financiero.',
     'sec.indicators':'5 Dimensiones del Índice','sec.historic':'Evolución Histórica',
     'sec.milestones':'Hitos Históricos','sec.tiers':'Tiers','sec.sponsors':'Sponsors',
@@ -3291,6 +3224,8 @@ const T = {
     'support.r4':'El índice siempre libre, sin publicidad ni paywalls',
     // ── Ranking ──
     'ranking.title':'Top apoyos','ranking.sub':'Quienes hacen posible RadARG',
+    'ranking.tab.monthly':'Este mes','ranking.tab.alltime':'Histórico',
+    'ranking.empty.month':'Todavía no hay apoyos este mes.<br>¡Podés ser el primero!',
     'ranking.empty':'Todavía no hay apoyos cargados.<br>¡Podés ser el primero!',
     'ranking.footer':'El ranking se actualiza todos los días',
     // ── ctx-strip nuevas ──
@@ -3307,6 +3242,10 @@ const T = {
     'ctx.icg':'Confianza en el Gobierno','ctx.icg.sub':'ICG UTDT · mensual',
     // ── Footer ──
     'footer.update':'Índice actualizado todos los días a las 12:00',
+    'footer.tagline':'El termómetro del mercado financiero argentino',
+    'footer.disc':'Datos de fuentes públicas verificadas. Índice informativo. No constituye asesoramiento financiero. Datos 2007–2015 usan estimaciones privadas de inflación.',
+    'footer.sources':'Fuentes de datos',
+    'footer.rights':'© 2026 RadARG · Todos los derechos reservados',
     // ── Metodología: simple (nuevas) ──
     'meth.g.q5':'¿Cada cuánto se actualiza?',
     'meth.g.a5':'El índice se recalcula y publica todos los días a las 12:00. Los datos de mercado como el dólar y el Merval se refrescan dentro de la página a lo largo del día.',
@@ -3330,6 +3269,7 @@ const T = {
     'nav.indicators':'Indicators','nav.historic':'Historical','nav.tiers':'Tiers','nav.methodology':'Methodology',
     'header.share':'Share',
     'score.sentiment':'Market sentiment',
+    'score.subtitle':'Where\'s Argentina\'s market today?',
     'donate.modal.sub':'If this index helps you, any contribution helps keep it active and free.',
     'gift.modal.email.label':'Your email address',
     'gift.modal.step3':'If so, you will receive an email with a single-use coupon to activate 1 month of Silver at no cost.',
@@ -3338,76 +3278,77 @@ const T = {
     'tier.modal.coupon.optional':'(optional)',
     'gift.modal.how':'How it works',
     'gift.modal.step1':'Enter your email below.',
-    'gift.modal.step2':'Our team reviews if you made valuable contributions implemented in RadARG.',
-    'gift.modal.step3':'If so, you will receive a single-use coupon to activate 1 month of Silver at no cost.',
-    'gift.modal.note':'Our team always notifies those who made valuable contributions. If your suggestion was implemented, we have or will let you know soon.',
+    'gift.modal.step2':'We check whether any of your suggestions actually made it into RadARG.',
+    'gift.modal.step3':'If so, you\'ll get a single-use coupon for 1 free month of Silver.',
+    'gift.modal.note':'We always reach out to people whose ideas we ship. If yours made it in, you\'ve already heard from us — or you will soon.',
     'gift.modal.email.label':'Your email address',
-    'gauge.label':'Argentina','gauge.title':'Fear & Greed Index','gauge.scale':'0 = total panic · 50 = neutral · 100 = euphoria','score.1w':'1 week ago','score.1m':'1 month ago',
+    'gauge.label':'Argentina','gauge.title':'Fear & Greed Index','gauge.scale':'0 = extreme fear · 50 = neutral · 100 = euphoria','score.1w':'1 week ago','score.1m':'1 month ago',
     'score.3m':'3 months ago','score.1y':'1 year ago','score.updating':'Updating…',
-    'ai.title':'AI Interpretation','ai.sub':'Automatic real-time analysis',
+    'ai.title':'AI Read','ai.sub':'Live analysis, updated automatically',
     'ai.economic':'Economic Situation','ai.political':'Political Situation',
-    'ai.sub.political':'Based on ICG UTDT and news from the last 48h',
-    'ai.loading':'Analyzing…','ai.disclaimer':'AI-generated. Not financial advice.',
-    'sec.indicators':'5 Index Dimensions','sec.historic':'Historical Evolution',
+    'ai.sub.political':'Based on UTDT confidence data and the last 48h of news',
+    'news.aisub':'One story per key topic · last 48h',
+    'ai.loading':'Analyzing…','ai.disclaimer':'AI-generated. Not investment advice.',
+    'sec.indicators':'The 5 Dimensions','sec.historic':'Historical Evolution',
     'sec.milestones':'Historical Milestones','sec.tiers':'Tiers','sec.sponsors':'Sponsors',
-    'sec.meth.general':'For everyone','sec.meth.tech':'For specialists',
+    'sec.meth.general':'For everyone','sec.meth.tech':'For the data nerds',
     'sec.suggest':'Suggestions',
     'suggest.eyebrow':'RadARG Community',
     'suggest.heading':'Your idea could shape the index',
     'suggest.p':'RadARG is built with its users. If you have ideas for new indicators, visual improvements, or missing data, I want to hear them.',
-    'suggest.p2':'The best suggestions get implemented. When that happens, we let you know.',
+    'suggest.p2':'The best ideas make it into the product — and when yours does, you\'ll hear from us.',
     'suggest.vp1':'We read every suggestion',
-    'suggest.vp2':'We notify you if your idea is implemented',
-    'suggest.vp3':'Implemented ideas = 1 free Silver month',
-    'suggest.gift.badge':'If we implement your idea, we gift you 1 free Silver month',
+    'suggest.vp2':'We ping you if we ship your idea',
+    'suggest.vp3':'Shipped idea = 1 month of Silver, free',
+    'suggest.gift.badge':'Ship your idea, get a free month of Silver',
     'suggest.optional':'(optional)',
-    'suggest.email.note':'(so we can notify you if your idea is implemented)',
+    'suggest.email.note':'(so we can reach you if we ship it)',
     'suggest.msg.label':'Your suggestion',
     'chart.title':'RadARG · Argentine Market Sentiment','chart.range':'RANGE',
     'zone.fe':'Extreme Fear','zone.f':'Fear','zone.n':'Neutral','zone.g':'Greed','zone.ge':'Extreme Greed',
     'milestones.show':'Show milestones',
     'pro.title':'Smart alerts and early access',
-    'pro.sub':'Get automatic notifications on sharp index moves, exchange rate spikes, or EMBI surges. Access beta features first.',
-    'pro.feat1.title':'Real-time alerts','pro.feat1.desc':'WhatsApp, email or Telegram when the index crosses critical thresholds.',
-    'pro.feat2.title':'Unlimited advanced AI','pro.feat2.desc':'Daily detailed interpretations with historical context.',
-    'pro.feat3.title':'Custom dashboard','pro.feat3.desc':'Configure the indicators that matter most to you.',
-    'pro.feat4.title':'Beta access','pro.feat4.desc':'First to try new features: provincial comparisons, API and more.',
-    'pro.feat5.title':'Weekly newsletter','pro.feat5.desc':'Weekly index summary with market analysis, every Monday.',
-    'pro.feat6.title':'Private API','pro.feat6.desc':'Integrate RadARG into your own systems and dashboards.',
+    'pro.sub':'Get pinged the moment the index swings, the dollar jumps, or country risk spikes — and try new features before anyone else.',
+    'pro.feat1.title':'Real-time alerts','pro.feat1.desc':'WhatsApp, email, or Telegram the moment the index crosses a critical level.',
+    'pro.feat2.title':'Unlimited advanced AI','pro.feat2.desc':'In-depth daily reads with historical context.',
+    'pro.feat3.title':'Custom dashboard','pro.feat3.desc':'Track the indicators that matter most to you.',
+    'pro.feat4.title':'Beta access','pro.feat4.desc':'First in line for new features: provincial breakdowns, API, and more.',
+    'pro.feat5.title':'Weekly newsletter','pro.feat5.desc':'Your week in the market, delivered every Monday.',
+    'pro.feat6.title':'Private API','pro.feat6.desc':'Plug RadARG into your own systems and dashboards.',
     // Tiers EN
     'tiers.headline':'Choose your access level',
-    'tiers.sub':'From free access to advanced tools for professional investors and analysts.',
+    'tiers.sub':'From free access to pro-grade tools for serious investors and analysts.',
     'tier.free.period':'forever','tier.month.period':'/ month',
-    'tier.trial.note':'Cancel anytime · No commitment',
+    'tier.trial.note':'Cancel anytime · No strings attached',
     'tier.security':'🔒 Secure payments via Mercado Pago & Stripe · Cancel anytime · 7-day money-back guarantee',
-    'tier.popular.pre':'The top choice among',
+    'tier.popular.pre':'The favorite among',
     'tier.popular.label':'Most chosen',
     // Bronze EN
-    'tier.bronze.name':'Bronze','tier.bronze.tagline':'The full index, no barriers. Everything you need to get started.',
+    'tier.bronze.name':'Bronze','tier.bronze.tagline':'The full index, no gates. Everything you need to start.',
     'tier.bronze.f1':'RadARG Index in real time','tier.bronze.f2':'5 index dimensions with descriptions',
-    'tier.bronze.f3':'Historical chart 2000–today','tier.bronze.f4':'AI analysis of the moment',
-    'tier.bronze.f5':'Relevant news of the day',
-    'tier.bronze.x1':'Weekly newsletter','tier.bronze.x2':'Personalized AI summarizer','tier.bronze.x3':'Index weighting tool',
+    'tier.bronze.f3':'Historical chart 2000–today','tier.bronze.f4':'AI read on today\'s market',
+    'tier.bronze.f5':'The day\'s key headlines',
+    'tier.bronze.x1':'Weekly newsletter','tier.bronze.x2':'Personalized AI summaries','tier.bronze.x3':'Index weighting tool',
     'tier.bronze.cta':'Explore RadARG',
     // Silver EN
-    'tier.silver.name':'Silver','tier.silver.tagline':'For those who want to stay one step ahead of the market with concrete weekly analysis.',
+    'tier.silver.name':'Silver','tier.silver.tagline':'For people who want to stay a step ahead, with concrete analysis every week.',
     'tier.silver.f1':'Everything in Bronze','tier.silver.f2':'Weekly newsletter every Monday',
-    'tier.silver.f3':'AI summarizer: weekly market context','tier.silver.f4':'Alerts on sharp market moves',
+    'tier.silver.f3':'AI summaries: your weekly market context','tier.silver.f4':'Alerts when the market moves fast',
     'tier.silver.f5':'Early access to new features',
     'tier.silver.x1':'Custom index weighting tool','tier.silver.x2':'Extended macro indicators',
     'tier.silver.cta':'Start 7-day free trial',
     // Gold EN
-    'tier.gold.name':'Gold','tier.gold.tagline':'For investors and analysts who need full control over the index and advanced macro data.',
-    'tier.gold.f1':'Everything in Silver','tier.gold.f2':'Index weighting: adjust weights to your criteria',
+    'tier.gold.name':'Gold','tier.gold.tagline':'For investors and analysts who want full control of the index and deeper macro data.',
+    'tier.gold.f1':'Everything in Silver','tier.gold.f2':'Index weighting: tune it to your own thesis',
     'tier.gold.f3':'Extended macro indicators: GDP, unemployment, foreign trade',
     'tier.gold.f4':'Customizable dashboard','tier.gold.f5':'Private data API','tier.gold.f6':'Priority support',
     'tier.gold.cta':'Access Gold',
     'tier.gold.x1':'Public data API',
     'tier.diamond.name':'Diamond',
-    'tier.diamond.tagline':'Full access, API included. For institutions, traders, and those building on RadARG.',
+    'tier.diamond.tagline':'Everything, API included. For institutions, traders, and builders on top of RadARG.',
     'tier.diamond.f1':'Everything in Gold',
     'tier.diamond.f2':'Public API: integrate RadARG into your systems',
-    'tier.diamond.f3':'Cross-user comparison and benchmarks',
+    'tier.diamond.f3':'Benchmarking across users',
     'tier.diamond.f4':'Historical data export (CSV/JSON)',
     'tier.diamond.f5':'Webhooks for programmatic alerts',
     'tier.diamond.f6':'Early access to everything, no exceptions',
@@ -3415,97 +3356,97 @@ const T = {
     'nav.tier':'Tiers',
     'tier.gold.x1':'Public data API',
     'tier.diamond.name':'Diamond',
-    'tier.diamond.tagline':'Full access, API included. For institutions, traders, and those building on RadARG.',
+    'tier.diamond.tagline':'Everything, API included. For institutions, traders, and builders on top of RadARG.',
     'tier.diamond.f1':'Everything in Gold',
     'tier.diamond.f2':'Public API: integrate RadARG into your systems',
-    'tier.diamond.f3':'Cross-user comparison and benchmarks',
+    'tier.diamond.f3':'Benchmarking across users',
     'tier.diamond.f4':'Historical data export (CSV/JSON)',
     'tier.diamond.f5':'Webhooks for programmatic alerts',
     'tier.diamond.f6':'Early access to everything, no exceptions',
     'tier.diamond.cta':'Access Diamond',
-    'gift.title':'1 mes de acceso al Tier Plata',
+    'gift.title':'1 month of Silver, on us',
     'gift.sub':'If you submitted a suggestion that we implemented, you earn 1 full month of Silver access. Activate with your card. No charge until it expires.',
     'gift.cta':'Activate access',
     'gift.modal.title':'Verify your suggestion',
     'gift.modal.cta':'✦ Send request',
     'nav.tier':'Tiers',
     // Gift EN
-    'gift.title':'1 mes de acceso al Tier Plata',
-    'gift.sub':'Have an idea to improve RadARG? If we implement it, we gift you 1 month of Silver.',
+    'gift.title':'1 month of Silver, on us',
+    'gift.sub':'Got an idea to make RadARG better? If we ship it, the next month of Silver is on us.',
     'gift.cta':'Activate access',
     'gift.modal.title':'Verify your suggestion',
-    'gift.modal.sub':'Enter your email and we verify if your suggestion was implemented. 1 month free, card required to activate.',
+    'gift.modal.sub':'Drop your email and our team checks whether your suggestion made it into the product. If it did, you get a single-use coupon for 1 month of Silver.',
     'gift.modal.placeholder':'your@email.com',
     'gift.modal.cta':'✦ Send request',
-    'gift.modal.terms':'* Card required. 1-month credit applied at no charge. If not cancelled before expiry, continues at USD 4.99/month.',
-    'tiers.headline':'Choose your access level','tiers.sub':'From free access to advanced tools for professional investors and analysts.',
-    'tier.free.period':'forever','tier.month.period':'/ month','tier.trial.note':'Cancel anytime · No commitment',
+    'gift.modal.terms':'The coupon is single-use and valid for 30 days from issue. Not combinable with other offers.',
+    'tiers.headline':'Choose your access level','tiers.sub':'From free access to pro-grade tools for serious investors and analysts.',
+    'tier.free.period':'forever','tier.month.period':'/ month','tier.trial.note':'Cancel anytime · No strings attached',
     'tier.security':'🔒 Secure payments via Mercado Pago & Stripe · Cancel anytime · 7-day money-back guarantee',
-    'tier.popular.pre':'The top choice among',
+    'tier.popular.pre':'The favorite among',
     'tier.popular.label':'Most chosen',
-    'tier.bronze.name':'Bronze','tier.bronze.tagline':'The full index, no barriers. Everything you need to get started.',
-    'tier.bronze.f1':'RadARG Index in real time','tier.bronze.f2':'5 index dimensions with descriptions','tier.bronze.f3':'Historical chart 2000–today','tier.bronze.f4':'AI analysis of the moment','tier.bronze.f5':'Relevant news of the day',
-    'tier.bronze.x1':'Weekly newsletter','tier.bronze.x2':'Personalized AI summarizer','tier.bronze.x3':'Index weighting tool',
+    'tier.bronze.name':'Bronze','tier.bronze.tagline':'The full index, no gates. Everything you need to start.',
+    'tier.bronze.f1':'RadARG Index in real time','tier.bronze.f2':'5 index dimensions with descriptions','tier.bronze.f3':'Historical chart 2000–today','tier.bronze.f4':'AI read on today\'s market','tier.bronze.f5':'The day\'s key headlines',
+    'tier.bronze.x1':'Weekly newsletter','tier.bronze.x2':'Personalized AI summaries','tier.bronze.x3':'Index weighting tool',
     'tier.bronze.cta':'Explore RadARG',
-    'tier.silver.name':'Silver','tier.silver.tagline':'For those who want to stay one step ahead of the market with concrete weekly analysis.',
-    'tier.silver.f1':'Everything in Bronze','tier.silver.f2':'Weekly newsletter every Monday','tier.silver.f3':'AI summarizer: weekly market context','tier.silver.f4':'Alerts on sharp market moves','tier.silver.f5':'Early access to new features',
+    'tier.silver.name':'Silver','tier.silver.tagline':'For people who want to stay a step ahead, with concrete analysis every week.',
+    'tier.silver.f1':'Everything in Bronze','tier.silver.f2':'Weekly newsletter every Monday','tier.silver.f3':'AI summaries: your weekly market context','tier.silver.f4':'Alerts when the market moves fast','tier.silver.f5':'Early access to new features',
     'tier.silver.x1':'Custom index weighting tool','tier.silver.x2':'Extended macro indicators',
     'tier.silver.cta':'Start 7-day free trial',
-    'tier.gold.name':'Gold','tier.gold.tagline':'For investors and analysts who need full control over the index and advanced macro data.',
-    'tier.gold.f1':'Everything in Silver','tier.gold.f2':'Index weighting: adjust weights to your criteria','tier.gold.f3':'Extended macro indicators: GDP, unemployment, foreign trade','tier.gold.f4':'Customizable dashboard','tier.gold.f5':'Private data API','tier.gold.f6':'Priority support',
+    'tier.gold.name':'Gold','tier.gold.tagline':'For investors and analysts who want full control of the index and deeper macro data.',
+    'tier.gold.f1':'Everything in Silver','tier.gold.f2':'Index weighting: tune it to your own thesis','tier.gold.f3':'Extended macro indicators: GDP, unemployment, foreign trade','tier.gold.f4':'Customizable dashboard','tier.gold.f5':'Private data API','tier.gold.f6':'Priority support',
     'tier.gold.cta':'Access Gold',
     'tier.gold.x1':'Public data API',
     'tier.diamond.name':'Diamond',
-    'tier.diamond.tagline':'Full access, API included. For institutions, traders, and those building on RadARG.',
+    'tier.diamond.tagline':'Everything, API included. For institutions, traders, and builders on top of RadARG.',
     'tier.diamond.f1':'Everything in Gold',
     'tier.diamond.f2':'Public API: integrate RadARG into your systems',
-    'tier.diamond.f3':'Cross-user comparison and benchmarks',
+    'tier.diamond.f3':'Benchmarking across users',
     'tier.diamond.f4':'Historical data export (CSV/JSON)',
     'tier.diamond.f5':'Webhooks for programmatic alerts',
     'tier.diamond.f6':'Early access to everything, no exceptions',
     'tier.diamond.cta':'Access Diamond',
-    'gift.title':'1 mes de acceso al Tier Plata',
+    'gift.title':'1 month of Silver, on us',
     'gift.sub':'If you submitted a suggestion that we implemented, you earn 1 full month of Silver access. Activate with your card. No charge until it expires.',
     'gift.cta':'Activate access',
     'gift.modal.title':'Verify your suggestion',
     'gift.modal.cta':'✦ Send request',
     'nav.tier':'Tiers',
-    'gift.title':'1 mes de acceso al Tier Plata','gift.sub':'Have an idea to improve RadARG? If we implement it, we gift you 1 month of Silver.','gift.cta':'Activate access',
-    'gift.modal.title':'Verify your suggestion','gift.modal.sub':'Enter your email and we verify if your suggestion was implemented. 1 month free, card required to activate.',
+    'gift.title':'1 month of Silver, on us','gift.sub':'Got an idea to make RadARG better? If we ship it, the next month of Silver is on us.','gift.cta':'Activate access',
+    'gift.modal.title':'Verify your suggestion','gift.modal.sub':'Drop your email and our team checks whether your suggestion made it into the product. If it did, you get a single-use coupon for 1 month of Silver.',
     'gift.modal.placeholder':'your@email.com','gift.modal.cta':'✦ Send request',
-    'gift.modal.terms':'* Card required. 1-month credit applied at no charge. If not cancelled before expiry, continues at USD 4.99/month.',
+    'gift.modal.terms':'The coupon is single-use and valid for 30 days from issue. Not combinable with other offers.',
     'pro.cta':'Subscribe to Pro','pro.support':'Support for free','pro.note':'Secure payments via Mercado Pago · Cancel anytime',
     'sponsors.eyebrow':'✦ Exclusive sponsorship opportunity ✦',
-    'sponsors.title':'Your brand in front of the people who move money in Argentina',
-    'sponsors.sub':'RadARG is the daily reference for investors, traders, financial analysts, portfolio managers and executives who make decisions with real money.',
-    'sponsors.subcta':'Not mass reach. The reach that acts.',
+    'sponsors.title':'Put your brand in front of Argentina\'s money movers',
+    'sponsors.sub':'RadARG is the daily go-to for the investors, traders, analysts, portfolio managers, and founders who put real money on the line.',
+    'sponsors.subcta':'Not mass reach. The reach that moves.',
     'sponsors.cta':'Become a sponsor',
     'sponsors.b1':'Audience: investors & analysts','sponsors.b2':'Logo on the homepage',
-    'sponsors.b3':'Direct link to your site','sponsors.b4':'Mention in index publications',
+    'sponsors.b3':'Direct link to your site','sponsors.b4':'Shout-outs in our index updates',
     'sponsors.aud1':'Individual investors','sponsors.aud2':'Active traders',
     'sponsors.aud3':'Financial analysts','sponsors.aud4':'Portfolio managers','sponsors.aud5':'Financial journalists',
     // Sponsor contact form
     'spform.eyebrow':'Sponsor RadARG','spform.title':'Tell us about your company',
-    'spform.sub':'We\'ll get back to you within 48 hours with a personalized proposal.',
+    'spform.sub':'We\'ll get back to you within 48 hours with a proposal built for you.',
     'spform.name':'Full name','spform.company':'Company / Organization',
     'spform.email':'Contact email','spform.budget':'Estimated monthly budget',
-    'spform.budget.select':'–','spform.message':'Tell us what you want to achieve',
+    'spform.budget.select':'–','spform.message':'Tell us what you\'re after',
     'spform.send':'Send inquiry',
     'spform.ok.title':'Inquiry sent!',
     'spform.ok.msg':'We\'ll get back to you within 48 hours. Also check your spam folder.',
     'spform.ok.close':'Close',
-    'spform.err':'There was an error sending. Please try again or contact us at contacto@radarg.com',
+    'spform.err':'Something went wrong. Try again, or reach us at contacto@radarg.com',
     'meth.g.label':'Simple explanation','meth.g.title':'What is RadARG for?',
-    'meth.g.desc':'RadARG tells you, in one number, whether the Argentine market is in panic or optimism mode.',
-    'meth.g.q1':'What does the number mean?','meth.g.a1':'The index runs from 0 to 100. Near 0 the market is in fear mode: people sell and distrust. Near 100 there is widespread optimism: people invest and bet on growth. The midpoint is a neutral zone.',
-    'meth.g.q2':'How to use it?','meth.g.a2':'Extreme Fear zones have historically offered entry opportunities for contrarian investors. Extreme Greed can signal an overheated or overvalued market. Use it as context for your own decisions, not as a buy or sell signal.',
-    'meth.g.q3':'What does it measure?','meth.g.a3':'Five dimensions of the Argentine economy: inflation and monetary policy, the exchange rate and reserves, real activity and welfare, the fiscal situation and sovereign debt, and financial markets. Each contributes between 15% and 25% to the final score.',
-    'meth.g.q4':'Can I trust it?','meth.g.a4':'The data is real and sourced from verified public institutions. Exchange rates update in real time within the page. No index predicts the future, so use it to understand economic context and make better-informed decisions, not as investment advice.',
-    'suggest.heading':'What would you improve?','suggest.p':'Ideas about indicators, visualizations or new features.',
+    'meth.g.desc':'RadARG tells you in a single number whether Argentina\'s market is running on fear or optimism.',
+    'meth.g.q1':'What does the number mean?','meth.g.a1':'It runs from 0 to 100. Near 0, fear takes over — people sell and sit on the sidelines. Near 100, optimism is everywhere — people invest and bet on growth. The middle is neutral ground.',
+    'meth.g.q2':'How to use it?','meth.g.a2':'Historically, Extreme Fear has been where contrarian investors found openings, while Extreme Greed can flag an overheated or overpriced market. Treat it as context for your own calls — not a buy or sell signal.',
+    'meth.g.q3':'What does it measure?','meth.g.a3':'Five dimensions of Argentina\'s economy: inflation and monetary policy, the exchange rate and reserves, real activity and welfare, fiscal health and sovereign debt, and financial markets. Each one adds between 15% and 25% to the final score.',
+    'meth.g.q4':'Can I trust it?','meth.g.a4':'The data is real, pulled from verified public institutions, and exchange rates update live right on the page. No index predicts the future — use it to read the economic context and make sharper decisions, not as investment advice.',
+    'suggest.heading':'What would you improve?','suggest.p':'Got ideas on indicators, visuals, or new features?',
     'suggest.name':'Name (optional)','suggest.type':'Type','suggest.message':'Your suggestion','suggest.send':'Send',
     'suggest.type.placeholder':'Select…','suggest.type.indicator':'New indicator','suggest.type.viz':'Visualization',
     'suggest.type.data':'Data or sources','suggest.type.feature':'Feature','suggest.type.bug':'Bug','suggest.type.other':'Other',
-    'donate.title':'RadARG is free','donate.sub':'No ads, no paywalls. Support if you find it useful.',
+    'donate.title':'RadARG is free','donate.sub':'No ads, no paywalls. Chip in if it helps you.',
     'scoreLabel.fe':'Extreme Fear','scoreLabel.f':'Fear','scoreLabel.n':'Neutral',
     'scoreLabel.g':'Moderate Greed','scoreLabel.ge':'Extreme Greed',
     // Dynamic UI strings
@@ -3522,7 +3463,7 @@ const T = {
     'val.writeMsg':'Please write your suggestion.',
     // Suggest popup
     'popup.thanks':'Thanks for your suggestion!',
-    'popup.msg':'I\'ll read it carefully. If you left your email and the idea is implemented, I\'ll let you know.',
+    'popup.msg':'We\'ll read it closely. If you left your email and we ship the idea, we\'ll let you know.',
     'popup.close':'Close',
     // Suggest placeholders
     'suggest.msg.placeholder':'Tell me your idea in as much detail as you want…',
@@ -3544,27 +3485,29 @@ const T = {
     'pro.payment.note':'Secure payment · Cancel anytime · USD or ARS',
     // Donate modal
     'donate.modal.title':'☕ Support RadARG',
-    'donate.modal.sub':'If this index helps you, any contribution helps keep it free.',
+    'donate.modal.sub':'If this index helps you, anything you chip in keeps it running and free.',
     // Ticker timestamp
     'ticker.act':'Upd.',
     // ── Nav ──
     'nav.support':'Support','nav.suggest':'Suggestions',
     // ── Support section ──
     'support.title':'RadARG is free and we want to keep it that way',
-    'support.sub':'Keeping the index online has real costs: the AI model that analyzes data and writes the summaries, the server, the data APIs and the project tools. If you find it useful, any contribution helps a lot.',
+    'support.sub':'Keeping the index live costs real money — the AI that crunches the data and writes the summaries, the server, the data APIs, the tooling. If it\'s useful to you, anything you chip in goes a long way.',
     'support.cta.main':'Support the project',
-    'support.disclaimer':'100% voluntary · Any amount helps',
+    'support.disclaimer':'100% voluntary · Every bit counts',
     'support.r1':'AI tokens for analysis and summaries',
     'support.r2':'Real-time market data APIs',
     'support.r3':'Server hosting and tools',
-    'support.r4':'The index always free, no ads or paywalls',
+    'support.r4':'An index that stays free — no ads, no paywalls',
     // ── Ranking ──
-    'ranking.title':'Top supporters','ranking.sub':'The people who make RadARG possible',
+    'ranking.title':'Top supporters','ranking.sub':'The people keeping RadARG alive',
+    'ranking.tab.monthly':'This month','ranking.tab.alltime':'All-time',
+    'ranking.empty.month':'No supporters yet this month.<br>You could be the first!',
     'ranking.empty':'No supporters yet.<br>You could be the first!',
     'ranking.footer':'The ranking updates every day',
     // ── ctx-strip new ──
     'ctx.brecha':'FX Gap','ctx.brecha.sub':'Blue vs. official',
-    'ctx.ccl':'CCL Dollar','ctx.ccl.sub':'Contado con liqui (CCL)',
+    'ctx.ccl':'CCL Dollar','ctx.ccl.sub':'Contado con Liquidación',
     'ctx.swipe':'Swipe to see all the data',
     'ctx.oficial':'Official Dollar','ctx.oficial.sub':'Official exchange rate · dolarapi.com',
     'ctx.blue':'Blue Dollar',
@@ -3576,24 +3519,28 @@ const T = {
     'ctx.icg':'Government Confidence','ctx.icg.sub':'ICG UTDT · monthly',
     // ── Footer ──
     'footer.update':'Index updated every day at 12:00',
+    'footer.tagline':'Argentina\'s financial market, at a glance',
+    'footer.disc':'Data from verified public sources. For information only — not financial advice. 2007–2015 figures use private inflation estimates.',
+    'footer.sources':'Data sources',
+    'footer.rights':'© 2026 RadARG · All rights reserved',
     // ── Methodology: simple (new) ──
     'meth.g.q5':'How often is it updated?',
-    'meth.g.a5':'The index is recalculated and published every day at 12:00. Market data such as the dollar and the Merval refresh within the page throughout the day.',
+    'meth.g.a5':'The index is recalculated and published daily at 12:00. Market data like the dollar and the Merval refresh on the page throughout the day.',
     // ── Methodology: technical ──
     'meth.t.label':'🔬 Technical methodology','meth.t.title':'Composite index design',
-    'meth.t.desc':'RadARG is a sentiment index for the Argentine economy. The final score (0–100) is the weighted average of five thematic segments, each made up of sub-indicators normalized to [0,100].',
+    'meth.t.desc':'RadARG is a sentiment index for Argentina\'s economy. The final score (0–100) is the weighted average of five thematic segments, each built from sub-indicators normalized to [0,100].',
     'meth.t.q1':'Segment structure',
     'meth.t.a1':'S = Σ(wᵢ·sᵢ), with Σwᵢ = 100%. Inflation & Monetary Policy 25%, FX & Reserves 25%, Markets & Expectations 20%, Real Activity & Welfare 15%, Fiscal & Sovereign Debt 15%.',
     'meth.t.q2':'Inflation & Monetary Policy',
-    'meth.t.a2':'Combines INDEC monthly CPI, real rate (time deposit minus inflation), and 12-month inflation expectations from the BCRA REM survey. Falling inflation and a positive real rate raise the score.',
+    'meth.t.a2':'Combines INDEC\'s monthly CPI, the real rate (time deposit minus inflation), and 12-month inflation expectations from the BCRA\'s REM survey. Falling inflation and a positive real rate push the score up.',
     'meth.t.q3':'FX & Reserves',
-    'meth.t.a3':'Exchange-rate gap with non-linear mapping (negative gap → score ~90, historically unprecedented), BCRA net reserves, and an agro-export liquidation proxy. The gap carries the most weight.',
+    'meth.t.a3':'The FX gap with non-linear mapping (a negative gap → score ~90, historically unprecedented), BCRA net reserves, and an agro-export liquidation proxy. The gap carries the most weight.',
     'meth.t.q4':'Markets & Expectations',
     'meth.t.a4':'Country Risk (EMBI), Merval in dollars, GD35 yield, AL30/GD30 spread (local vs New York law), leading-panel breadth and political climate (ICG-UTDT + news sentiment).',
     'meth.t.q5':'Activity & Fiscal',
-    'meth.t.a5':'Activity: EMAE, real wages (RIPTE), mass consumption, consumer confidence, unemployment and vehicle registrations. Fiscal: primary balance, debt rollover, IMF target compliance and sovereign rating relative to Argentina\'s own history.',
+    'meth.t.a5':'Activity: EMAE, real wages (RIPTE), mass consumption, consumer confidence, unemployment, and vehicle registrations. Fiscal: primary balance, debt rollover, IMF target compliance, and the sovereign rating relative to Argentina\'s own history.',
     'meth.t.q6':'Sources, frequency and limits',
-    'meth.t.a6':'Sources: dolarapi, ArgentinaDatos, BCRA, INDEC, Open BYMA Data, Yahoo Finance/CBOT, UTDT. The index is recalculated daily (12:00). It is a sentiment index, not predictive: it does not incorporate capital flows or forward expectations. 2007–2015 data uses private inflation estimates.',
+    'meth.t.a6':'Sources: dolarapi, ArgentinaDatos, BCRA, INDEC, Open BYMA Data, Yahoo Finance/CBOT, UTDT. The index is recalculated daily (12:00). It measures sentiment, not prediction — it does not factor in capital flows or forward expectations. 2007–2015 figures use private inflation estimates.',
   }
 };
 
@@ -4390,7 +4337,7 @@ function computeSubIndices(bs) {
       w:10, score: fmiV!=null ? fmiScore(fmiV) : 50,
       src: fmiV!=null ? 'FMI / Min. Economía' : NA,
       live: fmiV!=null, unavailable: fmiV==null,
-      raw: fmiV!=null ? `${es?'Cumplimiento':'Compliance'}: ${fmiV.toFixed(0)}/100` : '',
+      raw: fmiV!=null ? (()=>{ const v=fmiV; const lvl = v<40?(es?'Incumplimiento':'Non-compliant'):v<60?(es?'Cumplimiento parcial':'Partial compliance'):v<80?(es?'En regla':'On track'):(es?'Cumplimiento pleno':'Full compliance'); return (es?'Cumplimiento: ':'Compliance: ')+lvl; })() : '',
       unavailNote: fmiV==null ? (es?'Señal cualitativa mensual basada en comunicados FMI/Economía. En desarrollo.' : 'Monthly qualitative signal based on IMF/Economy communiques. In development.') : '',
       desc: es?'Evaluación del cumplimiento de las metas cuantitativas del acuerdo con el FMI. El incumplimiento activa cláusulas de waiver y genera incertidumbre.'
              :'Assessment of compliance with IMF agreement quantitative targets. Non-compliance triggers waiver clauses and generates uncertainty.' },
@@ -4410,12 +4357,12 @@ function computeSubIndices(bs) {
   const seg5 = [
     { name: es?'Riesgo País (EMBI)':'Country Risk (EMBI)', freq:'diario',
       w:25, score: LIVE.embi.score, src:'ArgentinaDatos', live: LIVE.embi.live,
-      raw: LIVE.embi.bps ? `${LIVE.embi.bps} bps · score ${LIVE.embi.score}/100` : '',
+      raw: LIVE.embi.bps ? `${LIVE.embi.bps} bps` : '',
       desc: es?'Spread de la deuda soberana argentina sobre los Treasuries de EEUU. El indicador de riesgo más seguido mediáticamente. Comprimió de ~850 bps en 2025 a ~525 bps hoy.'
              :'Spread of Argentine sovereign debt over US Treasuries. The most media-followed risk indicator. Compressed from ~850 bps in 2025 to ~525 bps today.' },
     { name: es?'Merval USD (vs media 52s)':'Merval USD (vs 52w avg)', freq:'diario',
       w:20, score: LIVE.merval.score, src:'IOL/Yahoo', live: LIVE.merval.live,
-      raw: LIVE.merval.usd ? `USD ${Math.round(LIVE.merval.usd).toLocaleString('es-AR')}` + (LIVE.merval.score!=null ? ` · score ${LIVE.merval.score}/100`:'') : (LIVE.merval.raw||''),
+      raw: LIVE.merval.usd ? `USD ${Math.round(LIVE.merval.usd).toLocaleString('es-AR')}` : (LIVE.merval.raw||''),
       desc: es?'El Merval en dólares CCL captura el apetito de riesgo en renta variable local. Máximos históricos en USD señalan codicia extrema del mercado financiero.'
              :'Merval in CCL dollars captures local equity risk appetite. Historical USD highs signal extreme financial market greed.' },
     { name: es?'Rendimiento GD35 (TIR)':'GD35 Yield (YTM)', freq:'diario',
@@ -4444,7 +4391,7 @@ function computeSubIndices(bs) {
       w:10, score: LIVE.icg!=null ? intScore((LIVE.icg/5)*100) : 40,
       src: LIVE.icg!=null ? 'UTDT (mensual)' : 'UTDT',
       live: LIVE.icg!=null, mensual: true,
-      raw: LIVE.icg!=null ? `${LIVE.icg.toFixed(2)}/5 (${intScore((LIVE.icg/5)*100)}/100)` : '',
+      raw: LIVE.icg!=null ? `${LIVE.icg.toFixed(2)}/5` : '',
       desc: es?'Índice de Confianza en el Gobierno de la UTDT. Encuesta mensual que mide la aprobación de la gestión. Históricamente, caídas sostenidas del ICG preceden deterioros del clima financiero y complican la renovación del apoyo político al ajuste fiscal.'
              :'UTDT Government Confidence Index. Monthly survey measuring approval of the administration. Historically, sustained ICG declines precede financial climate deterioration and complicate political support for fiscal adjustment.' },
     { name: es?'Sentimiento de Noticias':'News Sentiment', freq:'diario',
@@ -4452,7 +4399,7 @@ function computeSubIndices(bs) {
       src: LIVE._sentimiento_noticias!=null ? (es?'Múltiples fuentes · últimas 72h':'Multiple sources · last 72h') : 'Google News',
       live: LIVE._sentimiento_noticias!=null,
       unavailable: LIVE._sentimiento_noticias==null,
-      raw: LIVE._sentimiento_noticias!=null ? `${Math.round(LIVE._sentimiento_noticias)}/100` : '',
+      raw: LIVE._sentimiento_noticias!=null ? (()=>{ const v=Math.round(Number(LIVE._sentimiento_noticias)); return v<25?(es?'Muy negativo':'Very negative'):v<45?(es?'Negativo':'Negative'):v<56?(es?'Neutral':'Neutral'):v<75?(es?'Positivo':'Positive'):(es?'Muy positivo':'Very positive'); })() : '',
       unavailNote: LIVE._sentimiento_noticias==null ? (es?'Se actualiza diariamente con el GAS.':'Updated daily by the GAS.') : '',
       desc: es?'Análisis de sentimiento de las 15 noticias económicas y políticas más relevantes de las últimas 72 horas, agregadas de múltiples medios (La Nación, TN, Ámbito, Infobae, Crónica, A24, El Cronista, CNN, BBC, Bloomberg, entre otros). Un score alto indica un flujo de noticias positivo para el mercado; uno bajo refleja noticias de riesgo o incertidumbre. Se actualiza diariamente vía Google Apps Script.':'Sentiment analysis of the 15 most relevant economic and political news items from the last 72 hours, aggregated from multiple outlets (La Nación, TN, Ámbito, Infobae, Crónica, A24, El Cronista, CNN, BBC, Bloomberg, among others). A high score reflects a positive news flow for the market; a low one reflects risk or uncertainty. Updated daily via Google Apps Script.' },
   ];
@@ -5009,59 +4956,7 @@ async function fetchAllLive() {
   render();
 }
 
-/* ── Render ticker ─────────────────────────────────────────── */
-function renderTicker() {
-  const track = document.getElementById('tickerTrack');
-  if(!track) return;
-
-  // Guardar el set base (6 items) la primera vez
-  if(!track.dataset.baseHtml){
-    track.dataset.baseHtml = track.innerHTML;
-  }
-  const baseHtml = track.dataset.baseHtml;
-
-  // Función que rellena los valores en todas las copias presentes
-  const fill = () => {
-    const setAll = (cls, val) => track.querySelectorAll('.'+cls).forEach(e => e.textContent = val);
-    setAll('tk-of',  fmtPeso(S.oficial));
-    setAll('tk-bl',  fmtPeso(S.blue));
-    setAll('tk-mep', fmtPeso(S.mep));
-    setAll('tk-ccl', fmtPeso(S.ccl));
-    setAll('tk-may', fmtPeso(S.mayorista));
-    setAll('tk-tar', fmtPeso(S.tarjeta));
-  };
-
-  // 1. Poner UN set con los valores reales y medir su ancho (tras el layout)
-  track.style.animation = 'none';           // pausar mientras medimos
-  track.style.setProperty('--ticker-shift', '0px');
-  track.innerHTML = baseHtml;
-  fill();
-
-  requestAnimationFrame(() => {
-    const setWidth = track.scrollWidth;       // ancho real de un set con valores
-    const viewport = (track.parentElement && track.parentElement.offsetWidth) || window.innerWidth || 1200;
-    // Cantidad de sets para cubrir holgadamente 2x el viewport (mínimo 3 para fluidez)
-    const sets = Math.max(3, Math.ceil((viewport * 2) / Math.max(setWidth, 1)) + 1);
-    track.innerHTML = baseHtml.repeat(sets);
-    fill();
-    // El loop se desplaza exactamente el ancho de UN set base
-    track.style.setProperty('--ticker-shift', '-' + setWidth + 'px');
-    // Velocidad constante (~70 px/s) → duración proporcional al ancho de un set
-    const dur = Math.max(18, Math.round(setWidth / 70));
-    track.style.setProperty('--ticker-dur', dur + 's');
-    // Reactivar la animación
-    track.style.animation = '';
-  });
-}
-
-// Recalcular el ticker al redimensionar (evita huecos en cualquier ancho/zoom)
-let _tickerResizeTimer = null;
-window.addEventListener('resize', () => {
-  clearTimeout(_tickerResizeTimer);
-  _tickerResizeTimer = setTimeout(() => {
-    if(typeof S !== 'undefined' && S.oficial) renderTicker();
-  }, 200);
-});
+/* ── Ticker de cotizaciones: eliminado ─────────────────────── */
 
 /* ── Render context cards ──────────────────────────────────── */
 function renderCtx() {
@@ -6098,7 +5993,8 @@ function buildChart(from,to){
     data:{ labels:numLabels, datasets:[{
       data:scores, borderColor:'#0ea5e9', borderWidth:2, yAxisID:'y',
       pointRadius:scores.map((_,i)=>i===n-1?6:n<=36?3:0),
-      pointHoverRadius:6,
+      pointHoverRadius:7,
+      pointHitRadius:20,
       pointBackgroundColor:scores.map(scoreColor),
       pointBorderColor:scores.map(scoreColor), pointBorderWidth:0,
       fill:true,
@@ -6206,78 +6102,30 @@ function buildChart(from,to){
     ],
   });
   histInst._radargRawLabels = rawLabels;
-  bindMilestoneClicks();
-  // Cerrar el panel de hito si estaba abierto (el rango pudo cambiar las posiciones)
-  if(typeof closeMilestonePanel==='function'){ const p=document.getElementById('milestonePanel'); if(p && !p.dataset.keepOpen) closeMilestonePanel(); }
   } catch(err) {
     console.error('[RadARG] buildChart error:', err, '| n='+n+' from='+from+' to='+to);
   }
 }
 
-// ── Selección de hitos en el gráfico ──────────────────────────
-// Los hitos se dibujan como pixeles en el canvas (no son puntos de Chart.js),
-// así que detectamos el click/tap buscando el hito más cercano dentro de un radio amplio.
-let _milestoneHandlersBound = false;
-function bindMilestoneClicks(){
-  const canvasEl = document.getElementById('histChart');
-  if(!canvasEl || _milestoneHandlersBound) return;
-  _milestoneHandlersBound = true;
-
-  const handler = (clientX, clientY) => {
-    const boxes = window._milestoneHitboxes || [];
-    if(!boxes.length) return;
-    const rect = canvasEl.getBoundingClientRect();
-    const px = clientX - rect.left;
-    const py = clientY - rect.top;
-    const HIT_RADIUS = 34; // zona generosa para mouse y dedo
-    let best = null, bestD = Infinity;
-    boxes.forEach(b => {
-      const d = Math.hypot(b.x - px, b.y - py);
-      if(d < bestD){ bestD = d; best = b; }
-    });
-    if(best && bestD <= HIT_RADIUS){
-      // Toggle: si ya está abierto el mismo hito, lo cierra
-      const panel = document.getElementById('milestonePanel');
-      if(panel && panel.classList.contains('open') && panel.dataset.openLabel === best.m.label){
-        closeMilestonePanel();
-      } else {
-        openMilestonePanel(best.m, best.score);
-      }
-    } else {
-      closeMilestonePanel();
-    }
-  };
-
-  canvasEl.addEventListener('click', (e) => handler(e.clientX, e.clientY));
+// ── Navegación a hitos desde la sección "Hitos" ──────────────
+// Resetea el rango del gráfico, scrollea al gráfico y muestra el tooltip
+// nativo de Chart.js sobre el punto del hito (para ubicarlo en el tiempo).
+function showMilestoneTooltip(label){
+  if(!histInst) return;
+  const rawLbls = histInst._radargRawLabels || [];
+  const _disp = k => window.MONTHLY_DISPLAY ? window.MONTHLY_DISPLAY(k) : k;
+  // Buscar el índice del punto que corresponde al hito
+  let idx = -1;
+  for(let i=0;i<rawLbls.length;i++){ if(_disp(rawLbls[i])===label){ idx=i; break; } }
+  if(idx < 0) return;
+  try {
+    // Activar el tooltip nativo sobre el punto del dataset principal (índice 0)
+    histInst.tooltip.setActiveElements([{ datasetIndex:0, index:idx }], {x:0, y:0});
+    histInst.setActiveElements([{ datasetIndex:0, index:idx }]);
+    histInst.update();
+  } catch(_){}
 }
 
-function openMilestonePanel(m, score){
-  const panel = document.getElementById('milestonePanel');
-  if(!panel) return;
-  const isEN = LANG==='en';
-  const title = (isEN && m.short_en) ? m.short_en : m.short;
-  const desc  = (isEN && m.desc_en)  ? m.desc_en  : m.desc;
-  panel.style.setProperty('--mp-color', m.color);
-  const yEl=$('mpYear'), sEl=$('mpScore'), tEl=$('mpTitle'), dEl=$('mpDesc');
-  if(yEl) yEl.textContent = m.label;
-  if(sEl) sEl.textContent = (score!=null?score:m.score);
-  if(tEl) tEl.textContent = title || '';
-  if(dEl) dEl.textContent = desc || '';
-  panel.dataset.openLabel = m.label;
-  panel.classList.add('open');
-  panel.setAttribute('aria-hidden','false');
-}
-
-function closeMilestonePanel(){
-  const panel = document.getElementById('milestonePanel');
-  if(!panel) return;
-  panel.classList.remove('open');
-  panel.setAttribute('aria-hidden','true');
-  panel.dataset.openLabel = '';
-}
-
-// Abrir un hito específico desde la sección "Hitos": resetea el rango del gráfico,
-// scrollea al gráfico y abre el panel del hito.
 function openMilestoneFromCard(label){
   const m = MILESTONES.find(x => x.label === label);
   if(!m) return;
@@ -6296,8 +6144,8 @@ function openMilestoneFromCard(label){
     const top = chartSec.getBoundingClientRect().top + window.pageYOffset - headerH - 20;
     window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
   }
-  // 3. Esperar a que el chart se redibuje y abrir el panel del hito
-  setTimeout(() => { bindMilestoneClicks(); openMilestonePanel(m, m.score); }, 450);
+  // 3. Esperar a que el chart se redibuje y mostrar el tooltip nativo del hito
+  setTimeout(() => showMilestoneTooltip(m.label), 500);
 }
 
 function initSlider(){
@@ -6375,7 +6223,7 @@ function buildHitos(){
 function render(){
   const bs=brechaToScore(S.brecha),total=computeTotal(bs);
   try {
-    renderTicker(); renderCtx(); renderGauge(total); renderIndicators(bs);
+    renderCtx(); renderGauge(total); renderIndicators(bs);
   } catch(e) {
     console.error('[RadARG] render error:', e);
     const sec = document.getElementById('indicadores');
@@ -6539,23 +6387,35 @@ const NEWS_EN = [
   {tag:'economy',tagLabel:'Economy',headline:'March inflation: 3.4% monthly; 2026 YTD at 9.1%, lowest since 2017',meta:'INDEC · April 2026',impact:'pos',impactLabel:'Positive',url:'#'},
 ];
 
+// Pestaña activa del ranking: 'mensual' (default) | 'historico'
+window._rankingTab = window._rankingTab || 'mensual';
+
+function setRankingTab(tab){
+  window._rankingTab = (tab === 'historico') ? 'historico' : 'mensual';
+  const tm = document.getElementById('rankingTabMensual');
+  const th = document.getElementById('rankingTabHistorico');
+  if(tm) tm.classList.toggle('active', window._rankingTab === 'mensual');
+  if(th) th.classList.toggle('active', window._rankingTab === 'historico');
+  renderRanking();
+}
+
 function renderRanking(){
   const list = document.getElementById('rankingList');
   if(!list) return;
-  const data = window._ranking || [];
+  // Selecciona la fuente según la pestaña activa.
+  // Fallback retrocompatible: si solo existe el _ranking viejo, se usa como histórico.
+  const mensual   = window._ranking_mensual   || [];
+  const historico = window._ranking_historico || window._ranking || [];
+  const data = (window._rankingTab === 'historico') ? historico : mensual;
+
   if(!data.length){
-    list.innerHTML = '<div class="ranking-empty">' + t('ranking.empty') + '</div>';
+    const emptyKey = (window._rankingTab === 'historico') ? 'ranking.empty' : 'ranking.empty.month';
+    list.innerHTML = '<div class="ranking-empty">' + t(emptyKey) + '</div>';
     return;
   }
   // Ordenar por monto descendente y mostrar hasta 10 (la lista scrollea)
   const sorted = data.slice().sort((a,b)=> (parseFloat(b.monto)||0) - (parseFloat(a.monto)||0)).slice(0,10);
   const medals = ['🥇','🥈','🥉'];
-  // Normaliza la moneda: acepta 'USD'/'ARS'/'Pesos'/'Dólares' y muestra siempre una etiqueta clara
-  const fmtMoneda = (m) => {
-    const v = (m || '').toString().trim().toUpperCase();
-    if(v === 'USD' || v === 'US$' || v === 'DOLARES' || v === 'DÓLARES' || v === 'DOLAR' || v === 'DÓLAR') return 'USD';
-    return 'Pesos';  // por defecto, pesos
-  };
   list.innerHTML = sorted.map((r,i)=>{
     const topClass = i<3 ? ' top'+(i+1) : '';
     const medal = i<3 ? '<span class="ranking-medal">'+medals[i]+'</span>' : '';
@@ -6831,11 +6691,20 @@ async function loadDataJSON() {
       console.log('[data.json] Histórico vacío — conservando datos hardcodeados (' + window.MONTHLY.labels.length + ' meses)');
     }
 
-    // Apply ranking de apoyos
+    // Apply ranking de apoyos (mensual + histórico, con fallback al _ranking viejo)
+    if(d._ranking_mensual && Array.isArray(d._ranking_mensual)) {
+      window._ranking_mensual = d._ranking_mensual;
+    }
+    if(d._ranking_historico && Array.isArray(d._ranking_historico)) {
+      window._ranking_historico = d._ranking_historico;
+    }
     if(d._ranking && Array.isArray(d._ranking)) {
-      window._ranking = d._ranking;
+      window._ranking = d._ranking; // compat: se usa como histórico si no hay _ranking_historico
+    }
+    if(d._ranking_mensual || d._ranking_historico || d._ranking) {
       renderRanking();
-      console.log('[data.json] Ranking:', d._ranking.length, 'apoyos');
+      console.log('[data.json] Ranking — mensual:', (window._ranking_mensual||[]).length,
+                  '· histórico:', (window._ranking_historico||window._ranking||[]).length);
     }
 
     return true;
