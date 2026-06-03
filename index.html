@@ -2324,9 +2324,9 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
     <div class="score-card">
       <div class="sc-eyebrow" style="color:var(--ac)">
         <span class="live-dot" style="background:var(--ac);box-shadow:none"></span>
-        <span data-i18n="score.sentiment">Sentimiento del mercado</span>
+        <span id="scSentiment" data-i18n="score.sentiment">Sentimiento del mercado</span>
       </div>
-      <div style="font-size:11px;color:var(--text3);margin-bottom:.5rem;margin-top:-.5rem;white-space:nowrap" class="score-subtitle-txt" data-i18n="score.subtitle">¿Cómo está el mercado argentino hoy?</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:.5rem;margin-top:-.5rem;white-space:nowrap" class="score-subtitle-txt" id="scSubtitle" data-i18n="score.subtitle">¿Cómo está el mercado argentino hoy?</div>
       <span class="sc-score" id="gScore">–</span>
       <span class="sc-label" id="gLbl">–</span>
       <span class="sc-date" id="gDate"><span class="sc-live-dot"></span><span id="gDateTxt">–</span></span>
@@ -2380,13 +2380,13 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
     <!-- Gauge -->
     <div class="gauge-card">
       <div style="text-align:center;padding:1rem 0 .25rem">
-        <div class="gauge-title-txt" style="font-size:26px;font-weight:800;letter-spacing:-.5px;color:var(--text);margin-bottom:6px" data-i18n="gauge.title.fear">Fear &amp; Greed Argentina</div>
+        <div class="gauge-title-txt" style="font-size:26px;font-weight:800;letter-spacing:-.5px;color:var(--text);margin-bottom:6px" data-i18n="gauge.title.fear">Índice de Miedo y Codicia</div>
         <div style="font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--text3)" class="gauge-label-txt" data-i18n="gauge.label">Argentina</div>
         <div style="font-size:10px;color:var(--text3);margin-top:2px;font-family:'JetBrains Mono',monospace" class="gauge-scale-txt" id="gaugeScaleTxt" data-i18n="gauge.scale.fear">0 = miedo extremo · 50 = neutral · 100 = codicia extrema</div>
       </div>
       <div class="index-switch" role="tablist" aria-label="Seleccionar índice">
         <button class="index-tab active" id="idxTabFear" role="tab" aria-selected="true" onclick="setActiveIndex('fear')">
-          <span class="idx-tab-name" data-i18n="idx.fear">Fear &amp; Greed</span>
+          <span class="idx-tab-name" data-i18n="idx.fear">Miedo y Codicia</span>
           <span class="idx-tab-sub" data-i18n="idx.fear.sub">Mercado / volátil</span>
         </button>
         <button class="index-tab" id="idxTabMacro" role="tab" aria-selected="false" onclick="setActiveIndex('macro')">
@@ -2506,10 +2506,14 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
   <!-- INDICATORS -->
   <section id="indicadores">
     <div class="sec-hdr">
-      <span class="sec-ttl" data-i18n="sec.indicators">5 Dimensiones del Índice</span>
+      <span class="sec-ttl" id="dataIdxTitle" data-i18n="sec.indicators.fear">Componentes del Índice de Miedo y Codicia</span>
       <div class="sec-line"></div>
     </div>
-    <!-- Detail sections: one per segment -->
+    <div class="ranking-tabs" role="tablist" style="max-width:440px;margin:0 auto 1.25rem">
+      <button class="ranking-tab active" id="dataTabFear" role="tab" onclick="setDataIndex('fear')" data-i18n="data.tab.fear">Miedo y Codicia</button>
+      <button class="ranking-tab" id="dataTabMacro" role="tab" onclick="setDataIndex('macro')" data-i18n="data.tab.macro">Solidez Macro</button>
+    </div>
+    <!-- Detail sections: one per component/segment -->
     <div class="subidx-sections fade fade-4" id="subidxSections"></div>
   </section>
 
@@ -3177,9 +3181,13 @@ const T = {
     'header.share':'Compartir',
     'score.sentiment':'Sentimiento del mercado',
     'score.subtitle':'¿Cómo está el mercado argentino hoy?',
+    'score.sentiment.fear':'Sentimiento del mercado',
+    'score.subtitle.fear':'¿Las acciones argentinas están caras o baratas hoy?',
+    'score.sentiment.macro':'Solidez macroeconómica',
+    'score.subtitle.macro':'¿Qué tan sólida está la economía argentina hoy?',
     'gauge.label':'Argentina','gauge.title':'Índice de Sentimiento del Mercado','gauge.scale':'0 = pánico total · 50 = neutral · 100 = euforia','score.1w':'Hace 1 semana','score.1m':'Hace 1 mes',
-    'idx.macro':'Solidez Macro','idx.macro.sub':'Situación del país','idx.fear':'Fear & Greed','idx.fear.sub':'Mercado / volátil',
-    'gauge.title.macro':'Índice de Solidez Macroeconómica','gauge.title.fear':'Fear & Greed Argentina',
+    'idx.macro':'Solidez Macro','idx.macro.sub':'Situación del país','idx.fear':'Miedo y Codicia','idx.fear.sub':'Mercado / volátil',
+    'gauge.title.macro':'Índice de Solidez Macroeconómica','gauge.title.fear':'Índice de Miedo y Codicia',
     'gauge.scale.macro':'0 = crítico · 50 = estable · 100 = robusto','gauge.scale.fear':'0 = miedo extremo · 50 = neutral · 100 = codicia extrema',
     'score.3m':'Hace 3 meses','score.1y':'Hace 1 año','score.updating':'Actualizando…',
     'ai.title':'Interpretación IA','ai.sub':'Análisis automático en tiempo real',
@@ -3188,6 +3196,8 @@ const T = {
     'news.aisub':'Una noticia por cada tema relevante · últimas 48hs',
     'ai.loading':'Analizando…','ai.disclaimer':'Generado con IA. No constituye asesoramiento financiero.',
     'sec.indicators':'5 Dimensiones del Índice','sec.historic':'Evolución Histórica',
+    'sec.indicators.fear':'Componentes del Índice de Miedo y Codicia','sec.indicators.macro':'5 Dimensiones de la Solidez Macro',
+    'data.tab.fear':'Miedo y Codicia','data.tab.macro':'Solidez Macro',
     'sec.milestones':'Hitos Históricos','sec.tiers':'Tiers','sec.sponsors':'Sponsors',
     'sec.meth.general':'Para todos','sec.meth.tech':'Para especialistas',
     'sec.suggest':'Sugerencias',
@@ -3469,6 +3479,10 @@ const T = {
     'header.share':'Share',
     'score.sentiment':'Market sentiment',
     'score.subtitle':'Where\'s Argentina\'s market today?',
+    'score.sentiment.fear':'Market sentiment',
+    'score.subtitle.fear':'Are Argentine stocks cheap or expensive today?',
+    'score.sentiment.macro':'Macroeconomic strength',
+    'score.subtitle.macro':'How solid is Argentina\'s economy today?',
     'donate.modal.sub':'If this index helps you, any contribution helps keep it active and free.',
     'gift.modal.email.label':'Your email address',
     'gift.modal.step3':'If so, you will receive an email with a single-use coupon to activate 1 month of Silver at no cost.',
@@ -3492,6 +3506,8 @@ const T = {
     'news.aisub':'One story per key topic · last 48h',
     'ai.loading':'Analyzing…','ai.disclaimer':'AI-generated. Not investment advice.',
     'sec.indicators':'The 5 Dimensions','sec.historic':'Historical Evolution',
+    'sec.indicators.fear':'Fear & Greed Index Components','sec.indicators.macro':'The 5 Macro Strength Dimensions',
+    'data.tab.fear':'Fear & Greed','data.tab.macro':'Macro Strength',
     'sec.milestones':'Historical Milestones','sec.tiers':'Tiers','sec.sponsors':'Sponsors',
     'sec.meth.general':'For everyone','sec.meth.tech':'For the data nerds',
     'sec.suggest':'Suggestions',
@@ -5530,13 +5546,103 @@ function renderGauge(score){
 
 /* ── Render indicators ─────────────────────────────────────── */
 function renderIndicators(brechaScore) {
-  const bs  = intScore(brechaScore);
-  const sub = computeSubIndices(bs);
   const strip    = document.getElementById('subidxStrip');
   const sections = document.getElementById('subidxSections');
   if(!sections) return;
   if(strip) strip.innerHTML = '';
   sections.innerHTML = '';
+  if (DATA_INDEX === 'fear') return renderFearComponents();
+  return renderMacroSegments(brechaScore);
+}
+
+/* ── Componentes del Índice de Miedo y Codicia (Fear & Greed) ──
+   Tarjetas tipo acordeón, una por componente, con su score y peso.
+   No tienen sub-variables ni resumen IA (a diferencia de los segmentos
+   macro): son medidas directas del mercado accionario. */
+function renderFearComponents() {
+  const sections = document.getElementById('subidxSections');
+  const es = LANG !== 'en';
+  const comps = [
+    { key:'momentum', icon:'📈', w:25, color:'#ec4899',
+      name: es?'Momentum del Merval':'Merval Momentum',
+      score: fgMomentum(),
+      q: es?'¿El Merval está por encima o por debajo de su promedio reciente?':'Is the Merval above or below its recent average?',
+      desc: es?'Compara el nivel actual del Merval (en USD) contra su media móvil. Por encima de la media indica codicia; por debajo, miedo. Es el corazón del índice, igual que en el Fear & Greed de CNN.'
+              :'Compares the current Merval level (in USD) against its moving average. Above the average signals greed; below, fear. The core of the index, just like CNN\'s Fear & Greed.' },
+    { key:'amplitud', icon:'📊', w:20, color:'#0ea5e9',
+      name: es?'Amplitud del panel':'Market Breadth',
+      score: LIVE.amplitud ? LIVE.amplitud.score : 50,
+      q: es?'¿Suben más acciones de las que bajan?':'Are more stocks rising than falling?',
+      desc: es?'Mide cuántas acciones del panel líder suben frente a las que bajan. Un avance generalizado confirma un rally genuino; pocas acciones sosteniendo el índice es señal de fragilidad.'
+              :'Measures how many leading-panel stocks rise versus fall. A broad advance confirms a genuine rally; few stocks holding up the index signals fragility.' },
+    { key:'volatilidad', icon:'🌡️', w:18, color:'#f59e0b',
+      name: es?'Volatilidad':'Volatility',
+      score: fgVolatility(),
+      q: es?'¿Qué tan nervioso está el mercado?':'How nervous is the market?',
+      desc: es?'Volatilidad del Merval: cuánto oscila día a día. Alta volatilidad es el mejor proxy de miedo (equivale al VIX); baja volatilidad acompaña la calma y la codicia.'
+              :'Merval volatility: how much it swings day to day. High volatility is the best fear proxy (the VIX equivalent); low volatility accompanies calm and greed.' },
+    { key:'safehaven', icon:'🛡️', w:17, color:'#22c55e',
+      name: es?'Acciones vs. refugio':'Stocks vs. Safe Haven',
+      score: fgSafeHaven(),
+      q: es?'¿Los inversores prefieren acciones o refugio?':'Do investors prefer stocks or safe havens?',
+      desc: es?'Compara el apetito por acciones contra la demanda de activos refugio (bonos en dólares). Cuando las acciones le ganan al refugio hay codicia; cuando el capital corre al refugio, miedo.'
+              :'Compares appetite for stocks against demand for safe-haven assets (USD bonds). When stocks beat the haven there is greed; when capital flees to safety, fear.' },
+    { key:'credito', icon:'💵', w:12, color:'#a855f7',
+      name: es?'Apetito de riesgo crediticio':'Credit Risk Appetite',
+      score: fgCreditAppetite(),
+      q: es?'¿Hay apetito por tomar riesgo en bonos?':'Is there appetite for taking bond risk?',
+      desc: es?'Rendimiento de los bonos argentinos en dólares (HY). Un yield que baja muestra ganas de tomar riesgo (codicia); un yield que sube refleja huida del riesgo (miedo).'
+              :'Yield on Argentine USD bonds (HY). A falling yield shows willingness to take risk (greed); a rising yield reflects flight from risk (fear).' },
+    { key:'fuerza', icon:'💪', w:8, color:'#64748b',
+      name: es?'Fuerza de precios':'Price Strength',
+      score: fgPriceStrength(),
+      pending: true,
+      q: es?'¿Cuántas acciones están en máximos vs. mínimos?':'How many stocks are at highs vs. lows?',
+      desc: es?'Porcentaje de acciones del panel en máximos de 52 semanas frente a las que están en mínimos. Requiere histórico por papel: en construcción, por ahora se muestra neutral.'
+              :'Share of panel stocks at 52-week highs versus those at lows. Requires per-stock history: under construction, shown neutral for now.' },
+  ];
+
+  comps.forEach(c => {
+    const s = intScore(c.score);
+    const col = scoreColor(s), bg = scoreBg(s), lbl = scoreLabel(s);
+    const sect = document.createElement('div');
+    sect.className = 'subidx-section collapsed';
+    sect.id = 'fseg-' + c.key;
+    sect.style.setProperty('--ss-color', c.color);
+    sect.innerHTML = `
+      <div class="subidx-section-header">
+        <div class="subidx-sec-left">
+          <div class="subidx-sec-icon">${c.icon}</div>
+          <div class="subidx-sec-name">${c.name}</div>
+          <div class="subidx-sec-score-row">
+            <span class="subidx-sec-score" style="color:${col}">${s}</span>
+            <span class="subidx-sec-badge ind-badge" style="background:${bg};color:${col}">${lbl}</span>
+          </div>
+          <div class="subidx-sec-bar"><div class="subidx-sec-bar-fill" style="background:${c.color};width:${s}%"></div></div>
+          <div class="subidx-sec-weight">${c.w}% ${es?'del score final':'of final score'}</div>
+          ${c.pending ? `<div style="margin-top:6px;display:inline-flex;align-items:center;gap:4px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.25);border-radius:4px;padding:2px 7px;font-size:9px;font-weight:700;color:#f59e0b;letter-spacing:.06em">⚠️ ${es?'EN CONSTRUCCIÓN':'UNDER CONSTRUCTION'}</div>` : ''}
+        </div>
+        <div class="subidx-sec-prose">
+          <div class="subidx-sec-question">${c.q}</div>
+          <div class="subidx-sec-desc">${c.desc}</div>
+        </div>
+      </div>
+    `;
+    const hdr = sect.querySelector('.subidx-section-header');
+    const chev = document.createElement('span');
+    chev.className = 'subidx-chevron'; chev.setAttribute('aria-hidden','true'); chev.textContent='▾';
+    hdr.appendChild(chev);
+    hdr.addEventListener('click', () => sect.classList.toggle('collapsed'));
+    sections.appendChild(sect);
+  });
+}
+
+function renderMacroSegments(brechaScore) {
+  const bs  = intScore(brechaScore);
+  const sub = computeSubIndices(bs);
+  const strip    = document.getElementById('subidxStrip');
+  const sections = document.getElementById('subidxSections');
+  if(!sections) return;
 
   const segOrder = ['inflacion','cambiario','actividad','fiscal','mercados'];
 
@@ -6581,6 +6687,19 @@ function setActiveIndex(which){
   render();
 }
 
+/* ── Selector de la sección de datos (independiente del gauge) ── */
+let DATA_INDEX = 'fear';  // qué índice se muestra en la sección de componentes
+function setDataIndex(which){
+  if(which!=='macro' && which!=='fear') return;
+  DATA_INDEX = which;
+  const tabM=$('dataTabMacro'), tabF=$('dataTabFear');
+  if(tabM) tabM.classList.toggle('active', which==='macro');
+  if(tabF) tabF.classList.toggle('active', which==='fear');
+  const title=$('dataIdxTitle');
+  if(title) title.textContent = which==='fear' ? t('sec.indicators.fear') : t('sec.indicators.macro');
+  renderIndicators(brechaToScore(S.brecha));
+}
+
 /* Actualiza título, escala y descripción del gauge según el índice activo */
 function updateIndexChrome(score){
   const titleEl = document.querySelector('.gauge-title-txt');
@@ -6592,6 +6711,10 @@ function updateIndexChrome(score){
     ? {czlFe:'macroLabel.critico',czlF:'macroLabel.fragil',czlN:'macroLabel.estable',czlG:'macroLabel.solido',czlGe:'macroLabel.robusto'}
     : {czlFe:'zone.fe',czlF:'zone.f',czlN:'zone.n',czlG:'zone.g',czlGe:'zone.ge'};
   Object.keys(legendKeys).forEach(id => { const el=$(id); if(el) el.textContent=t(legendKeys[id]); });
+  // Eyebrow y subtítulo de la tarjeta de score, según el índice
+  const sent = $('scSentiment'), sub = $('scSubtitle');
+  if(sent) sent.textContent = ACTIVE_INDEX==='fear' ? t('score.sentiment.fear') : t('score.sentiment.macro');
+  if(sub)  sub.textContent  = ACTIVE_INDEX==='fear' ? t('score.subtitle.fear')  : t('score.subtitle.macro');
 }
 
 /* ── Master render ─────────────────────────────────────────── */
