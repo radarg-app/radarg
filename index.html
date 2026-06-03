@@ -4540,8 +4540,11 @@ function computeSubIndices(bs) {
     { name: es?'Riesgo País (EMBI)':'Country Risk (EMBI)', freq:'diario',
       w:25, score: LIVE.embi.score, src:'ArgentinaDatos', live: LIVE.embi.live,
       raw: LIVE.embi.bps ? `${LIVE.embi.bps} bps` : '',
-      desc: es?'Spread de la deuda soberana argentina sobre los Treasuries de EEUU. El indicador de riesgo más seguido mediáticamente. Comprimió de ~850 bps en 2025 a ~525 bps hoy.'
-             :'Spread of Argentine sovereign debt over US Treasuries. The most media-followed risk indicator. Compressed from ~850 bps in 2025 to ~525 bps today.' },
+      desc: (()=>{ const hoy = LIVE.embi.bps || null;
+        return es
+          ? `Spread de la deuda soberana argentina sobre los Treasuries de EEUU. El indicador de riesgo más seguido mediáticamente. Comprimió de ~850 bps en 2025${hoy?` a ~${hoy} bps hoy`:''}.`
+          : `Spread of Argentine sovereign debt over US Treasuries. The most media-followed risk indicator. Compressed from ~850 bps in 2025${hoy?` to ~${hoy} bps today`:''}.`;
+      })() },
     { name: es?'Merval USD (vs media 52s)':'Merval USD (vs 52w avg)', freq:'diario',
       w:20, score: LIVE.merval.score, src:'IOL/Yahoo', live: LIVE.merval.live,
       raw: LIVE.merval.usd ? `USD ${Math.round(LIVE.merval.usd).toLocaleString('es-AR')}` : (LIVE.merval.raw||''),
@@ -4985,8 +4988,10 @@ async function fetchAmplitud() {
       const ch=parseFloat(s.percentageChange??s.changeRate??s.pctChange??s.variacion??s.change??0);
       if(ch>0.1)up++; else if(ch<-0.1)dn++; else fl++;
     });
-    const total=up+dn+fl||1,breadth=(up-dn)/total,pctUp=Math.round(up/total*100);
-    LIVE.amplitud={score:intScore(50+breadth*40),raw:`${up}↑ ${fl}→ ${dn}↓ / ${total} ${t('ui.stocks')} (${pctUp}% ${t('ui.up')})`,src:'Open BYMA Data',live:true};
+    const total=up+dn+fl||1,moved=up+dn,pctUp=Math.round(up/total*100);
+    // Breadth estándar: % de acciones en alza sobre las que se movieron.
+    const breadthScore=moved>0?Math.min(100,Math.max(0,Math.round(up/moved*100))):50;
+    LIVE.amplitud={score:breadthScore,raw:`${up}↑ ${fl}→ ${dn}↓ / ${total} ${t('ui.stocks')} (${pctUp}% ${t('ui.up')})`,src:'Open BYMA Data',live:true};
   }catch(e){
     // Fallback: derive from Merval + EMBI momentum
     const s=intScore(LIVE.merval.score*.6+LIVE.embi.score*.4);
@@ -7116,8 +7121,17 @@ async function loadSheetSubDatos() {
   const ampScore = parseFloat(map['amplitud_score'] ?? -1);
   if (ampTotal > 0 && (ampUp >= 0 || ampDn >= 0)) {
     const pctUp = Math.round(ampUp / ampTotal * 100);
+    // Recalcular SIEMPRE desde up/dn (dato crudo confiable). No usamos amplitud_score
+    // del Sheet porque puede quedar desfasado respecto de up/dn y mostrar un puntaje
+    // que contradice los números (ej: 2↑/18↓ con score alto). Métrica estándar de
+    // breadth: % de acciones en alza sobre las que se movieron. 0%→0 (miedo extremo),
+    // 50%→50 (neutral), 100%→100 (codicia extrema).
+    const moved = ampUp + ampDn;
+    const breadthScore = moved > 0
+      ? Math.min(100, Math.max(0, Math.round(ampUp / moved * 100)))
+      : 50;
     LIVE.amplitud = {
-      score: ampScore > 0 ? ampScore : Math.min(100,Math.max(0,Math.round(50+(ampUp-ampDn)/ampTotal*40))),
+      score: breadthScore,
       raw:   LANG==='en'
         ? `${ampUp}↑ ${ampFl}→ ${ampDn}↓ / ${ampTotal} stocks (${pctUp}% weekly adv.)`
         : `${ampUp}↑ ${ampFl}→ ${ampDn}↓ / ${ampTotal} acciones (${pctUp}% alza semanal)`,
@@ -7125,7 +7139,7 @@ async function loadSheetSubDatos() {
       live:  true,
       _sheetVal: true
     };
-    console.log('[Sheet] Amplitud IOL:', ampUp+'↑', ampDn+'↓', 'score:', LIVE.amplitud.score);
+    console.log('[Sheet] Amplitud IOL:', ampUp+'↑', ampDn+'↓', 'score recalculado:', LIVE.amplitud.score);
   }  const aiEs = map['ai_analisis_es'];
   const aiEn = map['ai_analisis_en'];
   const aiSc = map['ai_score'];
