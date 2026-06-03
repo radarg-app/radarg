@@ -479,6 +479,23 @@ main { position:relative; z-index:1; max-width:1440px; margin:0 auto; padding:2r
   align-items:stretch;
 }
 .gauge-canvas-wrap { position:relative; width:100%; max-width:560px; margin:0 auto; display:flex; justify-content:center; align-items:center; flex:1; }
+/* ── Switch de índice (Solidez Macro / Fear & Greed) ── */
+.index-switch{
+  display:flex; gap:.4rem; max-width:420px; margin:.4rem auto 0; padding:.3rem;
+  background:var(--bg); border:1px solid var(--border); border-radius:12px;
+}
+.index-tab{
+  flex:1; display:flex; flex-direction:column; align-items:center; gap:1px;
+  padding:.5rem .4rem; border:none; border-radius:9px; cursor:pointer;
+  background:transparent; color:var(--text3); font-family:inherit;
+  transition:background .18s ease, color .18s ease;
+}
+.index-tab:hover{ color:var(--text2); }
+.index-tab.active{ background:var(--bg2); color:var(--text); box-shadow:0 1px 4px rgba(0,0,0,.2); }
+.index-tab.active .idx-tab-name{ color:var(--ac2); }
+.idx-tab-name{ font-size:.92rem; font-weight:700; letter-spacing:-.2px; }
+.idx-tab-sub{ font-size:.66rem; font-weight:500; letter-spacing:.04em; text-transform:uppercase; opacity:.8; }
+body.lm .index-tab.active{ background:#fff; }
 .gauge-canvas-wrap canvas { width:100% !important; }
 #mainGauge { width:100%; height:auto; display:block; }
 
@@ -2363,9 +2380,19 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
     <!-- Gauge -->
     <div class="gauge-card">
       <div style="text-align:center;padding:1rem 0 .25rem">
-        <div class="gauge-title-txt" style="font-size:26px;font-weight:800;letter-spacing:-.5px;color:var(--text);margin-bottom:6px" data-i18n="gauge.title">Índice de Sentimiento del Mercado</div>
+        <div class="gauge-title-txt" style="font-size:26px;font-weight:800;letter-spacing:-.5px;color:var(--text);margin-bottom:6px" data-i18n="gauge.title.fear">Fear &amp; Greed Argentina</div>
         <div style="font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--text3)" class="gauge-label-txt" data-i18n="gauge.label">Argentina</div>
-        <div style="font-size:10px;color:var(--text3);margin-top:2px;font-family:'JetBrains Mono',monospace" class="gauge-scale-txt" data-i18n="gauge.scale">0 = pánico total · 50 = neutral · 100 = euforia</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px;font-family:'JetBrains Mono',monospace" class="gauge-scale-txt" id="gaugeScaleTxt" data-i18n="gauge.scale.fear">0 = miedo extremo · 50 = neutral · 100 = codicia extrema</div>
+      </div>
+      <div class="index-switch" role="tablist" aria-label="Seleccionar índice">
+        <button class="index-tab active" id="idxTabFear" role="tab" aria-selected="true" onclick="setActiveIndex('fear')">
+          <span class="idx-tab-name" data-i18n="idx.fear">Fear &amp; Greed</span>
+          <span class="idx-tab-sub" data-i18n="idx.fear.sub">Mercado / volátil</span>
+        </button>
+        <button class="index-tab" id="idxTabMacro" role="tab" aria-selected="false" onclick="setActiveIndex('macro')">
+          <span class="idx-tab-name" data-i18n="idx.macro">Solidez Macro</span>
+          <span class="idx-tab-sub" data-i18n="idx.macro.sub">Situación del país</span>
+        </button>
       </div>
       <div class="gauge-canvas-wrap">
         <canvas id="mainGauge" style="display:block;width:100%" role="img"></canvas>
@@ -3151,6 +3178,9 @@ const T = {
     'score.sentiment':'Sentimiento del mercado',
     'score.subtitle':'¿Cómo está el mercado argentino hoy?',
     'gauge.label':'Argentina','gauge.title':'Índice de Sentimiento del Mercado','gauge.scale':'0 = pánico total · 50 = neutral · 100 = euforia','score.1w':'Hace 1 semana','score.1m':'Hace 1 mes',
+    'idx.macro':'Solidez Macro','idx.macro.sub':'Situación del país','idx.fear':'Fear & Greed','idx.fear.sub':'Mercado / volátil',
+    'gauge.title.macro':'Índice de Solidez Macroeconómica','gauge.title.fear':'Fear & Greed Argentina',
+    'gauge.scale.macro':'0 = crítico · 50 = estable · 100 = robusto','gauge.scale.fear':'0 = miedo extremo · 50 = neutral · 100 = codicia extrema',
     'score.3m':'Hace 3 meses','score.1y':'Hace 1 año','score.updating':'Actualizando…',
     'ai.title':'Interpretación IA','ai.sub':'Análisis automático en tiempo real',
     'ai.economic':'Situación Económica','ai.political':'Situación Política',
@@ -3327,6 +3357,7 @@ const T = {
     'donate.title':'RadARG es libre y gratuito','donate.sub':'Sin publicidad. Si te resulta útil, podés apoyar.',
     'scoreLabel.fe':'Miedo Extremo','scoreLabel.f':'Miedo','scoreLabel.n':'Neutral',
     'scoreLabel.g':'Codicia Moderada','scoreLabel.ge':'Codicia Extrema',
+    'macroLabel.critico':'Crítico','macroLabel.fragil':'Frágil','macroLabel.estable':'Estable','macroLabel.solido':'Sólido','macroLabel.robusto':'Robusto',
     // Dynamic UI strings
     'ui.updating':'Actualizando…','ui.realtime':'Tiempo real','ui.fallback':'Datos de respaldo',
     'ui.lastUpdate':'Última actualización:','ui.nextIn':'↻ Se actualiza todos los días a las 12:00 (hora Argentina)',
@@ -3451,6 +3482,9 @@ const T = {
     'gift.modal.note':'We always reach out to people whose ideas we ship. If yours made it in, you\'ve already heard from us — or you will soon.',
     'gift.modal.email.label':'Your email address',
     'gauge.label':'Argentina','gauge.title':'Fear & Greed Index','gauge.scale':'0 = extreme fear · 50 = neutral · 100 = euphoria','score.1w':'1 week ago','score.1m':'1 month ago',
+    'idx.macro':'Macro Strength','idx.macro.sub':'Country health','idx.fear':'Fear & Greed','idx.fear.sub':'Market / volatile',
+    'gauge.title.macro':'Macroeconomic Strength Index','gauge.title.fear':'Fear & Greed Argentina',
+    'gauge.scale.macro':'0 = critical · 50 = stable · 100 = robust','gauge.scale.fear':'0 = extreme fear · 50 = neutral · 100 = extreme greed',
     'score.3m':'3 months ago','score.1y':'1 year ago','score.updating':'Updating…',
     'ai.title':'AI Read','ai.sub':'Live analysis, updated automatically',
     'ai.economic':'Economic Situation','ai.political':'Political Situation',
@@ -3619,6 +3653,7 @@ const T = {
     'donate.title':'RadARG is free','donate.sub':'No ads, no paywalls. Chip in if it helps you.',
     'scoreLabel.fe':'Extreme Fear','scoreLabel.f':'Fear','scoreLabel.n':'Neutral',
     'scoreLabel.g':'Moderate Greed','scoreLabel.ge':'Extreme Greed',
+    'macroLabel.critico':'Critical','macroLabel.fragil':'Fragile','macroLabel.estable':'Stable','macroLabel.solido':'Solid','macroLabel.robusto':'Robust',
     // Dynamic UI strings
     'ui.updating':'Updating…','ui.realtime':'Real time','ui.fallback':'Fallback data',
     'ui.lastUpdate':'Last update:','ui.nextIn':'↻ Updated every day at 12:00 (Argentina time)',
@@ -3797,10 +3832,21 @@ function scoreBg(s) {
   return 'rgba(22,163,74,.14)';
 }
 function scoreLabel(s) {
+  // El índice activo determina la familia de etiquetas:
+  //  - 'fear'  → Miedo/Codicia (Fear & Greed Argentina)
+  //  - 'macro' → Crítico/Frágil/Estable/Sólido/Robusto (Solidez Macroeconómica)
+  if (ACTIVE_INDEX === 'macro') {
+    if (s<25) return t('macroLabel.critico'); if (s<45) return t('macroLabel.fragil');
+    if (s<56) return t('macroLabel.estable'); if (s<75) return t('macroLabel.solido');
+    return t('macroLabel.robusto');
+  }
   if (s<25) return t('scoreLabel.fe'); if (s<45) return t('scoreLabel.f');
   if (s<56) return t('scoreLabel.n');  if (s<75) return t('scoreLabel.g');
   return t('scoreLabel.ge');
 }
+
+/* ── Índice activo: 'macro' (Solidez Macroeconómica) | 'fear' (Fear & Greed) ── */
+let ACTIVE_INDEX = 'fear';  // por defecto el Fear & Greed (mercado)
 
 /* ── State ─────────────────────────────────────────────────── */
 const S = { oficial:1420, blue:1415, mep:1449, ccl:1494, mayorista:1380, tarjeta:1852, brecha:-0.4, ts:null, live:false };
@@ -4144,9 +4190,14 @@ function rofexScore(v) {
   if(v<=100) return 18; if(v<=150) return 10; return 5;
 }
 function volScore(v) {
-  if(!v) return 50;
-  if(v<15) return 80; if(v<25) return 65; if(v<35) return 50;
-  if(v<50) return 35; if(v<70) return 25; return 15;
+  // Volatilidad anualizada del MERVAL (%) → score invertido (más vol = más miedo).
+  // Misma curva que volToScore() del GAS. Refs: ~30% calma · ~50% nervios · >80% pánico.
+  if(v == null || isNaN(v) || v <= 0) return 50;
+  if(v < 25)  return 90;
+  if(v < 40)  return Math.round(90 - (v - 25) * 1.33);
+  if(v < 60)  return Math.round(70 - (v - 40) * 1.25);
+  if(v < 85)  return Math.round(45 - (v - 60) * 1.20);
+  return Math.max(3, Math.round(15 - (v - 85) * 0.20));
 }
 function baseMonetariaScore(varPct) {
   // Lower monthly growth = less monetary risk = more greed
@@ -4623,6 +4674,110 @@ function computeTotal(bs) {
   return Math.min(100, Math.max(0, Math.round(
     segs.reduce((s,seg) => s + seg.score * seg.w, 0) / tot
   )));
+}
+
+/* ── Fear & Greed Argentina — índice de mercado (volátil) ─────────
+   Si el data.json/Sheet ya trae el valor calculado por el GAS, se usa
+   directo. Si no, se recalcula con los mismos pesos sobre los sub-scores
+   de mercado de alta frecuencia. NO mezcla macro lenta (IPC, EMAE, fiscal). */
+/* ════════════════════════════════════════════════════════════════
+   FEAR & GREED ARGENTINA — fiel a CNN
+   Mide UNA cosa: si las acciones argentinas (Merval) están caras o
+   baratas respecto de su comportamiento normal. Todo es mercado
+   accionario; nada de macro directa. 6 componentes (sin put/call,
+   que Argentina no tiene mercado de opciones líquido).
+
+   Componentes y pesos:
+     1. Momentum del Merval (vs media móvil)      25%
+     2. Amplitud del panel (breadth)              20%
+     3. Volatilidad (vs su media / nivel)         18%
+     4. Acciones vs. refugio (safe haven)         17%
+     5. Apetito de riesgo crediticio (spread HY)  12%
+     6. Fuerza de precios (máx/mín 52s)            8%  (neutral hasta tener histórico)
+
+   Diseño "vs media móvil": cada componente que puede, se mide como
+   desvío respecto de su normal reciente (caro/barato es relativo).
+   Donde aún no hay serie, cae a normalización fija y migrará cuando
+   historico_diario acumule ruedas.
+═══════════════════════════════════════════════════════════════════ */
+
+/* Serie del Merval USD como array ordenado de valores (mensual hoy; diaria a futuro) */
+function mervalSeries() {
+  try {
+    if (Array.isArray(MERVAL_HIST) && MERVAL_HIST.length) {
+      const vals = MERVAL_HIST.map(p => p[1]).filter(v => v > 0);
+      // Parchear último punto con el valor live si existe
+      if (LIVE.merval && LIVE.merval.usd > 0) vals[vals.length-1] = LIVE.merval.usd;
+      return vals;
+    }
+  } catch(_){}
+  return [];
+}
+
+/* 1. Momentum: Merval actual vs su media móvil. >media = greed, <media = fear.
+   Se mide el desvío % y se mapea a 0-100 (±15% ≈ extremos). */
+function fgMomentum() {
+  const s = mervalSeries();
+  const cur = LIVE.merval && LIVE.merval.usd > 0 ? LIVE.merval.usd : (s.length ? s[s.length-1] : 0);
+  if (!cur || s.length < 6) return LIVE.merval ? LIVE.merval.score : 50; // fallback nivel fijo
+  // Media móvil de las últimas N (con serie mensual usamos ~10 ≈ "largo plazo"; con diaria sería ~100)
+  const win = Math.min(s.length, s.length >= 100 ? 100 : 10);
+  const ma = s.slice(-win).reduce((a,b)=>a+b,0) / win;
+  if (!ma) return 50;
+  const dev = (cur - ma) / ma;           // desvío relativo
+  return clamp(Math.round(50 + dev * 333)); // ±15% → ~0/100
+}
+
+/* 3. Volatilidad: nivel actual vs umbrales (invertido). Migrará a "vs media" con serie diaria. */
+function fgVolatility() {
+  if (LIVE._mervalVol != null && LIVE._mervalVol > 0) return volScore(LIVE._mervalVol);
+  return 50;
+}
+
+/* 4. Safe haven: apetito por acciones vs refugio. Aproximación con momentum del Merval
+   relativo al rendimiento de un bono USD corto. A falta de serie de retornos, usamos
+   el score del Merval atenuado por el del bono (más demanda de bono = más miedo). */
+function fgSafeHaven() {
+  const mervS = LIVE.merval ? LIVE.merval.score : 50;
+  const bonoS = LIVE.bonos ? LIVE.bonos.score : 50;
+  // Si las acciones rinden mejor que el refugio → greed; si el refugio domina → fear
+  return clamp(Math.round(50 + (mervS - bonoS) * 0.5));
+}
+
+/* 5. Apetito de riesgo crediticio: yield de bonos HY argentinos (GD35). Mayor yield = más miedo. */
+function fgCreditAppetite() {
+  if (LIVE._gd35Yield != null) return gd35YieldScore(LIVE._gd35Yield);
+  return LIVE.bonos ? LIVE.bonos.score : 50;
+}
+
+/* 6. Fuerza de precios (máx/mín 52s): requiere histórico por acción. Neutral por ahora. */
+function fgPriceStrength() {
+  // TODO: % de acciones del panel en máximos vs mínimos de 52s (necesita serie por papel)
+  return 50;
+}
+
+function computeFearGreed() {
+  // Si el data.json ya trae el valor calculado por el GAS, se usa directo
+  if (LIVE._fearGreed != null && !isNaN(LIVE._fearGreed)) {
+    return Math.min(100, Math.max(0, Math.round(Number(LIVE._fearGreed))));
+  }
+  const pairs = [
+    {s: fgMomentum(),        w: 25},  // Momentum del Merval vs media móvil
+    {s: LIVE.amplitud.score, w: 20},  // Amplitud del panel (breadth)
+    {s: fgVolatility(),      w: 18},  // Volatilidad
+    {s: fgSafeHaven(),       w: 17},  // Acciones vs refugio
+    {s: fgCreditAppetite(),  w: 12},  // Apetito de riesgo crediticio
+    {s: fgPriceStrength(),   w:  8}   // Fuerza de precios (neutral hasta tener histórico)
+  ];
+  const tot = pairs.reduce((a,p)=>a+p.w,0);
+  return Math.min(100,Math.max(0,Math.round(pairs.reduce((a,p)=>a+p.s*p.w,0)/tot)));
+}
+
+/* Devuelve el score del índice ACTUALMENTE activo */
+function activeScore() {
+  if (ACTIVE_INDEX === 'fear') return computeFearGreed();
+  const bs = brechaToScore(S.brecha);
+  return computeTotal(bs);
 }
 
 /* ── Fetches ───────────────────────────────────────────────── */
@@ -6406,11 +6561,32 @@ function buildHitos(){
   });
 }
 
+/* ── Switch entre índices ──────────────────────────────────── */
+function setActiveIndex(which){
+  if(which!=='macro' && which!=='fear') return;
+  ACTIVE_INDEX = which;
+  const tabM=$('idxTabMacro'), tabF=$('idxTabFear');
+  if(tabM){ tabM.classList.toggle('active', which==='macro'); tabM.setAttribute('aria-selected', which==='macro'); }
+  if(tabF){ tabF.classList.toggle('active', which==='fear');  tabF.setAttribute('aria-selected', which==='fear'); }
+  render();
+}
+
+/* Actualiza título, escala y descripción del gauge según el índice activo */
+function updateIndexChrome(score){
+  const titleEl = document.querySelector('.gauge-title-txt');
+  const scaleEl = $('gaugeScaleTxt');
+  if(titleEl) titleEl.textContent = ACTIVE_INDEX==='fear' ? t('gauge.title.fear') : t('gauge.title.macro');
+  if(scaleEl) scaleEl.textContent = ACTIVE_INDEX==='fear' ? t('gauge.scale.fear') : t('gauge.scale.macro');
+}
+
 /* ── Master render ─────────────────────────────────────────── */
 function render(){
   const bs=brechaToScore(S.brecha),total=computeTotal(bs);
+  const gaugeScore = ACTIVE_INDEX==='fear' ? computeFearGreed() : total;
+  lastScore = gaugeScore;
   try {
-    renderCtx(); renderGauge(total); renderIndicators(bs);
+    renderCtx(); renderGauge(gaugeScore); renderIndicators(bs);
+    updateIndexChrome(gaugeScore);
   } catch(e) {
     console.error('[RadARG] render error:', e);
     const sec = document.getElementById('indicadores');
@@ -6823,6 +6999,8 @@ async function loadDataJSON() {
     if(f('amplitud_up')!==null)           LIVE._amplitudUp = f('amplitud_up');
     if(f('amplitud_dn')!==null)           LIVE._amplitudDn = f('amplitud_dn');
     if(f('sentimiento_noticias')!==null)  LIVE._sentimiento_noticias = f('sentimiento_noticias');
+    if(f('fear_greed')!==null)            LIVE._fearGreed = f('fear_greed');
+    if(f('score_macro')!==null)           LIVE._scoreMacro = f('score_macro');
     if(f('ai_analisis_es')!==null)        LIVE._ai_analisis_es = String(f('ai_analisis_es'));
     if(f('ai_analisis_en')!==null)        LIVE._ai_analisis_en = String(f('ai_analisis_en'));
     if(f('ai_seg_inflacion_es')!==null) LIVE._ai_seg_inflacion_es = String(f('ai_seg_inflacion_es'));
@@ -6964,6 +7142,8 @@ function applyInjectedData() {
   if(_f('consumo_servicios_var')!==null) LIVE._consumoServ = _f('consumo_servicios_var');
   if(_f('amplitud_score')!==null)        LIVE._amplitudScore = _f('amplitud_score');
   if(_f('sentimiento_noticias')!==null)  LIVE._sentimiento_noticias = _f('sentimiento_noticias');
+  if(_f('fear_greed')!==null)            LIVE._fearGreed = _f('fear_greed');
+  if(_f('score_macro')!==null)           LIVE._scoreMacro = _f('score_macro');
   if(_f('ai_analisis_es')!==null)        LIVE._ai_analisis_es = String(_f('ai_analisis_es'));
   if(_f('ai_analisis_en')!==null)        LIVE._ai_analisis_en = String(_f('ai_analisis_en'));
   if(_f('ai_seg_inflacion_es')!==null) LIVE._ai_seg_inflacion_es = String(_f('ai_seg_inflacion_es'));
