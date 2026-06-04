@@ -2588,14 +2588,6 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
         <div class="czl-item"><div class="czl-color" style="background:#22c55e"></div><div><div class="czl-name" id="czlG" data-i18n="zone.g">Codicia</div><div class="czl-range">56–74</div></div></div>
         <div class="czl-item"><div class="czl-color" style="background:#16a34a"></div><div><div class="czl-name" id="czlGe" data-i18n="zone.ge">Codicia Extrema</div><div class="czl-range">75–100</div></div></div>
         <div class="chart-toggles">
-          <label class="merval-switch-wrap" title="Mostrar/ocultar Índice de Solidez Macro en el gráfico" for="macroToggle">
-            <span data-i18n="chart.macroToggle" class="toggle-lbl toggle-lbl-macro">📐 Solidez Macro</span>
-            <div class="merval-switch sw-macro">
-              <input type="checkbox" id="macroToggle" onchange="toggleMacro()">
-              <div class="merval-switch-track"></div>
-              <div class="merval-switch-thumb"></div>
-            </div>
-          </label>
           <label class="merval-switch-wrap" title="Mostrar/ocultar Merval USD en el gráfico" for="mervalToggle">
             <span data-i18n="chart.mervalToggle" class="toggle-lbl toggle-lbl-merval">📈 Merval USD</span>
             <div class="merval-switch sw-merval">
@@ -3400,7 +3392,6 @@ const T = {
     // Chart tooltip
     'chart.score':'Score','chart.sliderHint':'Drag the ends to adjust the period',
     'chart.mervalToggle':'Merval USD',
-    'chart.macroToggle':'Solidez Macro',
     'chart.presToggle':'Presidentes',
     // AI refresh title
     'ai.refresh':'Actualizar análisis',
@@ -3702,7 +3693,7 @@ const T = {
     'hitos.hide':'Hide milestones',
     // Chart tooltip
     'chart.score':'Score','chart.sliderHint':'Drag the ends to adjust the period',
-    'chart.mervalToggle':'Merval USD','chart.presToggle':'Presidents','chart.macroToggle':'Macro Strength',
+    'chart.mervalToggle':'Merval USD','chart.presToggle':'Presidents',
     // AI refresh title
     'ai.refresh':'Refresh analysis',
     // AI fallback
@@ -6056,8 +6047,6 @@ function generateSegmentSummary(key, seg){
     2026:[48,52,54,48,59],
   };
   Object.entries(BY_YEAR).forEach(([yr,ms])=>{ms.forEach((sc,m)=>{window.MONTHLY.labels.push(`${yr}-${String(m+1).padStart(2,'0')}`);window.MONTHLY.scores.push(sc);});});
-  // Serie F&G alineada a MONTHLY.labels (se rellena más abajo, tras definir FEARGREED_HIST)
-  window.MONTHLY.fearScores = [];
 })();
 
 /* ── Merval USD historical data (monthly, Jan 2000–present) ── */
@@ -6150,35 +6139,6 @@ const MERVAL_HIST = [
 // Build lookup: label → merv_usd
 const MERVAL_MAP = {};
 MERVAL_HIST.forEach(([lbl, v]) => { MERVAL_MAP[lbl] = v; });
-
-/* ── Serie histórica del Índice de Miedo y Codicia (Fear & Greed) ──
-   El F&G nació hace pocos días, así que no hay histórico real. Lo
-   RECONSTRUIMOS desde el Merval USD, que es su driver dominante
-   (momentum = 25% del índice y, hacia atrás, el único componente con
-   serie larga). Cada mes recibe el score de momentum: posición del
-   Merval de ese mes dentro del rango histórico completo (mín→1, máx→100),
-   misma fórmula que fgMomentum() usa hoy. Es una aproximación honesta:
-   refleja qué tan caro/barato estaba el Merval en cada momento. */
-const FEARGREED_HIST = (() => {
-  const vals = MERVAL_HIST.map(p => p[1]).filter(v => v > 0);
-  if (!vals.length) return {};
-  const max = Math.max(...vals), min = Math.min(...vals);
-  const range = (max - min) || 1;
-  const map = {};
-  MERVAL_HIST.forEach(([lbl, v]) => {
-    if (v > 0) map[lbl] = Math.min(100, Math.max(1, Math.round(1 + (v - min) / range * 99)));
-  });
-  return map;
-})();
-// Alinear la serie F&G con window.MONTHLY.labels (formato "YYYY-MM").
-// FEARGREED_HIST usa labels "Ene 2000"; convertimos vía MONTHLY_DISPLAY inverso.
-(function fillFearScores(){
-  if (!window.MONTHLY || !window.MONTHLY.labels) return;
-  window.MONTHLY.fearScores = window.MONTHLY.labels.map(lbl => {
-    const disp = window.MONTHLY_DISPLAY ? window.MONTHLY_DISPLAY(lbl) : lbl;
-    return FEARGREED_HIST[disp] != null ? FEARGREED_HIST[disp] : null;
-  });
-})();
 
 /* ── Mandatos presidenciales argentinos (desde 2000) ──────────
    start: "YYYY-MM" del inicio del mandato (o del período cubierto)
@@ -6308,13 +6268,6 @@ let mervalVisible = false;
 function toggleMerval() {
   const chk = document.getElementById('mervalToggle');
   mervalVisible = chk ? chk.checked : !mervalVisible;
-  buildChart(sliderFrom, sliderTo);
-}
-
-let macroVisible = false;
-function toggleMacro() {
-  const chk = document.getElementById('macroToggle');
-  macroVisible = chk ? chk.checked : !macroVisible;
   buildChart(sliderFrom, sliderTo);
 }
 
@@ -6496,38 +6449,20 @@ function buildChart(from,to){
   // numLabels = [0,1,2,...] — purely numeric so Chart.js never tries to parse
   const numLabels = rawLabels.map((_,i) => i);
 
-  // Serie del Índice de Miedo y Codicia (F&G) — principal del gráfico
-  const fearAll  = window.MONTHLY.fearScores || [];
-  const fearScores = fearAll.slice(from, to+1);
-  // Para el último punto, usar el valor F&G live si está disponible
-  if (fearScores.length && typeof computeFearGreed === 'function') {
-    try {
-      const liveFg = computeFearGreed();
-      if (liveFg != null && !isNaN(liveFg)) fearScores[fearScores.length-1] = liveFg;
-    } catch(e){}
-  }
-  // Serie de Solidez Macro — secundaria, toggleable
-  const macroDatasets = (macroVisible) ? [{
-    label:'Solidez Macro', data:scores,
-    borderColor: isLM ? '#7e22ce' : '#a855f7', borderWidth:2, borderDash:[5,3],
-    pointRadius:0, pointHoverRadius:4, pointBackgroundColor: isLM?'#7e22ce':'#a855f7',
-    fill:false, tension:.4, spanGaps:true, yAxisID:'y', clip:false,
-  }] : [];
-
   try {
   histInst = new Chart(canvasEl, {
     type:'line',
     data:{ labels:numLabels, datasets:[{
-      data:fearScores, borderColor:'#0ea5e9', borderWidth:2, yAxisID:'y',
-      pointRadius:fearScores.map((_,i)=>i===n-1?6:n<=36?3:0),
+      data:scores, borderColor:'#0ea5e9', borderWidth:2, yAxisID:'y',
+      pointRadius:scores.map((_,i)=>i===n-1?6:n<=36?3:0),
       pointHoverRadius:7,
       pointHitRadius:20,
-      pointBackgroundColor:fearScores.map(v=>v==null?'#0ea5e9':scoreColor(v)),
-      pointBorderColor:fearScores.map(v=>v==null?'#0ea5e9':scoreColor(v)), pointBorderWidth:0,
+      pointBackgroundColor:scores.map(scoreColor),
+      pointBorderColor:scores.map(scoreColor), pointBorderWidth:0,
       fill:true,
       backgroundColor:ctx=>{const g=ctx.chart.ctx.createLinearGradient(0,0,0,320);g.addColorStop(0,'rgba(14,165,233,.15)');g.addColorStop(1,'rgba(14,165,233,0)');return g;},
-      tension:.4, spanGaps:true,
-    }, ...macroDatasets, ...mervalDatasets]},
+      tension:.4,
+    }, ...mervalDatasets]},
     options:{
       responsive:true, maintainAspectRatio:false,
       plugins:{
@@ -6549,9 +6484,6 @@ function buildChart(from,to){
               if(c.dataset.label==='Merval USD'){
                 const raw = MERVAL_MAP[_disp(rawLabels[c.dataIndex])];
                 return raw!=null ? `  Merval: USD ${raw.toLocaleString('es-AR')}` : '  Merval: s/d';
-              }
-              if(c.dataset.label==='Solidez Macro'){
-                return `  ${LANG==='en'?'Macro':'Macro'}: ${c.parsed.y}  ·  ${scoreLabel(c.parsed.y)}`;
               }
               return `  ${t('chart.score')}: ${c.parsed.y}  ·  ${scoreLabel(c.parsed.y)}`;
             },
