@@ -2588,6 +2588,14 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
         <div class="czl-item"><div class="czl-color" style="background:#22c55e"></div><div><div class="czl-name" id="czlG" data-i18n="zone.g">Codicia</div><div class="czl-range">56–74</div></div></div>
         <div class="czl-item"><div class="czl-color" style="background:#16a34a"></div><div><div class="czl-name" id="czlGe" data-i18n="zone.ge">Codicia Extrema</div><div class="czl-range">75–100</div></div></div>
         <div class="chart-toggles">
+          <label class="merval-switch-wrap" title="Mostrar/ocultar Índice de Solidez Macro en el gráfico" for="macroToggle">
+            <span data-i18n="chart.macroToggle" class="toggle-lbl toggle-lbl-macro">📐 Solidez Macro</span>
+            <div class="merval-switch sw-macro">
+              <input type="checkbox" id="macroToggle" onchange="toggleMacro()">
+              <div class="merval-switch-track"></div>
+              <div class="merval-switch-thumb"></div>
+            </div>
+          </label>
           <label class="merval-switch-wrap" title="Mostrar/ocultar Merval USD en el gráfico" for="mervalToggle">
             <span data-i18n="chart.mervalToggle" class="toggle-lbl toggle-lbl-merval">📈 Merval USD</span>
             <div class="merval-switch sw-merval">
@@ -3392,6 +3400,7 @@ const T = {
     // Chart tooltip
     'chart.score':'Score','chart.sliderHint':'Drag the ends to adjust the period',
     'chart.mervalToggle':'Merval USD',
+    'chart.macroToggle':'Solidez Macro',
     'chart.presToggle':'Presidentes',
     // AI refresh title
     'ai.refresh':'Actualizar análisis',
@@ -3693,7 +3702,7 @@ const T = {
     'hitos.hide':'Hide milestones',
     // Chart tooltip
     'chart.score':'Score','chart.sliderHint':'Drag the ends to adjust the period',
-    'chart.mervalToggle':'Merval USD','chart.presToggle':'Presidents',
+    'chart.mervalToggle':'Merval USD','chart.presToggle':'Presidents','chart.macroToggle':'Macro Strength',
     // AI refresh title
     'ai.refresh':'Refresh analysis',
     // AI fallback
@@ -4637,7 +4646,7 @@ function computeSubIndices(bs) {
         if(up!=null && dn!=null) return `${up}↑ ${fl??''}${fl!=null?' planas ':' '}${dn}↓ de ${tot??((up||0)+(dn||0)+(fl||0))} acciones`;
         return LIVE.amplitud.raw||'';
       })(),
-      desc: es?'% de acciones del panel con variación semanal positiva. Amplitud alta (>70%) confirma un rally genuino; amplitud baja con índice en alza señala movimiento frágil.'
+      desc: es?'% de acciones del panel con variación positiva en los últimos 30 días corridos. Amplitud alta (>70%) confirma un rally genuino; amplitud baja con índice en alza señala movimiento frágil.'
              :'% of panel stocks with positive weekly change. High breadth (>70%) confirms genuine rally; low breadth with rising index signals fragile move.' },
     { name: es?'Confianza en el Gobierno (ICG)':'Gov. Confidence (ICG)', freq:'mensual',
       w:10, score: LIVE.icg!=null ? intScore((LIVE.icg/5)*100) : 40,
@@ -4730,18 +4739,22 @@ function mervalSeries() {
   return [];
 }
 
-/* 1. Momentum: Merval actual vs su media móvil. >media = greed, <media = fear.
-   Se mide el desvío % y se mapea a 0-100 (±15% ≈ extremos). */
+/* 1. Momentum del Merval: posición del valor actual dentro de su rango histórico.
+   Score 100 = máximo histórico, 1 = mínimo histórico, lineal entre ambos.
+   El valor live ya está incluido en la serie (mervalSeries lo parchea), así que
+   si el Merval supera su máximo previo, ese nuevo valor pasa a ser el máximo y el
+   cálculo se reajusta solo (queda en 100 hasta que aparezca uno mayor). */
 function fgMomentum() {
   const s = mervalSeries();
   const cur = LIVE.merval && LIVE.merval.usd > 0 ? LIVE.merval.usd : (s.length ? s[s.length-1] : 0);
-  if (!cur || s.length < 6) return LIVE.merval ? LIVE.merval.score : 50; // fallback nivel fijo
-  // Media móvil de las últimas N (con serie mensual usamos ~10 ≈ "largo plazo"; con diaria sería ~100)
-  const win = Math.min(s.length, s.length >= 100 ? 100 : 10);
-  const ma = s.slice(-win).reduce((a,b)=>a+b,0) / win;
-  if (!ma) return 50;
-  const dev = (cur - ma) / ma;           // desvío relativo
-  return intScore(Math.round(50 + dev * 333)); // ±15% → ~0/100
+  if (!cur || !s.length) return 50;
+  // max/min sobre TODA la serie histórica, incluyendo el valor actual (autoajuste de máximo)
+  const max = Math.max(...s, cur);
+  const min = Math.min(...s, cur);
+  if (max <= min) return 50;
+  // Mapeo lineal: min → 1, max → 100
+  const score = 1 + (cur - min) / (max - min) * 99;
+  return Math.min(100, Math.max(1, Math.round(score)));
 }
 
 /* 3. Volatilidad: nivel actual vs umbrales (invertido). Migrará a "vs media" con serie diaria. */
@@ -5573,8 +5586,8 @@ function renderFearComponents() {
       name: es?'Amplitud del panel':'Market Breadth',
       score: LIVE.amplitud ? LIVE.amplitud.score : 50,
       q: es?'¿Suben más acciones de las que bajan?':'Are more stocks rising than falling?',
-      desc: es?'Mide cuántas acciones del panel líder suben frente a las que bajan. Un avance generalizado confirma un rally genuino; pocas acciones sosteniendo el índice es señal de fragilidad.'
-              :'Measures how many leading-panel stocks rise versus fall. A broad advance confirms a genuine rally; few stocks holding up the index signals fragility.' },
+      desc: es?'Mide cuántas acciones del panel líder subieron frente a las que bajaron en los últimos 30 días corridos. Un avance generalizado confirma un rally genuino; pocas acciones sosteniendo el índice es señal de fragilidad.'
+              :'Measures how many leading-panel stocks rose versus fell over the last 30 calendar days. A broad advance confirms a genuine rally; few stocks holding up the index signals fragility.' },
     { key:'volatilidad', icon:'🌡️', w:18, color:'#f59e0b',
       name: es?'Volatilidad':'Volatility',
       score: fgVolatility(),
@@ -6043,6 +6056,8 @@ function generateSegmentSummary(key, seg){
     2026:[48,52,54,48,59],
   };
   Object.entries(BY_YEAR).forEach(([yr,ms])=>{ms.forEach((sc,m)=>{window.MONTHLY.labels.push(`${yr}-${String(m+1).padStart(2,'0')}`);window.MONTHLY.scores.push(sc);});});
+  // Serie F&G alineada a MONTHLY.labels (se rellena más abajo, tras definir FEARGREED_HIST)
+  window.MONTHLY.fearScores = [];
 })();
 
 /* ── Merval USD historical data (monthly, Jan 2000–present) ── */
@@ -6135,6 +6150,35 @@ const MERVAL_HIST = [
 // Build lookup: label → merv_usd
 const MERVAL_MAP = {};
 MERVAL_HIST.forEach(([lbl, v]) => { MERVAL_MAP[lbl] = v; });
+
+/* ── Serie histórica del Índice de Miedo y Codicia (Fear & Greed) ──
+   El F&G nació hace pocos días, así que no hay histórico real. Lo
+   RECONSTRUIMOS desde el Merval USD, que es su driver dominante
+   (momentum = 25% del índice y, hacia atrás, el único componente con
+   serie larga). Cada mes recibe el score de momentum: posición del
+   Merval de ese mes dentro del rango histórico completo (mín→1, máx→100),
+   misma fórmula que fgMomentum() usa hoy. Es una aproximación honesta:
+   refleja qué tan caro/barato estaba el Merval en cada momento. */
+const FEARGREED_HIST = (() => {
+  const vals = MERVAL_HIST.map(p => p[1]).filter(v => v > 0);
+  if (!vals.length) return {};
+  const max = Math.max(...vals), min = Math.min(...vals);
+  const range = (max - min) || 1;
+  const map = {};
+  MERVAL_HIST.forEach(([lbl, v]) => {
+    if (v > 0) map[lbl] = Math.min(100, Math.max(1, Math.round(1 + (v - min) / range * 99)));
+  });
+  return map;
+})();
+// Alinear la serie F&G con window.MONTHLY.labels (formato "YYYY-MM").
+// FEARGREED_HIST usa labels "Ene 2000"; convertimos vía MONTHLY_DISPLAY inverso.
+(function fillFearScores(){
+  if (!window.MONTHLY || !window.MONTHLY.labels) return;
+  window.MONTHLY.fearScores = window.MONTHLY.labels.map(lbl => {
+    const disp = window.MONTHLY_DISPLAY ? window.MONTHLY_DISPLAY(lbl) : lbl;
+    return FEARGREED_HIST[disp] != null ? FEARGREED_HIST[disp] : null;
+  });
+})();
 
 /* ── Mandatos presidenciales argentinos (desde 2000) ──────────
    start: "YYYY-MM" del inicio del mandato (o del período cubierto)
@@ -6264,6 +6308,13 @@ let mervalVisible = false;
 function toggleMerval() {
   const chk = document.getElementById('mervalToggle');
   mervalVisible = chk ? chk.checked : !mervalVisible;
+  buildChart(sliderFrom, sliderTo);
+}
+
+let macroVisible = false;
+function toggleMacro() {
+  const chk = document.getElementById('macroToggle');
+  macroVisible = chk ? chk.checked : !macroVisible;
   buildChart(sliderFrom, sliderTo);
 }
 
@@ -6445,20 +6496,38 @@ function buildChart(from,to){
   // numLabels = [0,1,2,...] — purely numeric so Chart.js never tries to parse
   const numLabels = rawLabels.map((_,i) => i);
 
+  // Serie del Índice de Miedo y Codicia (F&G) — principal del gráfico
+  const fearAll  = window.MONTHLY.fearScores || [];
+  const fearScores = fearAll.slice(from, to+1);
+  // Para el último punto, usar el valor F&G live si está disponible
+  if (fearScores.length && typeof computeFearGreed === 'function') {
+    try {
+      const liveFg = computeFearGreed();
+      if (liveFg != null && !isNaN(liveFg)) fearScores[fearScores.length-1] = liveFg;
+    } catch(e){}
+  }
+  // Serie de Solidez Macro — secundaria, toggleable
+  const macroDatasets = (macroVisible) ? [{
+    label:'Solidez Macro', data:scores,
+    borderColor: isLM ? '#7e22ce' : '#a855f7', borderWidth:2, borderDash:[5,3],
+    pointRadius:0, pointHoverRadius:4, pointBackgroundColor: isLM?'#7e22ce':'#a855f7',
+    fill:false, tension:.4, spanGaps:true, yAxisID:'y', clip:false,
+  }] : [];
+
   try {
   histInst = new Chart(canvasEl, {
     type:'line',
     data:{ labels:numLabels, datasets:[{
-      data:scores, borderColor:'#0ea5e9', borderWidth:2, yAxisID:'y',
-      pointRadius:scores.map((_,i)=>i===n-1?6:n<=36?3:0),
+      data:fearScores, borderColor:'#0ea5e9', borderWidth:2, yAxisID:'y',
+      pointRadius:fearScores.map((_,i)=>i===n-1?6:n<=36?3:0),
       pointHoverRadius:7,
       pointHitRadius:20,
-      pointBackgroundColor:scores.map(scoreColor),
-      pointBorderColor:scores.map(scoreColor), pointBorderWidth:0,
+      pointBackgroundColor:fearScores.map(v=>v==null?'#0ea5e9':scoreColor(v)),
+      pointBorderColor:fearScores.map(v=>v==null?'#0ea5e9':scoreColor(v)), pointBorderWidth:0,
       fill:true,
       backgroundColor:ctx=>{const g=ctx.chart.ctx.createLinearGradient(0,0,0,320);g.addColorStop(0,'rgba(14,165,233,.15)');g.addColorStop(1,'rgba(14,165,233,0)');return g;},
-      tension:.4,
-    }, ...mervalDatasets]},
+      tension:.4, spanGaps:true,
+    }, ...macroDatasets, ...mervalDatasets]},
     options:{
       responsive:true, maintainAspectRatio:false,
       plugins:{
@@ -6480,6 +6549,9 @@ function buildChart(from,to){
               if(c.dataset.label==='Merval USD'){
                 const raw = MERVAL_MAP[_disp(rawLabels[c.dataIndex])];
                 return raw!=null ? `  Merval: USD ${raw.toLocaleString('es-AR')}` : '  Merval: s/d';
+              }
+              if(c.dataset.label==='Solidez Macro'){
+                return `  ${LANG==='en'?'Macro':'Macro'}: ${c.parsed.y}  ·  ${scoreLabel(c.parsed.y)}`;
               }
               return `  ${t('chart.score')}: ${c.parsed.y}  ·  ${scoreLabel(c.parsed.y)}`;
             },
@@ -7180,8 +7252,8 @@ async function loadDataJSON() {
         LIVE.amplitud = {
           score: breadthScore,
           raw: LANG==='en'
-            ? `${aUp}↑ ${aFl}→ ${aDn}↓ / ${aTot} stocks (${pctUp}% weekly adv.)`
-            : `${aUp}↑ ${aFl}→ ${aDn}↓ / ${aTot} acciones (${pctUp}% alza semanal)`,
+            ? `${aUp}↑ ${aFl}→ ${aDn}↓ / ${aTot} stocks (${pctUp}% 30d adv.)`
+            : `${aUp}↑ ${aFl}→ ${aDn}↓ / ${aTot} acciones (${pctUp}% alza 30d)`,
           src:'IOL', live:true, _sheetVal:true
         };
         console.log('[data.json] Amplitud recalculada:', aUp+'↑', aDn+'↓', '→ score', breadthScore);
@@ -7476,8 +7548,8 @@ async function loadSheetSubDatos() {
     LIVE.amplitud = {
       score: breadthScore,
       raw:   LANG==='en'
-        ? `${ampUp}↑ ${ampFl}→ ${ampDn}↓ / ${ampTotal} stocks (${pctUp}% weekly adv.)`
-        : `${ampUp}↑ ${ampFl}→ ${ampDn}↓ / ${ampTotal} acciones (${pctUp}% alza semanal)`,
+        ? `${ampUp}↑ ${ampFl}→ ${ampDn}↓ / ${ampTotal} stocks (${pctUp}% 30d adv.)`
+        : `${ampUp}↑ ${ampFl}→ ${ampDn}↓ / ${ampTotal} acciones (${pctUp}% alza 30d)`,
       src:   'IOL',
       live:  true,
       _sheetVal: true
