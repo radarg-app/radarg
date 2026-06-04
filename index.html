@@ -481,20 +481,20 @@ main { position:relative; z-index:1; max-width:1440px; margin:0 auto; padding:2r
 .gauge-canvas-wrap { position:relative; width:100%; max-width:560px; margin:0 auto; display:flex; justify-content:center; align-items:center; flex:1; }
 /* ── Switch de índice (Solidez Macro / Fear & Greed) ── */
 .index-switch{
-  display:flex; gap:.4rem; max-width:420px; margin:.4rem auto 0; padding:.3rem;
+  display:flex; gap:.4rem; max-width:560px; width:fit-content; margin:.4rem auto 0; padding:.3rem;
   background:var(--bg); border:1px solid var(--border); border-radius:12px;
 }
 .index-tab{
   flex:1; display:flex; flex-direction:column; align-items:center; gap:1px;
-  padding:.5rem .4rem; border:none; border-radius:9px; cursor:pointer;
-  background:transparent; color:var(--text3); font-family:inherit;
+  padding:.5rem 1.1rem; border:none; border-radius:9px; cursor:pointer;
+  background:transparent; color:var(--text3); font-family:inherit; white-space:nowrap;
   transition:background .18s ease, color .18s ease;
 }
 .index-tab:hover{ color:var(--text2); }
 .index-tab.active{ background:var(--bg2); color:var(--text); box-shadow:0 1px 4px rgba(0,0,0,.2); }
 .index-tab.active .idx-tab-name{ color:var(--ac2); }
-.idx-tab-name{ font-size:.92rem; font-weight:700; letter-spacing:-.2px; }
-.idx-tab-sub{ font-size:.66rem; font-weight:500; letter-spacing:.04em; text-transform:uppercase; opacity:.8; }
+.idx-tab-name{ font-size:.92rem; font-weight:700; letter-spacing:-.2px; white-space:nowrap; }
+.idx-tab-sub{ font-size:.66rem; font-weight:500; letter-spacing:.04em; text-transform:uppercase; opacity:.8; white-space:nowrap; }
 body.lm .index-tab.active{ background:#fff; }
 .gauge-canvas-wrap canvas { width:100% !important; }
 #mainGauge { width:100%; height:auto; display:block; }
@@ -556,6 +556,12 @@ body.lm .index-tab.active{ background:#fff; }
 
 /* ── Carrusel en móvil: scroll horizontal con auto-desplazamiento ── */
 @media(max-width:560px){
+  .index-switch{ max-width:100%; width:auto; gap:.25rem; }
+  .index-tab{ padding:.45rem .5rem; flex:1; min-width:0; }
+  .idx-tab-name{ font-size:.8rem; }
+  /* En móvil el subtítulo va en minúsculas (ocupa ~15% menos) y sin letter-spacing,
+     para garantizar que entre en una sola línea incluso en pantallas de 320px. */
+  .idx-tab-sub{ font-size:.58rem; letter-spacing:0; text-transform:none; }
   .ctx-strip{
     display:flex; flex-wrap:nowrap;
     grid-template-columns:none;
@@ -687,6 +693,20 @@ body.lm .subidx-sec-name { color:var(--ss-color-dark, #0a0a14); }
 body.lm .subidx-sec-bar { background:rgba(0,0,0,.1); }
 .subidx-sec-bar-fill { height:100%; border-radius:2px; transition:width .9s cubic-bezier(.4,0,.2,1); }
 
+/* ── Formato horizontal de las tarjetas del Índice de Miedo y Codicia ──
+   Nombre arriba (full width); debajo, una sola fila con ícono + score + badge
+   + valor + peso, igual que el header de la foto de referencia. */
+.fg-sec-left { min-width:0 !important; width:100%; }
+.fg-sec-row { display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; }
+.fg-sec-row .subidx-sec-icon { font-size:30px; margin-bottom:0; }
+.fg-sec-row .subidx-sec-score { font-size:42px; }
+.fg-sec-row .subidx-sec-badge { align-self:center; }
+.fg-sec-value { font-size:14px; font-weight:700; }
+.fg-sec-weight { font-size:11px; color:var(--text3); font-family:'JetBrains Mono',monospace; }
+.fg-section .subidx-section-header { flex-direction:column; gap:.875rem; align-items:stretch; }
+.fg-section .subidx-sec-prose { width:100%; }
+.fg-section .subidx-chevron { position:absolute; top:1.125rem; right:1.5rem; margin:0; z-index:2; }
+
 .subidx-sec-prose { flex:1; position:relative; z-index:1; }
 .subidx-sec-question {
   font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase;
@@ -766,6 +786,20 @@ body.lm .subidx-ai-body { color:#2a2a40; }
 .var-card-score-num { font-size:16px; font-weight:800; letter-spacing:-.5px; line-height:1; }
 .var-card-score-lbl { font-size:9.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; opacity:.9; }
 
+/* ── Tarjetas del Índice de Miedo y Codicia: var-card a ancho completo, horizontal ──
+   Texto (valor + descripción) a la izquierda; puntaje + barra + fuente a la derecha. */
+.fg-card { margin-bottom:.75rem; padding:1rem 1.25rem; }
+.fg-card-body { display:flex; gap:1.5rem; align-items:flex-start; }
+.fg-card-main { flex:1; min-width:0; }
+.fg-card-main .var-card-value { font-size:18px; margin-bottom:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+@media(max-width:640px){ .fg-card-main .var-card-value { font-size:16px; white-space:normal; } }
+.fg-card-main .var-card-desc { font-size:13.5px; margin-bottom:0; }
+.fg-card-score { width:200px; flex-shrink:0; display:flex; flex-direction:column; gap:6px; }
+@media(max-width:640px){
+  .fg-card-body { flex-direction:column; gap:.75rem; }
+  .fg-card-score { width:100%; }
+}
+
 /* Botón "Cerrar sección": horizontal, fino, abarca el ancho */
 .subidx-close-btn {
   display:block; width:calc(100% - 3rem); margin:0 1.5rem 1.25rem;
@@ -830,13 +864,13 @@ body.lm .var-card-bar { background:rgba(0,0,0,.07); }
 .merval-switch input { opacity:0; width:0; height:0; position:absolute; }
 .merval-switch-track {
   position:absolute; inset:0;
-  background:var(--bg4); border-radius:9px;
+  background:var(--bg4); border-radius:4px;
   border:1px solid var(--border2);
   transition:background .2s, border-color .2s;
 }
 .merval-switch-thumb {
   position:absolute; top:2px; left:2px;
-  width:12px; height:12px; border-radius:50%;
+  width:12px; height:12px; border-radius:3px;
   background:#fff; transition:transform .2s, background .2s;
   box-shadow:0 1px 3px rgba(0,0,0,.3);
 }
@@ -2006,6 +2040,14 @@ body.lm .support-reason { color:rgba(0,0,0,.55); }
 .ranking-tab.active { background:var(--ac); color:#fff; box-shadow:0 1px 4px rgba(0,0,0,.18); }
 body.lm .ranking-tabs { background:#f0f1f5; border-color:rgba(0,0,0,.08); }
 body.lm .ranking-tab.active { color:#fff; }
+/* Variante para el selector de índice de la sección de datos: más ancho y visible */
+.data-index-tabs { max-width:600px; margin:0 auto 1.5rem; gap:.5rem; padding:5px; border-radius:12px; }
+.data-index-tabs .ranking-tab { font-size:14px; padding:11px 18px; border-radius:9px; letter-spacing:0; }
+.data-index-tabs .ranking-tab.active { box-shadow:0 2px 10px rgba(14,165,233,.35); }
+@media(max-width:560px){
+  .data-index-tabs { max-width:100%; }
+  .data-index-tabs .ranking-tab { font-size:12.5px; padding:10px 8px; }
+}
 .ranking-list {
   display:flex; flex-direction:column; gap:.5rem; flex:1;
   max-height:340px; overflow-y:auto;
@@ -2151,12 +2193,22 @@ body.lm .ranking-footer { border-top-color:rgba(0,0,0,.08); }
 
   /* Chart */
   .chart-card { padding:1rem; }
-  .chart-zone-legend { gap:.5rem; overflow-x:auto; flex-wrap:nowrap; }
+  .chart-zone-legend { gap:.625rem 1rem; flex-wrap:wrap; overflow-x:visible; }
   .czl-item { flex-shrink:0; }
   .chart-wrap { height:340px; }
-  /* Toggles Merval/Presidentes — más compactos en tablet */
-  .chart-toggles { gap:.625rem; }
-  .toggle-lbl-merval, .toggle-lbl-pres { font-size:10px; }
+  /* Toggles Merval/Presidentes — fila propia full-width, separada con borde */
+  .chart-toggles {
+    width:100%; margin:.5rem 0 0; padding-top:.625rem;
+    border-top:1px solid var(--border);
+    display:flex; gap:.625rem; flex-wrap:wrap; justify-content:stretch;
+  }
+  .chart-toggles .merval-switch-wrap {
+    flex:1; min-width:160px; margin:0; justify-content:space-between;
+    padding:.5rem .75rem; background:var(--bg4);
+    border:1px solid var(--border); border-radius:8px;
+  }
+  body.lm .chart-toggles .merval-switch-wrap { background:#f0f1f5; }
+  .toggle-lbl-merval, .toggle-lbl-pres { font-size:11px; }
 
   /* Pro features — 1 col */
   .pro-features { grid-template-columns:1fr; }
@@ -2186,14 +2238,34 @@ body.lm .ranking-footer { border-top-color:rgba(0,0,0,.08); }
   .sc-refs { flex-direction:column; gap:.375rem; }
   /* Chart en móvil: altura mayor para que quepa el Merval */
   .chart-wrap { height:300px; }
-  /* Leyenda de zonas: scroll horizontal para que no colapsen */
-  .chart-zone-legend { flex-wrap:nowrap; overflow-x:auto; gap:.375rem; padding:.5rem .75rem; }
+
+  /* Encabezado del gráfico: título y descripción más legibles */
+  .chart-title { font-size:13px; line-height:1.3; }
+  .chart-sub { font-size:10px; }
+  .chart-desc-txt { font-size:10px !important; line-height:1.45; }
+
+  /* Leyenda de zonas: grilla 2 columnas en lugar de scroll horizontal */
+  .chart-zone-legend {
+    flex-wrap:wrap; overflow-x:visible; gap:.4rem .75rem;
+    padding:.625rem .75rem; align-items:flex-start;
+  }
+  .czl-item { width:calc(50% - .5rem); }
   .czl-name { font-size:10px; }
-  .czl-range { display:none; }   /* ocultar rango numérico en móvil muy chico */
-  /* Toggles: debajo de la leyenda en móvil */
-  .chart-toggles { margin-left:0; margin-top:.5rem; justify-content:flex-start; }
-  .chart-zone-legend { flex-wrap:wrap; }
-  .toggle-lbl-merval, .toggle-lbl-pres { font-size:10px; }
+  .czl-range { display:none; }
+
+  /* Toggles: bloque propio, full-width, apilados en columna en pantalla chica */
+  .chart-toggles {
+    width:100%; margin:.5rem 0 0; padding-top:.625rem;
+    border-top:1px solid var(--border);
+    display:flex; flex-direction:column; gap:.625rem; align-items:stretch;
+  }
+  .chart-toggles .merval-switch-wrap {
+    flex:none; width:100%; min-width:0; margin:0; justify-content:space-between;
+    padding:.5rem .75rem; background:var(--bg4);
+    border:1px solid var(--border); border-radius:8px;
+  }
+  body.lm .chart-toggles .merval-switch-wrap { background:#f0f1f5; }
+  .toggle-lbl-merval, .toggle-lbl-pres { font-size:12px; font-weight:700; }
 }
 .btn-donate-sm {
   display:inline-flex; align-items:center; gap:5px;
@@ -2509,7 +2581,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
       <span class="sec-ttl" id="dataIdxTitle" data-i18n="sec.indicators.fear">Componentes del Índice de Miedo y Codicia</span>
       <div class="sec-line"></div>
     </div>
-    <div class="ranking-tabs" role="tablist" style="max-width:440px;margin:0 auto 1.25rem">
+    <div class="ranking-tabs data-index-tabs" role="tablist">
       <button class="ranking-tab active" id="dataTabFear" role="tab" onclick="setDataIndex('fear')" data-i18n="data.tab.fear">Miedo y Codicia</button>
       <button class="ranking-tab" id="dataTabMacro" role="tab" onclick="setDataIndex('macro')" data-i18n="data.tab.macro">Solidez Macro</button>
     </div>
@@ -4615,7 +4687,7 @@ function computeSubIndices(bs) {
   const seg5 = [
     { name: es?'Riesgo País (EMBI)':'Country Risk (EMBI)', freq:'diario',
       w:25, score: LIVE.embi.score, src:'ArgentinaDatos', live: LIVE.embi.live,
-      raw: LIVE.embi.bps ? `${LIVE.embi.bps} bps` : '',
+      raw: LIVE.embi.bps ? (es ? `Riesgo país en ${LIVE.embi.bps} puntos` : `Country risk at ${LIVE.embi.bps} bps`) : '',
       desc: (()=>{ const hoy = LIVE.embi.bps || null;
         return es
           ? `Spread de la deuda soberana argentina sobre los Treasuries de EEUU. El indicador de riesgo más seguido mediáticamente. Comprimió de ~850 bps en 2025${hoy?` a ~${hoy} bps hoy`:''}.`
@@ -4754,51 +4826,60 @@ function mervalSeries() {
 /* 1. Momentum del Merval: posición del valor actual en su rango histórico.
    Dato crudo: Merval en USD. Score: mín hist→1, máx hist→100 (autoajuste). */
 function fgMomentum() {
-  const s = mervalSeries();
-  const cur = LIVE.merval && LIVE.merval.usd > 0 ? LIVE.merval.usd : (s.length ? s[s.length-1] : 0);
-  if (!cur || !s.length) return { score:50, raw:'s/d', value:null };
-  const max = Math.max(...s, cur), min = Math.min(...s, cur);
+  const es = LANG !== 'en';
+  const s0 = mervalSeries();
+  const cur = LIVE.merval && LIVE.merval.usd > 0 ? LIVE.merval.usd : (s0.length ? s0[s0.length-1] : 0);
+  if (!cur || !s0.length) return { score:50, raw:'s/d', value:null };
+  const max = Math.max(...s0, cur), min = Math.min(...s0, cur);
   const score = (max<=min) ? 50 : Math.min(100, Math.max(1, Math.round(1 + (cur-min)/(max-min)*99)));
-  return { score, value:cur, raw:`USD ${Math.round(cur).toLocaleString('es-AR')}` };
+  const usd = Math.round(cur).toLocaleString('es-AR');
+  return { score, value:cur, raw: es ? `Merval en USD ${usd}` : `Merval at USD ${usd}` };
 }
 
 /* 2. Amplitud del panel: acciones que subieron vs bajaron en 30 días. */
 function fgAmplitud() {
+  const es = LANG !== 'en';
   const up = Number(LIVE._amplitudUp), dn = Number(LIVE._amplitudDn);
   const tot = Number(LIVE._amplitudTotal||0);
   if (!(tot > 0) || (isNaN(up) && isNaN(dn))) return { score:50, raw:'s/d', value:null };
   const moved = up + dn;
   const score = moved>0 ? Math.min(100, Math.max(0, Math.round(up/moved*100))) : 50;
   const pctUp = Math.round(up/tot*100);
-  return { score, value:pctUp, raw:`${up}↑ ${dn}↓ / ${tot} (${pctUp}%)` };
+  return { score, value:pctUp, raw: es ? `${up} de ${tot} acciones suben en 30 días` : `${up} of ${tot} stocks rising in 30 days` };
 }
 
 /* 3. Volatilidad del Merval (% anualizada). Más vol = más miedo (score invertido). */
 function fgVolatility() {
+  const es = LANG !== 'en';
   const v = LIVE._mervalVol;
   if (v == null || isNaN(v) || v <= 0) return { score:50, raw:'s/d', value:null };
-  return { score: volScore(v), value:v, raw:`${v.toFixed(1)}% anual.` };
+  return { score: volScore(v), value:v, raw: es ? `Volatilidad anual del ${v.toFixed(0)}%` : `Annual volatility of ${v.toFixed(0)}%` };
 }
 
 /* 4. Apetito de riesgo crediticio: yield del GD35 (bono USD). Mayor yield = más miedo. */
 function fgCreditAppetite() {
+  const es = LANG !== 'en';
   const y = LIVE._gd35Yield;
   if (y == null || isNaN(y)) return { score:50, raw:'s/d', value:null };
-  return { score: gd35YieldScore(y), value:y, raw:`${y.toFixed(2)}%` };
+  return { score: gd35YieldScore(y), value:y, raw: es ? `Bono en USD rinde ${y.toFixed(1)}%` : `USD bond yields ${y.toFixed(1)}%` };
 }
 
 /* 5. Riesgo país (EMBI, en bps). Mayor riesgo = más miedo. */
 function fgRiesgoPais() {
+  const es = LANG !== 'en';
   const bps = LIVE.embi && LIVE.embi.bps != null ? LIVE.embi.bps : null;
   if (bps == null || isNaN(bps)) return { score:50, raw:'s/d', value:null };
-  return { score: embiToScore(bps), value:bps, raw:`${Math.round(bps)} bps` };
+  return { score: embiToScore(bps), value:bps, raw: es ? `Riesgo país en ${Math.round(bps)} puntos` : `Country risk at ${Math.round(bps)} bps` };
 }
 
 /* 6. Brecha cambiaria (%). Mayor brecha = más miedo. */
 function fgBrecha() {
+  const es = LANG !== 'en';
   const b = S.brecha;
   if (b == null || isNaN(b)) return { score:50, raw:'s/d', value:null };
-  return { score: brechaToScore(b), value:b, raw:`${b.toFixed(1)}%` };
+  const bAbs = Math.abs(b).toFixed(1);
+  if (b < 0.5 && b > -0.5) return { score: brechaToScore(b), value:b, raw: es ? `Dólar oficial y libre alineados` : `Official and free dollar aligned` };
+  return { score: brechaToScore(b), value:b, raw: es ? `Brecha cambiaria del ${bAbs}%` : `FX gap of ${bAbs}%` };
 }
 
 /* Lista canónica de los 6 componentes del F&G (mismo orden y pesos en GAS y HTML). */
@@ -5568,9 +5649,11 @@ function renderGauge(score){
     }
   });
 
-  // Update last point of MONTHLY with current live score so chart matches
-  if(totalM > 0 && s > 0){
-    window.MONTHLY.scores[totalM-1] = s;
+  // Update last point of MONTHLY with the current MACRO score (the chart always
+  // represents the Solidez Macro index, independent of which index is active above).
+  const macroNow = computeTotal(brechaToScore(S.brecha));
+  if(totalM > 0 && macroNow > 0){
+    window.MONTHLY.scores[totalM-1] = macroNow;
     // Rebuild chart if already initialized
     if(typeof buildChart==='function' && typeof sliderFrom!=='undefined'){
       buildChart(sliderFrom, sliderTo);
@@ -5580,10 +5663,8 @@ function renderGauge(score){
 
 /* ── Render indicators ─────────────────────────────────────── */
 function renderIndicators(brechaScore) {
-  const strip    = document.getElementById('subidxStrip');
   const sections = document.getElementById('subidxSections');
   if(!sections) return;
-  if(strip) strip.innerHTML = '';
   sections.innerHTML = '';
   if (DATA_INDEX === 'fear') return renderFearComponents();
   return renderMacroSegments(brechaScore);
@@ -5629,6 +5710,16 @@ function renderFearComponents() {
               :'Gap between parallel and official dollar. A wide gap reflects distrust and fear; a narrow gap, FX calm.' },
   };
 
+  // Fuente de cada componente (para la línea inferior con el puntito ⚡)
+  const meta2 = {
+    momentum:    { src:'IOL/Yahoo', live:true },
+    amplitud:    { src:'IOL',        live:true },
+    volatilidad: { src:'IOL',        live:true },
+    credito:     { src:'IOL',        live:true },
+    riesgo:      { src:'ArgentinaDatos', live:true },
+    brecha:      { src:'ArgentinaDatos', live:true },
+  };
+
   fgComponents().forEach(({key, fn}) => {
     const r = fn();                 // { score, raw, value }
     const m = meta[key];
@@ -5637,42 +5728,45 @@ function renderFearComponents() {
     const col = noData ? 'var(--text3)' : scoreColor(s);
     const bg  = noData ? 'rgba(255,255,255,.06)' : scoreBg(s);
     const lbl = noData ? (es?'Sin datos':'No data') : scoreLabel(s);
-    const sect = document.createElement('div');
-    sect.className = 'subidx-section collapsed';
-    sect.id = 'fseg-' + key;
-    sect.style.setProperty('--ss-color', m.color);
-    sect.innerHTML = `
-      <div class="subidx-section-header">
-        <div class="subidx-sec-left">
-          <div class="subidx-sec-icon">${m.icon}</div>
-          <div class="subidx-sec-name">${m.name}</div>
-          <div class="subidx-sec-value" style="font-size:18px;font-weight:700;color:var(--text);margin:2px 0;font-family:'JetBrains Mono',monospace">${r.raw}</div>
-          <div class="subidx-sec-score-row">
-            <span class="subidx-sec-score" style="color:${col}">${noData?'—':s}</span>
-            <span class="subidx-sec-badge ind-badge" style="background:${bg};color:${col}">${lbl}</span>
-          </div>
-          <div class="subidx-sec-bar"><div class="subidx-sec-bar-fill" style="background:${m.color};width:${noData?0:s}%"></div></div>
-          <div class="subidx-sec-weight">${W.toFixed(1)}% ${es?'del score final':'of final score'}</div>
+    const sc  = m.color;
+    const src = meta2[key] || { src:'IOL', live:true };
+    const dotColor = (src.live && !noData) ? 'var(--g)' : 'var(--text3)';
+    const dotAnim  = (src.live && !noData) ? 'animation:pulse-dot 2s infinite' : '';
+
+    // ── TARJETA estilo var-card, a ancho completo (horizontal) ──
+    const card = document.createElement('div');
+    card.className = 'var-card fg-card' + (noData ? ' unavailable' : '');
+    card.style.setProperty('--vc-color', sc);
+    card.innerHTML = `
+      <div class="var-card-top">
+        <span class="var-card-name">${m.name}</span>
+        ${noData ? '<span class="var-card-badge-unavail">'+(es?'SIN DATOS':'NO DATA')+'</span>' : ''}
+      </div>
+      <div class="fg-card-body">
+        <div class="fg-card-main">
+          <div class="var-card-value" style="color:${col}">${r.raw}</div>
+          <div class="var-card-desc">${m.desc}</div>
         </div>
-        <div class="subidx-sec-prose">
-          <div class="subidx-sec-question">${m.q}</div>
-          <div class="subidx-sec-desc">${m.desc}</div>
+        <div class="fg-card-score">
+          <span class="var-card-score-pill" style="background:${bg};color:${col}">
+            <span class="var-card-score-num">${noData ? '—' : s}</span>
+            <span class="var-card-score-lbl">${lbl}</span>
+          </span>
+          <div class="var-card-bar"><div class="var-card-bar-fill" style="background:${noData?'#4b5563':sc};width:${noData?0:s}%"></div></div>
+          <div class="var-card-src">
+            <span class="ind-source-dot" style="background:${dotColor};${dotAnim}"></span>
+            ${(src.live && !noData) ? '⚡ ' : ''}${src.src}
+          </div>
         </div>
       </div>
     `;
-    const hdr = sect.querySelector('.subidx-section-header');
-    const chev = document.createElement('span');
-    chev.className = 'subidx-chevron'; chev.setAttribute('aria-hidden','true'); chev.textContent='▾';
-    hdr.appendChild(chev);
-    hdr.addEventListener('click', () => sect.classList.toggle('collapsed'));
-    sections.appendChild(sect);
+    sections.appendChild(card);
   });
 }
 
 function renderMacroSegments(brechaScore) {
   const bs  = intScore(brechaScore);
   const sub = computeSubIndices(bs);
-  const strip    = document.getElementById('subidxStrip');
   const sections = document.getElementById('subidxSections');
   if(!sections) return;
 
@@ -5685,37 +5779,6 @@ function renderMacroSegments(brechaScore) {
     const bg   = scoreBg(s);
     const lbl  = scoreLabel(s);
     const sc   = seg.color; // fixed identity color
-
-    // ── STRIP CARD ───────────────────────────────────────────
-    const card = document.createElement('div');
-    card.className = 'strip-card';
-    card.style.background = 'var(--bg2)';
-    card.style.setProperty('--sc-color', sc);
-    card.innerHTML = `
-      <div class="strip-top">
-        <span class="strip-icon">${seg.icon}</span>
-        <span class="strip-name" style="color:${sc}">${seg.name}</span>
-      </div>
-      <div class="strip-score-row">
-        <span class="strip-score" style="color:${col}" data-score="${s}">${s}</span>
-        <span class="strip-badge ind-badge" style="background:${bg};color:${col}" data-score="${s}">${lbl}</span>
-      </div>
-      <div class="strip-bar"><div class="strip-bar-fill" style="background:${sc};width:${s}%"></div></div>
-      <div class="strip-weight">${seg.w}% ${LANG==='en'?'of total':'del total'}</div>
-    `;
-    card.addEventListener('click', () => {
-      const el = document.getElementById('seg-'+key);
-      if(el) {
-        if(el.classList.contains('collapsed')) el.classList.remove('collapsed');
-        el.scrollIntoView({behavior:'smooth', block:'start'});
-        setTimeout(() => {
-          el.style.transition='box-shadow .15s';
-          el.style.boxShadow='0 0 0 2px '+sc+', 0 0 24px '+sc+'44';
-          setTimeout(()=>{ el.style.boxShadow=''; }, 700);
-        }, 350);
-      }
-    });
-    if(strip) strip.appendChild(card);
 
     // ── DETAIL SECTION ───────────────────────────────────────
     const sect = document.createElement('div');
