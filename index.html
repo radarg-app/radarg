@@ -2576,9 +2576,9 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
     <div class="chart-card">
       <div class="chart-top">
         <div>
-          <div class="chart-title" data-i18n="chart.title">RadARG · Sentimiento del mercado argentino</div>
+          <div class="chart-title" data-i18n="chart.title">RadARG · Índice de Solidez Macroeconómica</div>
           <div class="chart-sub" id="chartSub">Datos mensuales · Ene 2000 – May 2026</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:4px" class="chart-desc-txt" data-i18n="chart.desc">0 = pánico · 100 = euforia. Históricamente, valores por encima de 75 precedieron correcciones importantes en activos argentinos.</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px" class="chart-desc-txt" data-i18n="chart.desc">0 = crítico · 50 = estable · 100 = robusto. Evolución histórica de la solidez macroeconómica argentina desde el año 2000.</div>
         </div>
       </div>
       <div class="chart-zone-legend">
@@ -3212,8 +3212,8 @@ const T = {
     'suggest.optional':'(opcional)',
     'suggest.email.note':'(para avisarte si implementamos tu idea)',
     'suggest.msg.label':'Tu sugerencia',
-    'chart.title':'RadARG · Sentimiento del mercado argentino','chart.range':'RANGO',
-    'chart.desc':'0 = pánico · 100 = euforia. Históricamente, valores por encima de 75 precedieron correcciones importantes en activos argentinos.',
+    'chart.title':'RadARG · Índice de Solidez Macroeconómica','chart.range':'RANGO',
+    'chart.desc':'0 = crítico · 50 = estable · 100 = robusto. Evolución histórica de la solidez macroeconómica argentina desde el año 2000.',
     'sec.news':'Noticias que mueven el índice',
     'zone.fe':'Miedo Extremo','zone.f':'Miedo','zone.n':'Neutral','zone.g':'Codicia','zone.ge':'Codicia Extrema',
     'milestones.show':'Ver hitos',
@@ -3522,8 +3522,8 @@ const T = {
     'suggest.optional':'(optional)',
     'suggest.email.note':'(so we can reach you if we ship it)',
     'suggest.msg.label':'Your suggestion',
-    'chart.title':'RadARG · Argentine Market Sentiment','chart.range':'RANGE',
-    'chart.desc':'0 = panic · 100 = euphoria. Historically, readings above 75 have preceded major corrections in Argentine assets.',
+    'chart.title':'RadARG · Macroeconomic Strength Index','chart.range':'RANGE',
+    'chart.desc':'0 = critical · 50 = stable · 100 = robust. Historical evolution of Argentina\'s macroeconomic strength since the year 2000.',
     'sec.news':'News that moves the index',
     'zone.fe':'Extreme Fear','zone.f':'Fear','zone.n':'Neutral','zone.g':'Greed','zone.ge':'Extreme Greed',
     'milestones.show':'Show milestones',
@@ -3859,6 +3859,15 @@ function scoreLabel(s) {
   if (s<25) return t('scoreLabel.fe'); if (s<45) return t('scoreLabel.f');
   if (s<56) return t('scoreLabel.n');  if (s<75) return t('scoreLabel.g');
   return t('scoreLabel.ge');
+}
+
+/* Etiqueta SIEMPRE en escala de Solidez Macro (Crítico..Robusto), usada por el
+   gráfico histórico, que representa explícitamente el índice de solidez sin importar
+   qué índice esté activo en el gauge. */
+function macroLabel(s) {
+  if (s<25) return t('macroLabel.critico'); if (s<45) return t('macroLabel.fragil');
+  if (s<56) return t('macroLabel.estable'); if (s<75) return t('macroLabel.solido');
+  return t('macroLabel.robusto');
 }
 
 /* ── Índice activo: 'macro' (Solidez Macroeconómica) | 'fear' (Fear & Greed) ── */
@@ -6485,7 +6494,7 @@ function buildChart(from,to){
                 const raw = MERVAL_MAP[_disp(rawLabels[c.dataIndex])];
                 return raw!=null ? `  Merval: USD ${raw.toLocaleString('es-AR')}` : '  Merval: s/d';
               }
-              return `  ${t('chart.score')}: ${c.parsed.y}  ·  ${scoreLabel(c.parsed.y)}`;
+              return `  ${t('chart.score')}: ${c.parsed.y}  ·  ${macroLabel(c.parsed.y)}`;
             },
             footer: items => {
               const lbl = _disp(rawLabels[items[0]?.dataIndex]||'');
