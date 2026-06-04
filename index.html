@@ -4744,45 +4744,73 @@ function mervalSeries() {
    El valor live ya está incluido en la serie (mervalSeries lo parchea), así que
    si el Merval supera su máximo previo, ese nuevo valor pasa a ser el máximo y el
    cálculo se reajusta solo (queda en 100 hasta que aparezca uno mayor). */
+/* ════════════════════════════════════════════════════════════════
+   COMPONENTES DEL ÍNDICE DE MIEDO Y CODICIA (Fear & Greed)
+   6 componentes, todos con dato crudo real y peso igual (16.67% c/u).
+   Cada función devuelve { score, raw, value } de forma determinística:
+   mismo dato → mismo puntaje, calculable también en el GAS.
+═══════════════════════════════════════════════════════════════════ */
+
+/* 1. Momentum del Merval: posición del valor actual en su rango histórico.
+   Dato crudo: Merval en USD. Score: mín hist→1, máx hist→100 (autoajuste). */
 function fgMomentum() {
   const s = mervalSeries();
   const cur = LIVE.merval && LIVE.merval.usd > 0 ? LIVE.merval.usd : (s.length ? s[s.length-1] : 0);
-  if (!cur || !s.length) return 50;
-  // max/min sobre TODA la serie histórica, incluyendo el valor actual (autoajuste de máximo)
-  const max = Math.max(...s, cur);
-  const min = Math.min(...s, cur);
-  if (max <= min) return 50;
-  // Mapeo lineal: min → 1, max → 100
-  const score = 1 + (cur - min) / (max - min) * 99;
-  return Math.min(100, Math.max(1, Math.round(score)));
+  if (!cur || !s.length) return { score:50, raw:'s/d', value:null };
+  const max = Math.max(...s, cur), min = Math.min(...s, cur);
+  const score = (max<=min) ? 50 : Math.min(100, Math.max(1, Math.round(1 + (cur-min)/(max-min)*99)));
+  return { score, value:cur, raw:`USD ${Math.round(cur).toLocaleString('es-AR')}` };
 }
 
-/* 3. Volatilidad: nivel actual vs umbrales (invertido). Migrará a "vs media" con serie diaria. */
+/* 2. Amplitud del panel: acciones que subieron vs bajaron en 30 días. */
+function fgAmplitud() {
+  const up = Number(LIVE._amplitudUp), dn = Number(LIVE._amplitudDn);
+  const tot = Number(LIVE._amplitudTotal||0);
+  if (!(tot > 0) || (isNaN(up) && isNaN(dn))) return { score:50, raw:'s/d', value:null };
+  const moved = up + dn;
+  const score = moved>0 ? Math.min(100, Math.max(0, Math.round(up/moved*100))) : 50;
+  const pctUp = Math.round(up/tot*100);
+  return { score, value:pctUp, raw:`${up}↑ ${dn}↓ / ${tot} (${pctUp}%)` };
+}
+
+/* 3. Volatilidad del Merval (% anualizada). Más vol = más miedo (score invertido). */
 function fgVolatility() {
-  if (LIVE._mervalVol != null && LIVE._mervalVol > 0) return volScore(LIVE._mervalVol);
-  return 50;
+  const v = LIVE._mervalVol;
+  if (v == null || isNaN(v) || v <= 0) return { score:50, raw:'s/d', value:null };
+  return { score: volScore(v), value:v, raw:`${v.toFixed(1)}% anual.` };
 }
 
-/* 4. Safe haven: apetito por acciones vs refugio. Aproximación con momentum del Merval
-   relativo al rendimiento de un bono USD corto. A falta de serie de retornos, usamos
-   el score del Merval atenuado por el del bono (más demanda de bono = más miedo). */
-function fgSafeHaven() {
-  const mervS = LIVE.merval ? LIVE.merval.score : 50;
-  const bonoS = LIVE.bonos ? LIVE.bonos.score : 50;
-  // Si las acciones rinden mejor que el refugio → greed; si el refugio domina → fear
-  return intScore(Math.round(50 + (mervS - bonoS) * 0.5));
-}
-
-/* 5. Apetito de riesgo crediticio: yield de bonos HY argentinos (GD35). Mayor yield = más miedo. */
+/* 4. Apetito de riesgo crediticio: yield del GD35 (bono USD). Mayor yield = más miedo. */
 function fgCreditAppetite() {
-  if (LIVE._gd35Yield != null) return gd35YieldScore(LIVE._gd35Yield);
-  return LIVE.bonos ? LIVE.bonos.score : 50;
+  const y = LIVE._gd35Yield;
+  if (y == null || isNaN(y)) return { score:50, raw:'s/d', value:null };
+  return { score: gd35YieldScore(y), value:y, raw:`${y.toFixed(2)}%` };
 }
 
-/* 6. Fuerza de precios (máx/mín 52s): requiere histórico por acción. Neutral por ahora. */
-function fgPriceStrength() {
-  // TODO: % de acciones del panel en máximos vs mínimos de 52s (necesita serie por papel)
-  return 50;
+/* 5. Riesgo país (EMBI, en bps). Mayor riesgo = más miedo. */
+function fgRiesgoPais() {
+  const bps = LIVE.embi && LIVE.embi.bps != null ? LIVE.embi.bps : null;
+  if (bps == null || isNaN(bps)) return { score:50, raw:'s/d', value:null };
+  return { score: embiToScore(bps), value:bps, raw:`${Math.round(bps)} bps` };
+}
+
+/* 6. Brecha cambiaria (%). Mayor brecha = más miedo. */
+function fgBrecha() {
+  const b = S.brecha;
+  if (b == null || isNaN(b)) return { score:50, raw:'s/d', value:null };
+  return { score: brechaToScore(b), value:b, raw:`${b.toFixed(1)}%` };
+}
+
+/* Lista canónica de los 6 componentes del F&G (mismo orden y pesos en GAS y HTML). */
+function fgComponents() {
+  return [
+    { key:'momentum', fn:fgMomentum },
+    { key:'amplitud', fn:fgAmplitud },
+    { key:'volatilidad', fn:fgVolatility },
+    { key:'credito', fn:fgCreditAppetite },
+    { key:'riesgo', fn:fgRiesgoPais },
+    { key:'brecha', fn:fgBrecha },
+  ];
 }
 
 function computeFearGreed() {
@@ -4790,16 +4818,9 @@ function computeFearGreed() {
   if (LIVE._fearGreed != null && !isNaN(LIVE._fearGreed)) {
     return Math.min(100, Math.max(0, Math.round(Number(LIVE._fearGreed))));
   }
-  const pairs = [
-    {s: fgMomentum(),        w: 25},  // Momentum del Merval vs media móvil
-    {s: LIVE.amplitud.score, w: 20},  // Amplitud del panel (breadth)
-    {s: fgVolatility(),      w: 18},  // Volatilidad
-    {s: fgSafeHaven(),       w: 17},  // Acciones vs refugio
-    {s: fgCreditAppetite(),  w: 12},  // Apetito de riesgo crediticio
-    {s: fgPriceStrength(),   w:  8}   // Fuerza de precios (neutral hasta tener histórico)
-  ];
-  const tot = pairs.reduce((a,p)=>a+p.w,0);
-  return Math.min(100,Math.max(0,Math.round(pairs.reduce((a,p)=>a+p.s*p.w,0)/tot)));
+  // Recálculo determinístico: promedio simple (pesos iguales) de los 6 componentes
+  const comps = fgComponents().map(c => c.fn().score);
+  return Math.round(comps.reduce((a,b)=>a+b,0) / comps.length);
 }
 
 /* Devuelve el score del índice ACTUALMENTE activo */
@@ -5569,75 +5590,73 @@ function renderIndicators(brechaScore) {
 }
 
 /* ── Componentes del Índice de Miedo y Codicia (Fear & Greed) ──
-   Tarjetas tipo acordeón, una por componente, con su score y peso.
-   No tienen sub-variables ni resumen IA (a diferencia de los segmentos
-   macro): son medidas directas del mercado accionario. */
+   6 componentes, peso igual (16.67% c/u). Cada uno expone su VALOR CRUDO
+   de forma destacada (como los del índice macro) y un puntaje determinístico. */
 function renderFearComponents() {
   const sections = document.getElementById('subidxSections');
   const es = LANG !== 'en';
-  const comps = [
-    { key:'momentum', icon:'📈', w:25, color:'#ec4899',
+  const W = (100/6); // peso igual
+  const meta = {
+    momentum: { icon:'📈', color:'#ec4899',
       name: es?'Momentum del Merval':'Merval Momentum',
-      score: fgMomentum(),
-      q: es?'¿El Merval está por encima o por debajo de su promedio reciente?':'Is the Merval above or below its recent average?',
-      desc: es?'Compara el nivel actual del Merval (en USD) contra su media móvil. Por encima de la media indica codicia; por debajo, miedo. Es el corazón del índice, igual que en el Fear & Greed de CNN.'
-              :'Compares the current Merval level (in USD) against its moving average. Above the average signals greed; below, fear. The core of the index, just like CNN\'s Fear & Greed.' },
-    { key:'amplitud', icon:'📊', w:20, color:'#0ea5e9',
+      q: es?'¿El Merval está caro o barato respecto de su historia?':'Is the Merval cheap or expensive vs its history?',
+      desc: es?'Posición del Merval (en USD) dentro de su rango histórico completo. Cerca de máximos indica codicia; cerca de mínimos, miedo. Es el corazón del índice.'
+              :'Position of the Merval (in USD) within its full historical range. Near highs signals greed; near lows, fear. The core of the index.' },
+    amplitud: { icon:'📊', color:'#0ea5e9',
       name: es?'Amplitud del panel':'Market Breadth',
-      score: LIVE.amplitud ? LIVE.amplitud.score : 50,
       q: es?'¿Suben más acciones de las que bajan?':'Are more stocks rising than falling?',
-      desc: es?'Mide cuántas acciones del panel líder subieron frente a las que bajaron en los últimos 30 días corridos. Un avance generalizado confirma un rally genuino; pocas acciones sosteniendo el índice es señal de fragilidad.'
-              :'Measures how many leading-panel stocks rose versus fell over the last 30 calendar days. A broad advance confirms a genuine rally; few stocks holding up the index signals fragility.' },
-    { key:'volatilidad', icon:'🌡️', w:18, color:'#f59e0b',
+      desc: es?'Acciones del panel líder que subieron frente a las que bajaron en los últimos 30 días corridos. Un avance generalizado confirma un rally genuino.'
+              :'Leading-panel stocks that rose versus fell over the last 30 calendar days. A broad advance confirms a genuine rally.' },
+    volatilidad: { icon:'🌡️', color:'#f59e0b',
       name: es?'Volatilidad':'Volatility',
-      score: fgVolatility(),
       q: es?'¿Qué tan nervioso está el mercado?':'How nervous is the market?',
-      desc: es?'Volatilidad del Merval: cuánto oscila día a día. Alta volatilidad es el mejor proxy de miedo (equivale al VIX); baja volatilidad acompaña la calma y la codicia.'
-              :'Merval volatility: how much it swings day to day. High volatility is the best fear proxy (the VIX equivalent); low volatility accompanies calm and greed.' },
-    { key:'safehaven', icon:'🛡️', w:17, color:'#22c55e',
-      name: es?'Acciones vs. refugio':'Stocks vs. Safe Haven',
-      score: fgSafeHaven(),
-      q: es?'¿Los inversores prefieren acciones o refugio?':'Do investors prefer stocks or safe havens?',
-      desc: es?'Compara el apetito por acciones contra la demanda de activos refugio (bonos en dólares). Cuando las acciones le ganan al refugio hay codicia; cuando el capital corre al refugio, miedo.'
-              :'Compares appetite for stocks against demand for safe-haven assets (USD bonds). When stocks beat the haven there is greed; when capital flees to safety, fear.' },
-    { key:'credito', icon:'💵', w:12, color:'#a855f7',
+      desc: es?'Volatilidad anualizada del Merval. Alta volatilidad es el mejor proxy de miedo (equivale al VIX); baja volatilidad acompaña la calma.'
+              :'Annualized Merval volatility. High volatility is the best fear proxy (the VIX equivalent); low volatility accompanies calm.' },
+    credito: { icon:'💵', color:'#a855f7',
       name: es?'Apetito de riesgo crediticio':'Credit Risk Appetite',
-      score: fgCreditAppetite(),
       q: es?'¿Hay apetito por tomar riesgo en bonos?':'Is there appetite for taking bond risk?',
-      desc: es?'Rendimiento de los bonos argentinos en dólares (HY). Un yield que baja muestra ganas de tomar riesgo (codicia); un yield que sube refleja huida del riesgo (miedo).'
-              :'Yield on Argentine USD bonds (HY). A falling yield shows willingness to take risk (greed); a rising yield reflects flight from risk (fear).' },
-    { key:'fuerza', icon:'💪', w:8, color:'#64748b',
-      name: es?'Fuerza de precios':'Price Strength',
-      score: fgPriceStrength(),
-      pending: true,
-      q: es?'¿Cuántas acciones están en máximos vs. mínimos?':'How many stocks are at highs vs. lows?',
-      desc: es?'Porcentaje de acciones del panel en máximos de 52 semanas frente a las que están en mínimos. Requiere histórico por papel: en construcción, por ahora se muestra neutral.'
-              :'Share of panel stocks at 52-week highs versus those at lows. Requires per-stock history: under construction, shown neutral for now.' },
-  ];
+      desc: es?'Rendimiento del bono argentino en dólares (GD35). Un yield que baja muestra ganas de tomar riesgo (codicia); uno que sube refleja huida del riesgo (miedo).'
+              :'Yield on the Argentine USD bond (GD35). A falling yield shows risk appetite (greed); a rising one reflects flight from risk (fear).' },
+    riesgo: { icon:'🌎', color:'#ef4444',
+      name: es?'Riesgo país (EMBI)':'Country Risk (EMBI)',
+      q: es?'¿Cuánto desconfía el mundo de la deuda argentina?':'How much does the world distrust Argentine debt?',
+      desc: es?'Spread de la deuda soberana sobre los Treasuries de EEUU. Es el termómetro de crédito más seguido: más bps = más miedo.'
+              :'Sovereign debt spread over US Treasuries. The most-watched credit thermometer: more bps = more fear.' },
+    brecha: { icon:'💱', color:'#22c55e',
+      name: es?'Brecha cambiaria':'FX Gap',
+      q: es?'¿Cuánta presión hay sobre el dólar?':'How much pressure is on the dollar?',
+      desc: es?'Diferencia entre el dólar paralelo y el oficial. Una brecha amplia refleja desconfianza y miedo; una brecha baja, calma cambiaria.'
+              :'Gap between parallel and official dollar. A wide gap reflects distrust and fear; a narrow gap, FX calm.' },
+  };
 
-  comps.forEach(c => {
-    const s = intScore(c.score);
-    const col = scoreColor(s), bg = scoreBg(s), lbl = scoreLabel(s);
+  fgComponents().forEach(({key, fn}) => {
+    const r = fn();                 // { score, raw, value }
+    const m = meta[key];
+    const s = intScore(r.score);
+    const noData = (r.value == null);
+    const col = noData ? 'var(--text3)' : scoreColor(s);
+    const bg  = noData ? 'rgba(255,255,255,.06)' : scoreBg(s);
+    const lbl = noData ? (es?'Sin datos':'No data') : scoreLabel(s);
     const sect = document.createElement('div');
     sect.className = 'subidx-section collapsed';
-    sect.id = 'fseg-' + c.key;
-    sect.style.setProperty('--ss-color', c.color);
+    sect.id = 'fseg-' + key;
+    sect.style.setProperty('--ss-color', m.color);
     sect.innerHTML = `
       <div class="subidx-section-header">
         <div class="subidx-sec-left">
-          <div class="subidx-sec-icon">${c.icon}</div>
-          <div class="subidx-sec-name">${c.name}</div>
+          <div class="subidx-sec-icon">${m.icon}</div>
+          <div class="subidx-sec-name">${m.name}</div>
+          <div class="subidx-sec-value" style="font-size:18px;font-weight:700;color:var(--text);margin:2px 0;font-family:'JetBrains Mono',monospace">${r.raw}</div>
           <div class="subidx-sec-score-row">
-            <span class="subidx-sec-score" style="color:${col}">${s}</span>
+            <span class="subidx-sec-score" style="color:${col}">${noData?'—':s}</span>
             <span class="subidx-sec-badge ind-badge" style="background:${bg};color:${col}">${lbl}</span>
           </div>
-          <div class="subidx-sec-bar"><div class="subidx-sec-bar-fill" style="background:${c.color};width:${s}%"></div></div>
-          <div class="subidx-sec-weight">${c.w}% ${es?'del score final':'of final score'}</div>
-          ${c.pending ? `<div style="margin-top:6px;display:inline-flex;align-items:center;gap:4px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.25);border-radius:4px;padding:2px 7px;font-size:9px;font-weight:700;color:#f59e0b;letter-spacing:.06em">⚠️ ${es?'EN CONSTRUCCIÓN':'UNDER CONSTRUCTION'}</div>` : ''}
+          <div class="subidx-sec-bar"><div class="subidx-sec-bar-fill" style="background:${m.color};width:${noData?0:s}%"></div></div>
+          <div class="subidx-sec-weight">${W.toFixed(1)}% ${es?'del score final':'of final score'}</div>
         </div>
         <div class="subidx-sec-prose">
-          <div class="subidx-sec-question">${c.q}</div>
-          <div class="subidx-sec-desc">${c.desc}</div>
+          <div class="subidx-sec-question">${m.q}</div>
+          <div class="subidx-sec-desc">${m.desc}</div>
         </div>
       </div>
     `;
