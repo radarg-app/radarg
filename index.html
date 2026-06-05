@@ -807,19 +807,43 @@ body.lm .subidx-ai-body { color:#2a2a40; }
   .fg-card-body { flex-direction:column; gap:.75rem; }
   .fg-card-score { width:100%; }
 }
+/* Explicación de cómo se calcula el puntaje del componente (desplegable) */
+/* Tarjeta del componente: clic en cualquier parte despliega la explicación del puntaje */
+.fg-card-clickable { cursor:pointer; }
+.fg-card-chevron { margin-left:auto; color:var(--text3); font-size:13px; transition:transform .25s ease, color .2s; flex-shrink:0; }
+.fg-card-clickable:hover .fg-card-chevron { color:var(--ac2); }
+.fg-card-clickable.open .fg-card-chevron { transform:rotate(180deg); color:var(--ac2); }
+.fg-scoring-panel {
+  display:none; margin-top:.9rem; padding-top:.9rem;
+  border-top:1px dashed var(--border);
+}
+.fg-card-clickable.open .fg-scoring-panel { display:block; }
+.fg-card-clickable.just-opened .fg-scoring-panel { animation:faqReveal .25s ease; }
+.fg-close-btn { width:100% !important; margin:.9rem 0 0 !important; }
+.fg-scoring-q { font-size:12.5px; font-weight:700; color:var(--ac2); margin-bottom:.55rem; }
+.fg-scoring-body {
+  padding:.85rem 1rem; border-radius:10px;
+  background:var(--bg4); border:1px solid var(--border);
+  font-size:12.5px; line-height:1.7; color:var(--text2);
+}
+body.lm .fg-scoring-body { background:#f4f5f8; }
+.fg-scoring-body strong { color:var(--text); font-weight:700; }
+body.lm .fg-scoring-body strong { color:#0a0a14; }
 
 /* Botón "Cerrar sección": horizontal, fino, abarca el ancho */
 .subidx-close-btn {
-  display:block; width:calc(100% - 3rem); margin:0 1.5rem 1.25rem;
-  padding:9px 0; border-radius:8px; cursor:pointer;
-  background:var(--bg3); border:1px solid var(--border);
-  color:var(--text2); font-family:'Inter',sans-serif;
-  font-size:11.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
-  transition:background .15s, border-color .15s, color .15s;
+  display:flex; align-items:center; justify-content:center; gap:.45rem;
+  width:calc(100% - 3rem); margin:.25rem 1.5rem 1.25rem;
+  padding:12px 22px; border-radius:10px; cursor:pointer;
+  background:var(--ss-color, var(--ac)); border:none;
+  color:#fff; font-family:'Inter',sans-serif;
+  font-size:12px; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
+  box-shadow:0 2px 10px color-mix(in srgb, var(--ss-color, var(--ac)) 35%, transparent);
+  transition:transform .15s ease, box-shadow .2s ease, filter .15s ease;
 }
-.subidx-close-btn:hover { background:var(--bg4); border-color:var(--border2); color:var(--text); }
-body.lm .subidx-close-btn { background:#f0f1f5; border-color:rgba(0,0,0,.10); color:#2a2a40; }
-body.lm .subidx-close-btn:hover { background:#e6e8ef; border-color:rgba(0,0,0,.18); color:#0a0a14; }
+.subidx-close-btn:hover { filter:brightness(1.08); transform:translateY(-1px); box-shadow:0 4px 16px color-mix(in srgb, var(--ss-color, var(--ac)) 45%, transparent); }
+.subidx-close-btn:active { transform:translateY(0); }
+.subidx-close-btn .cls-x { font-size:14px; line-height:1; font-weight:400; }
 .var-card-unavail-note { font-size:9px; color:#f59e0b; line-height:1.5; margin-bottom:3px; font-style:italic; }
 .var-card-bar { height:2px; background:rgba(255,255,255,.07); border-radius:1px; overflow:hidden; margin:4px 0 3px; }
 body.lm .var-card-bar { background:rgba(0,0,0,.07); }
@@ -5707,6 +5731,11 @@ function renderGauge(score){
 function renderIndicators(brechaScore) {
   const sections = document.getElementById('subidxSections');
   if(!sections) return;
+  // Recordar qué componentes del F&G tenían la explicación abierta, antes de limpiar,
+  // para restaurarlos tras un re-render (p.ej. al cambiar de idioma).
+  window._fgOpenKeys = new Set(
+    [...sections.querySelectorAll('.fg-card.open[data-fgkey]')].map(el => el.dataset.fgkey)
+  );
   sections.innerHTML = '';
   if (DATA_INDEX === 'fear') return renderFearComponents();
   return renderMacroSegments(brechaScore);
@@ -5719,37 +5748,51 @@ function renderFearComponents() {
   const sections = document.getElementById('subidxSections');
   const es = LANG !== 'en';
   const W = (100/6); // peso igual
+  // Componentes que tenían la explicación abierta (capturados en renderIndicators antes de limpiar)
+  const openKeys = window._fgOpenKeys || new Set();
   const meta = {
     momentum: { icon:'📈', color:'#ec4899',
       name: es?'Momentum del Merval':'Merval Momentum',
       q: es?'¿El Merval está caro o barato respecto de su historia?':'Is the Merval cheap or expensive vs its history?',
       desc: es?'Posición del Merval (en USD) dentro de su rango histórico completo. Cerca de máximos indica codicia; cerca de mínimos, miedo. Es el corazón del índice.'
-              :'Position of the Merval (in USD) within its full historical range. Near highs signals greed; near lows, fear. The core of the index.' },
+              :'Position of the Merval (in USD) within its full historical range. Near highs signals greed; near lows, fear. The core of the index.',
+      scoring: es?'Se ubica el <strong>valor actual del Merval en USD</strong> dentro de todo su rango histórico:<br><br>• El <strong>mínimo</strong> de la serie equivale a un puntaje de <strong>1</strong><br>• El <strong>máximo</strong>, a <strong>100</strong><br>• El valor de hoy se posiciona linealmente entre esos extremos<br><br>Si el Merval está en la mitad de su rango histórico, el puntaje ronda <strong>50</strong>. Cuanto más cerca de máximos, más alto (codicia); cuanto más cerca de mínimos, más bajo (miedo).'
+              :'The <strong>current Merval value in USD</strong> is placed within its full historical range:<br><br>• The series <strong>low</strong> maps to a score of <strong>1</strong><br>• The <strong>high</strong>, to <strong>100</strong><br>• Today\'s value sits linearly between those extremes<br><br>If the Merval is halfway through its historical range, the score is around <strong>50</strong>. Closer to highs means a higher score (greed); closer to lows, a lower one (fear).' },
     amplitud: { icon:'📊', color:'#0ea5e9',
       name: es?'Amplitud del panel':'Market Breadth',
       q: es?'¿Suben más acciones de las que bajan?':'Are more stocks rising than falling?',
       desc: es?'Acciones del panel líder que subieron frente a las que bajaron en los últimos 30 días corridos. Un avance generalizado confirma un rally genuino.'
-              :'Leading-panel stocks that rose versus fell over the last 30 calendar days. A broad advance confirms a genuine rally.' },
+              :'Leading-panel stocks that rose versus fell over the last 30 calendar days. A broad advance confirms a genuine rally.',
+      scoring: es?'El puntaje es directamente el <strong>porcentaje de acciones que suben</strong> sobre el total de las que se movieron.<br><br>Ejemplo: si de 20 acciones <strong>14 subieron</strong> y 6 bajaron, el puntaje es <strong>70</strong> (14 de 20).<br><br>• <strong>50</strong> = suben tantas como bajan<br>• <strong>Por encima</strong> = predomina el verde (codicia)<br>• <strong>Por debajo</strong> = predomina el rojo (miedo)'
+              :'The score is simply the <strong>share of rising stocks</strong> among those that moved.<br><br>Example: if <strong>14 of 20</strong> stocks rose and 6 fell, the score is <strong>70</strong> (14 of 20).<br><br>• <strong>50</strong> = as many rise as fall<br>• <strong>Above</strong> = green prevails (greed)<br>• <strong>Below</strong> = red prevails (fear)' },
     volatilidad: { icon:'🌡️', color:'#f59e0b',
       name: es?'Volatilidad':'Volatility',
       q: es?'¿Qué tan nervioso está el mercado?':'How nervous is the market?',
       desc: es?'Volatilidad anualizada del Merval. Alta volatilidad es el mejor proxy de miedo (equivale al VIX); baja volatilidad acompaña la calma.'
-              :'Annualized Merval volatility. High volatility is the best fear proxy (the VIX equivalent); low volatility accompanies calm.' },
+              :'Annualized Merval volatility. High volatility is the best fear proxy (the VIX equivalent); low volatility accompanies calm.',
+      scoring: es?'El puntaje está <strong>invertido</strong>: más volatilidad equivale a más miedo, así que baja el score.<br><br>• Menos de <strong>25%</strong> anual → <strong>90</strong> (calma)<br>• <strong>25% a 40%</strong> → baja de 90 a 70<br>• <strong>40% a 60%</strong> → baja de 70 a 45 (nervios)<br>• <strong>60% a 85%</strong> → baja de 45 a 15 (miedo)<br>• Más de <strong>85%</strong> → cae hasta un mínimo de 3 (pánico)'
+              :'The score is <strong>inverted</strong>: more volatility means more fear, so it lowers the score.<br><br>• Below <strong>25%</strong> annualized → <strong>90</strong> (calm)<br>• <strong>25% to 40%</strong> → drops from 90 to 70<br>• <strong>40% to 60%</strong> → drops from 70 to 45 (nervous)<br>• <strong>60% to 85%</strong> → drops from 45 to 15 (fear)<br>• Above <strong>85%</strong> → falls to a floor of 3 (panic)' },
     credito: { icon:'💵', color:'#a855f7',
       name: es?'Apetito de riesgo crediticio':'Credit Risk Appetite',
       q: es?'¿Hay apetito por tomar riesgo en bonos?':'Is there appetite for taking bond risk?',
       desc: es?'Rendimiento del bono argentino en dólares (GD35). Un yield que baja muestra ganas de tomar riesgo (codicia); uno que sube refleja huida del riesgo (miedo).'
-              :'Yield on the Argentine USD bond (GD35). A falling yield shows risk appetite (greed); a rising one reflects flight from risk (fear).' },
+              :'Yield on the Argentine USD bond (GD35). A falling yield shows risk appetite (greed); a rising one reflects flight from risk (fear).',
+      scoring: es?'El puntaje está <strong>invertido</strong>: a menor rendimiento exigido al bono, mayor confianza (codicia). Por tramos del yield anual:<br><br>• Menos de <strong>6%</strong> → 85<br>• <strong>6% a 9%</strong> → 70<br>• <strong>9% a 12%</strong> → 55<br>• <strong>12% a 16%</strong> → 40<br>• <strong>16% a 22%</strong> → 25<br>• Más de <strong>22%</strong> → 15<br><br>Un yield alto significa que el mercado exige mucho para prestarle al país: señal de miedo.'
+              :'The score is <strong>inverted</strong>: the lower the yield demanded, the higher the confidence (greed). By annual-yield bands:<br><br>• Under <strong>6%</strong> → 85<br>• <strong>6% to 9%</strong> → 70<br>• <strong>9% to 12%</strong> → 55<br>• <strong>12% to 16%</strong> → 40<br>• <strong>16% to 22%</strong> → 25<br>• Over <strong>22%</strong> → 15<br><br>A high yield means the market demands a lot to lend to the country: a sign of fear.' },
     riesgo: { icon:'🌎', color:'#ef4444',
       name: es?'Riesgo país (EMBI)':'Country Risk (EMBI)',
       q: es?'¿Cuánto desconfía el mundo de la deuda argentina?':'How much does the world distrust Argentine debt?',
       desc: es?'Spread de la deuda soberana sobre los Treasuries de EEUU. Es el termómetro de crédito más seguido: más bps = más miedo.'
-              :'Sovereign debt spread over US Treasuries. The most-watched credit thermometer: more bps = more fear.' },
+              :'Sovereign debt spread over US Treasuries. The most-watched credit thermometer: more bps = more fear.',
+      scoring: es?'El puntaje está <strong>invertido</strong>: a más puntos de riesgo país, más miedo.<br><br>• Menos de <strong>200</strong> puntos → cerca de 90<br>• <strong>200 a 500</strong> → baja de 85 a 55<br>• <strong>500 a 900</strong> → baja de 55 a 25<br>• <strong>900 a 1500</strong> → baja de 25 a 10<br>• Más de <strong>1500</strong> → mínimos (cerca de 2)<br><br>Mide cuánto extra exige el mundo para prestarle a la Argentina frente a EEUU.'
+              :'The score is <strong>inverted</strong>: the higher the country risk, the more fear.<br><br>• Below <strong>200</strong> points → near 90<br>• <strong>200 to 500</strong> → drops from 85 to 55<br>• <strong>500 to 900</strong> → drops from 55 to 25<br>• <strong>900 to 1500</strong> → drops from 25 to 10<br>• Above <strong>1500</strong> → bottoms out (near 2)<br><br>It measures the extra return the world demands to lend to Argentina versus the US.' },
     brecha: { icon:'💱', color:'#22c55e',
       name: es?'Brecha cambiaria':'FX Gap',
       q: es?'¿Cuánta presión hay sobre el dólar?':'How much pressure is on the dollar?',
       desc: es?'Diferencia entre el dólar paralelo y el oficial. Una brecha amplia refleja desconfianza y miedo; una brecha baja, calma cambiaria.'
-              :'Gap between parallel and official dollar. A wide gap reflects distrust and fear; a narrow gap, FX calm.' },
+              :'Gap between parallel and official dollar. A wide gap reflects distrust and fear; a narrow gap, FX calm.',
+      scoring: es?'El puntaje está <strong>invertido</strong>: a mayor brecha, más miedo.<br><br>• Brecha <strong>negativa o nula</strong> → máximo (cerca de 90, inédito)<br>• Hasta <strong>5%</strong> → baja muy poco<br>• <strong>5% a 15%</strong> → de 83 a 72<br>• <strong>15% a 40%</strong> → de 72 a 50<br>• <strong>40% a 80%</strong> → de 50 a 26<br>• <strong>80% a 130%</strong> → de 26 a 5<br>• Más de <strong>130%</strong> → 5<br><br>Mide cuánto se aparta el dólar libre del oficial.'
+              :'The score is <strong>inverted</strong>: the wider the gap, the more fear.<br><br>• <strong>Negative or zero</strong> gap → top score (near 90, unprecedented)<br>• Up to <strong>5%</strong> → barely moves<br>• <strong>5% to 15%</strong> → from 83 to 72<br>• <strong>15% to 40%</strong> → from 72 to 50<br>• <strong>40% to 80%</strong> → from 50 to 26<br>• <strong>80% to 130%</strong> → from 26 to 5<br>• Above <strong>130%</strong> → 5<br><br>It measures how far the free dollar drifts from the official one.' },
   };
 
   // Fuente de cada componente (para la línea inferior con el puntito ⚡)
@@ -5774,14 +5817,17 @@ function renderFearComponents() {
     const dotColor = (src.live && !noData) ? 'var(--g)' : 'var(--text3)';
     const dotAnim  = (src.live && !noData) ? 'animation:pulse-dot 2s infinite' : '';
 
-    // ── TARJETA estilo var-card, a ancho completo (horizontal) ──
+    // ── TARJETA estilo var-card, a ancho completo (horizontal). Clic = despliega explicación ──
     const card = document.createElement('div');
-    card.className = 'var-card fg-card' + (noData ? ' unavailable' : '');
+    card.className = 'var-card fg-card' + (noData ? ' unavailable' : '') + (m.scoring ? ' fg-card-clickable' : '');
+    card.dataset.fgkey = key;
+    if (m.scoring && openKeys.has(key)) card.classList.add('open');
     card.style.setProperty('--vc-color', noData ? '#6b7280' : col);
     card.innerHTML = `
       <div class="var-card-top">
         <span class="var-card-name">${m.name}</span>
         ${noData ? '<span class="var-card-badge-unavail">'+(es?'SIN DATOS':'NO DATA')+'</span>' : ''}
+        ${m.scoring ? '<span class="fg-card-chevron" aria-hidden="true">▾</span>' : ''}
       </div>
       <div class="fg-card-body">
         <div class="fg-card-main">
@@ -5800,9 +5846,36 @@ function renderFearComponents() {
           </div>
         </div>
       </div>
+      ${m.scoring ? `<div class="fg-scoring-panel">
+        <div class="fg-scoring-q">${es?'¿Cómo se calcula este puntaje?':'How is this score calculated?'}</div>
+        <div class="fg-scoring-body">${m.scoring}</div>
+        <button class="subidx-close-btn fg-close-btn" type="button" style="--ss-color:${noData?'#6b7280':col}">
+          <span class="cls-x">✕</span> ${es?'Cerrar':'Close'}
+        </button>
+      </div>` : ''}
     `;
+    if (m.scoring) {
+      card.addEventListener('click', () => {
+        const willOpen = !card.classList.contains('open');
+        card.classList.toggle('open');
+        if (willOpen) {
+          card.classList.add('just-opened');
+          setTimeout(() => card.classList.remove('just-opened'), 300);
+        }
+      });
+      // Botón "Cerrar" dentro del panel: cierra sin re-disparar el toggle de la tarjeta
+      const fgClose = card.querySelector('.fg-close-btn');
+      if (fgClose) {
+        fgClose.addEventListener('click', (e) => {
+          e.stopPropagation();
+          card.classList.remove('open');
+        });
+      }
+    }
     sections.appendChild(card);
   });
+  // Limpiar el estado capturado para que no reabra tarjetas en renders no relacionados
+  window._fgOpenKeys = null;
 }
 
 function renderMacroSegments(brechaScore) {
@@ -5882,7 +5955,7 @@ function renderMacroSegments(brechaScore) {
             <div class="subidx-ai-body loading" id="ai-summary-body-${key}">${LANG==='en'?'Generating summary…':'Generando resumen…'}</div>
           </div>
           <button class="subidx-close-btn" type="button" data-close-seg="${key}">
-            ${LANG==='en'?'Close section':'Cerrar sección'} ▴
+            <span class="cls-x">✕</span> ${LANG==='en'?'Close section':'Cerrar sección'}
           </button>
         </div>
       </div>
