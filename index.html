@@ -3105,7 +3105,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
 
     <div class="faq-block-title" data-i18n="faq.group.fear">Índice de Miedo y Codicia</div>
     <div class="faq-grid">
-      <details class="faq-item" open>
+      <details class="faq-item">
         <summary data-i18n="faq.q1">¿Qué es el Índice de Miedo y Codicia argentino?</summary>
         <p data-i18n-html="faq.a1">Resume el ánimo del mercado de acciones argentino en <strong>un solo número de 0 a 100</strong>.<br><br><strong>Valores bajos = miedo:</strong> los inversores venden, predomina la cautela y los precios suelen quedar deprimidos.<br><strong>Valores altos = codicia:</strong> hay entusiasmo, apetito por el riesgo y los precios tienden a estirarse.<br><strong>50 = zona neutral.</strong><br><br>Mide el <strong>clima emocional</strong> del mercado, no la salud de la economía.</p>
       </details>
@@ -5770,7 +5770,6 @@ function renderFearComponents() {
     const col = noData ? 'var(--text3)' : scoreColor(s);
     const bg  = noData ? 'rgba(255,255,255,.06)' : scoreBg(s);
     const lbl = noData ? (es?'Sin datos':'No data') : scoreLabel(s);
-    const sc  = m.color;
     const src = meta2[key] || { src:'IOL', live:true };
     const dotColor = (src.live && !noData) ? 'var(--g)' : 'var(--text3)';
     const dotAnim  = (src.live && !noData) ? 'animation:pulse-dot 2s infinite' : '';
@@ -5778,7 +5777,7 @@ function renderFearComponents() {
     // ── TARJETA estilo var-card, a ancho completo (horizontal) ──
     const card = document.createElement('div');
     card.className = 'var-card fg-card' + (noData ? ' unavailable' : '');
-    card.style.setProperty('--vc-color', sc);
+    card.style.setProperty('--vc-color', noData ? '#6b7280' : col);
     card.innerHTML = `
       <div class="var-card-top">
         <span class="var-card-name">${m.name}</span>
@@ -5794,7 +5793,7 @@ function renderFearComponents() {
             <span class="var-card-score-num">${noData ? '—' : s}</span>
             <span class="var-card-score-lbl">${lbl}</span>
           </span>
-          <div class="var-card-bar"><div class="var-card-bar-fill" style="background:${noData?'#4b5563':sc};width:${noData?0:s}%"></div></div>
+          <div class="var-card-bar"><div class="var-card-bar-fill" style="background:${noData?'#4b5563':col};width:${noData?0:s}%"></div></div>
           <div class="var-card-src">
             <span class="ind-source-dot" style="background:${dotColor};${dotAnim}"></span>
             ${(src.live && !noData) ? '⚡ ' : ''}${src.src}
