@@ -75,15 +75,23 @@
           "name": "¿Qué es el Índice de Miedo y Codicia argentino?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "RadARG es un índice que mide el sentimiento del mercado financiero argentino con un único número de 0 a 100. Cerca de 0 indica miedo extremo (los inversores venden y desconfían); cerca de 100 indica codicia extrema (optimismo generalizado); 50 es neutral. Es el equivalente argentino del Fear & Greed Index de CNN, pero adaptado a la macroeconomía local."
+            "text": "Es un indicador que resume el ánimo del mercado de acciones argentino en un solo número de 0 a 100. Valores bajos reflejan miedo: los inversores venden, predomina la cautela y los precios suelen quedar deprimidos. Valores altos reflejan codicia: hay entusiasmo, apetito por el riesgo y los precios tienden a estirarse. El 50 marca una zona neutral. Mide el clima emocional del mercado, no la salud de la economía."
           }
         },
         {
           "@type": "Question",
-          "name": "¿Cómo se calcula el índice RadARG?",
+          "name": "¿Cómo interpreto el miedo y la codicia?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "El puntaje final es el promedio ponderado de cinco dimensiones: Inflación y Política Monetaria (25%), Tipo de Cambio y Reservas (25%), Mercados y Expectativas (20%), Actividad Real y Bienestar (15%) y Fiscal y Deuda Soberana (15%). Cada dimensión combina más de 30 indicadores económicos reales —como inflación, riesgo país, brecha cambiaria, reservas del BCRA y el Merval en dólares— normalizados a una escala de 0 a 100."
+            "text": "El miedo y la codicia son pistas sobre cómo está valorado el mercado. Una lectura de miedo puede indicar que las acciones quedaron baratas respecto de su valor real, porque el pesimismo empuja los precios por debajo de lo razonable. Una lectura de codicia puede señalar lo contrario: precios inflados por el optimismo, donde el mercado paga de más. Por eso muchos inversores de perfil contrario miran el miedo como posible oportunidad y la codicia como señal de prudencia."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Qué es el Índice de Solidez Macroeconómica?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Mide qué tan firme está la economía argentina en un número de 0 a 100. A diferencia del de Miedo y Codicia, que capta el humor del mercado, este se enfoca en los fundamentos: inflación, reservas, actividad, cuentas públicas y deuda. Cerca de 0 la situación es crítica; cerca de 100, robusta; el 50 indica una economía estable."
           }
         },
         {
@@ -91,7 +99,7 @@
           "name": "¿De dónde salen los datos de RadARG?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Los datos provienen de fuentes públicas verificadas: INDEC, BCRA, ArgentinaDatos, Open BYMA Data, JP Morgan EMBI+, Yahoo Finance/CBOT y la Universidad Torcuato Di Tella (UTDT). El índice se recalcula y publica todos los días a las 12:00, hora de Argentina."
+            "text": "De fuentes públicas verificadas: INDEC, BCRA, ArgentinaDatos, Open BYMA Data, el EMBI de JP Morgan, Yahoo Finance y la Universidad Torcuato Di Tella. Ambos índices se recalculan y publican todos los días a las 12:00 del mediodía, hora de Argentina."
           }
         },
         {
@@ -99,7 +107,7 @@
           "name": "¿RadARG sirve para invertir?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "RadARG es una herramienta de contexto, no una recomendación de inversión. Históricamente, las zonas de Miedo Extremo han ofrecido oportunidades a inversores contrarian, mientras que la Codicia Extrema puede señalar un mercado sobrecomprado. Sirve para entender el clima del mercado argentino, no como señal de compra o venta."
+            "text": "RadARG es una herramienta de contexto, no una recomendación de compra o venta. Ayuda a entender en qué clima está el mercado y la economía, pero la decisión de invertir depende de tu estrategia, tu horizonte y tu tolerancia al riesgo. Usalo como un termómetro más, no como una señal automática."
           }
         },
         {
@@ -107,7 +115,7 @@
           "name": "¿RadARG es gratis?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Sí. El índice RadARG es de acceso libre y gratuito, sin publicidad ni paywalls. Existen niveles de acceso opcionales (Tiers) con funciones avanzadas como alertas, newsletter y API, pero el índice principal es siempre gratuito."
+            "text": "Sí. Ambos índices son de acceso libre y gratuito, sin publicidad ni muros de pago. Hay niveles opcionales con funciones avanzadas como alertas, newsletter y acceso por API, pero los índices principales son siempre gratuitos."
           }
         }
       ]
@@ -2280,31 +2288,48 @@ body.lm .ranking-footer { border-top-color:rgba(0,0,0,.08); }
 
 /* ════════ FAQ (SEO/GEO) ═══════════════════════════════════ */
 .faq-section { max-width:880px; margin:3.5rem auto 0; }
-.faq-h2 { font-size:1.6rem; font-weight:800; letter-spacing:-.5px; margin:0 0 1.5rem; color:var(--text); }
+.faq-h2 { font-size:1.6rem; font-weight:800; letter-spacing:-.5px; margin:0 0 1.75rem; color:var(--text); }
+.faq-block-title {
+  font-size:.78rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--ac2); margin:1.75rem 0 .85rem; padding-left:.15rem;
+}
+.faq-block-title:first-of-type { margin-top:0; }
 .faq-grid { display:flex; flex-direction:column; gap:.65rem; }
 .faq-item {
   background:var(--bg2); border:1px solid var(--border);
-  border-radius:12px; padding:0 1.1rem; overflow:hidden;
-  transition:border-color .2s ease;
+  border-radius:12px; padding:0 1.25rem; overflow:hidden;
+  border-left:3px solid transparent;
+  transition:border-color .2s ease, background .2s ease;
 }
-.faq-item[open] { border-color:var(--border2); }
+.faq-item:hover { border-color:var(--border2); }
+.faq-item[open] { border-color:var(--border2); border-left-color:var(--ac2); }
 .faq-item summary {
-  list-style:none; cursor:pointer; padding:1rem 0;
+  list-style:none; cursor:pointer; padding:1.05rem 0;
   font-size:1.02rem; font-weight:650; color:var(--text);
   display:flex; align-items:center; justify-content:space-between; gap:1rem;
 }
 .faq-item summary::-webkit-details-marker { display:none; }
 .faq-item summary::after {
-  content:'+'; font-size:1.4rem; font-weight:400; color:var(--ac);
-  flex-shrink:0; transition:transform .2s ease; line-height:1;
+  content:'+'; font-size:1.5rem; font-weight:300; color:var(--ac2);
+  flex-shrink:0; transition:transform .25s ease; line-height:1;
 }
 .faq-item[open] summary::after { transform:rotate(45deg); }
 .faq-item p {
-  margin:0; padding:0 0 1.1rem; font-size:.96rem; line-height:1.65;
-  color:var(--text2); max-width:72ch;
+  margin:0; padding:0 0 1.15rem; font-size:.96rem; line-height:1.7;
+  color:var(--text2); max-width:74ch;
+  animation:faqReveal .25s ease;
 }
+.faq-item p strong { color:var(--text); font-weight:700; }
+body.lm .faq-item p strong { color:#0a0a14; }
+@keyframes faqReveal { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
 body.lm .faq-item { background:#fff; }
-@media(max-width:640px){ .faq-section{ margin-top:2.5rem; } .faq-h2{ font-size:1.35rem; } }
+body.lm .faq-block-title { color:#1d4ed8; }
+@media(max-width:640px){
+  .faq-section{ margin-top:2.5rem; }
+  .faq-h2{ font-size:1.35rem; }
+  .faq-item summary{ font-size:.95rem; }
+  .faq-item p{ font-size:.92rem; }
+}
 
 footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:relative; z-index:1; }
 .foot-inner { max-width:1440px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:2rem; align-items:start; }
@@ -2371,7 +2396,6 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
     <li><a href="#indicadores" data-i18n="nav.indicators">Indicadores</a></li>
     <li><a href="#apoyar"      data-i18n="nav.support">Apoyar</a></li>
     <li><a href="#historico"   data-i18n="nav.historic">Histórico</a></li>
-    <li><a href="#metodologia" data-i18n="nav.methodology">Metodología</a></li>
     <li><a href="#sugerencias" data-i18n="nav.suggest">Sugerencias</a></li>
     <!-- Tiers oculto temporalmente. Reactivar agregando: <li><a href="#tiers" data-i18n="nav.tiers">Tiers</a></li> -->
   </ul></nav>
@@ -2994,42 +3018,6 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
   </div>
 
   <!-- METHODOLOGY -->
-  <section id="metodologia">
-    <div class="sec-hdr">
-      <span class="sec-ttl" data-i18n="sec.meth.general">Para todos</span>
-      <div class="sec-line"></div>
-    </div>
-    <div class="meth-intro meth-intro-simple" style="margin-bottom:1rem">
-      <div class="meth-intro-label" style="color:var(--g)" data-i18n="meth.g.label">🟢 Explicación simple</div>
-      <div class="meth-intro-title" data-i18n="meth.g.title">¿Para qué sirve RadARG?</div>
-      <div class="meth-intro-desc" data-i18n="meth.g.desc">RadARG te dice, de un solo número, si el mercado argentino está en modo pánico o en modo optimismo. Funciona como un semáforo: verde es calma, rojo es miedo.</div>
-    </div>
-    <div class="meth-grid">
-      <div class="meth-card"><div class="meth-q" data-i18n="meth.g.q1">¿Qué significa el número?</div><div class="meth-a" data-i18n="meth.g.a1">Va de 0 a 100. Cerca de 0 hay miedo extremo: la gente vende y desconfía. Cerca de 100 hay optimismo: la gente invierte y apuesta al crecimiento. El punto medio es zona neutral, sin pánico ni euforia.</div></div>
-      <div class="meth-card"><div class="meth-q" data-i18n="meth.g.q2">¿Cómo usarlo?</div><div class="meth-a" data-i18n="meth.g.a2">En Miedo Extremo históricamente aparecieron oportunidades para inversores contrarian. En Codicia Extrema el mercado puede estar caro. Es un complemento, no una predicción.</div></div>
-      <div class="meth-card"><div class="meth-q" data-i18n="meth.g.q3">¿Qué mide?</div><div class="meth-a" data-i18n="meth.g.a3">Cinco dimensiones de la economía: inflación y política monetaria, tipo de cambio y reservas, actividad real y bienestar, situación fiscal y deuda soberana, y los mercados financieros.</div></div>
-      <div class="meth-card"><div class="meth-q" data-i18n="meth.g.q4">¿Puedo confiar?</div><div class="meth-a" data-i18n="meth.g.a4">Los datos son reales y de fuentes públicas verificadas. El tipo de cambio se actualiza en tiempo real. Pero ningún índice predice el futuro: usalo para entender el contexto, no como consejo de inversión.</div></div>
-      <div class="meth-card"><div class="meth-q" data-i18n="meth.g.q5">¿Cada cuánto se actualiza?</div><div class="meth-a" data-i18n="meth.g.a5">El índice se recalcula y publica todos los días a las 12:00. Los datos de mercado como el dólar y el Merval se refrescan dentro de la página a lo largo del día.</div></div>
-    </div>
-    <div class="sec-hdr" style="margin-top:2rem">
-      <span class="sec-ttl" data-i18n="sec.meth.tech">Para especialistas</span>
-      <div class="sec-line"></div>
-    </div>
-    <div class="meth-intro meth-intro-tech" style="margin-bottom:1rem">
-      <div class="meth-intro-label" style="color:var(--ac)" data-i18n="meth.t.label">🔬 Metodología técnica</div>
-      <div class="meth-intro-title" data-i18n="meth.t.title">Diseño del índice compuesto</div>
-      <div class="meth-intro-desc" data-i18n="meth.t.desc">RadARG es un índice de sentimiento de la economía argentina. El score final (0–100) es el promedio ponderado de cinco segmentos temáticos, cada uno compuesto por sub-indicadores normalizados a [0,100].</div>
-    </div>
-    <div class="meth-grid">
-      <div class="meth-card"><div class="meth-q" data-i18n="meth.t.q1">Estructura de segmentos</div><div class="meth-a" data-i18n="meth.t.a1">S = Σ(wᵢ·sᵢ), con Σwᵢ = 100%. Inflación y Política Monetaria 25%, Tipo de Cambio y Reservas 25%, Mercados y Expectativas 20%, Actividad Real y Bienestar 15%, Fiscal y Deuda Soberana 15%.</div></div>
-      <div class="meth-card"><div class="meth-q" data-i18n="meth.t.q2">Inflación y Política Monetaria</div><div class="meth-a" data-i18n="meth.t.a2">Combina IPC mensual del INDEC, tasa real (plazo fijo menos inflación), y expectativas de inflación a 12 meses del REM del BCRA. Inflación a la baja y tasa real positiva elevan el score.</div></div>
-      <div class="meth-card"><div class="meth-q" data-i18n="meth.t.q3">Tipo de Cambio y Reservas</div><div class="meth-a" data-i18n="meth.t.a3">Brecha cambiaria con mapeo no lineal (brecha negativa → score ~90, históricamente inédito), reservas netas del BCRA, y un proxy de liquidación del agro. La brecha es el componente de mayor peso.</div></div>
-      <div class="meth-card"><div class="meth-q" data-i18n="meth.t.q4">Mercados y Expectativas</div><div class="meth-a" data-i18n="meth.t.a4">Riesgo País (EMBI), Merval en dólares, rendimiento del GD35, spread AL30/GD30 (ley local vs Nueva York), amplitud del panel líder y clima político (ICG-UTDT + sentimiento de noticias).</div></div>
-      <div class="meth-card"><div class="meth-q" data-i18n="meth.t.q5">Actividad y Fiscal</div><div class="meth-a" data-i18n="meth.t.a5">Actividad: EMAE, salario real (RIPTE), consumo masivo, confianza del consumidor, desempleo y patentamientos. Fiscal: resultado primario, rollover de deuda, cumplimiento de metas con el FMI y calificación soberana relativa al historial argentino.</div></div>
-      <div class="meth-card"><div class="meth-q" data-i18n="meth.t.q6">Fuentes, frecuencia y límites</div><div class="meth-a" data-i18n="meth.t.a6">Fuentes: dolarapi, ArgentinaDatos, BCRA, INDEC, Open BYMA Data, Yahoo Finance/CBOT, UTDT. El índice se recalcula a diario (12:00). Es un índice de sentimiento, no predictivo: no incorpora flujos de capitales ni expectativas forward. Datos 2007–2015 usan estimaciones privadas de inflación.</div></div>
-    </div>
-  </section>
-
   <!-- SUGGESTIONS -->
   <section id="sugerencias">
     <div class="sec-hdr">
@@ -3113,27 +3101,53 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
       <span class="sec-ttl" data-i18n="faq.kicker">Preguntas frecuentes</span>
       <div class="sec-line"></div>
     </div>
-    <h2 class="faq-h2" data-i18n="faq.title">Qué es RadARG y cómo funciona</h2>
+    <h2 class="faq-h2" data-i18n="faq.title">Preguntas Frecuentes</h2>
+
+    <div class="faq-block-title" data-i18n="faq.group.fear">Índice de Miedo y Codicia</div>
     <div class="faq-grid">
       <details class="faq-item" open>
         <summary data-i18n="faq.q1">¿Qué es el Índice de Miedo y Codicia argentino?</summary>
-        <p data-i18n="faq.a1">RadARG es un índice que mide el sentimiento del mercado financiero argentino con un único número de 0 a 100. Cerca de 0 indica miedo extremo: los inversores venden y desconfían. Cerca de 100 indica codicia extrema: hay optimismo generalizado. El punto medio (50) es zona neutral. Es el equivalente argentino del Fear &amp; Greed Index de CNN, pero adaptado a la macroeconomía local.</p>
+        <p data-i18n-html="faq.a1">Resume el ánimo del mercado de acciones argentino en <strong>un solo número de 0 a 100</strong>.<br><br><strong>Valores bajos = miedo:</strong> los inversores venden, predomina la cautela y los precios suelen quedar deprimidos.<br><strong>Valores altos = codicia:</strong> hay entusiasmo, apetito por el riesgo y los precios tienden a estirarse.<br><strong>50 = zona neutral.</strong><br><br>Mide el <strong>clima emocional</strong> del mercado, no la salud de la economía.</p>
       </details>
       <details class="faq-item">
-        <summary data-i18n="faq.q2">¿Cómo se calcula el índice?</summary>
-        <p data-i18n="faq.a2">El puntaje final es el promedio ponderado de cinco dimensiones: Inflación y Política Monetaria (25%), Tipo de Cambio y Reservas (25%), Mercados y Expectativas (20%), Actividad Real y Bienestar (15%) y Fiscal y Deuda Soberana (15%). Cada dimensión combina más de 30 indicadores económicos reales —inflación, riesgo país, brecha cambiaria, reservas del BCRA, el Merval en dólares y más— normalizados a una escala de 0 a 100.</p>
+        <summary data-i18n="faq.q2">¿Cómo interpreto el miedo y la codicia?</summary>
+        <p data-i18n-html="faq.a2">El miedo y la codicia no son buenos ni malos en sí mismos: son <strong>pistas sobre cómo está valorado el mercado</strong>.<br><br>• <strong>Miedo</strong> puede indicar acciones <strong>baratas</strong> respecto de su valor real, porque el pesimismo empuja los precios por debajo de lo razonable.<br>• <strong>Codicia</strong> puede señalar lo contrario: <strong>precios inflados</strong> por el optimismo, donde el mercado paga de más.<br><br>Por eso muchos inversores de perfil contrario miran el miedo como posible oportunidad y la codicia como señal de prudencia.</p>
       </details>
       <details class="faq-item">
-        <summary data-i18n="faq.q3">¿De dónde salen los datos?</summary>
-        <p data-i18n="faq.a3">Los datos provienen de fuentes públicas verificadas: INDEC, BCRA, ArgentinaDatos, Open BYMA Data, JP Morgan EMBI+, Yahoo Finance/CBOT y la Universidad Torcuato Di Tella (UTDT). El índice se recalcula y publica todos los días a las 12:00, hora de Argentina.</p>
+        <summary data-i18n="faq.q3">¿Con qué se calcula?</summary>
+        <p data-i18n-html="faq.a3">Combina <strong>seis componentes</strong> del mercado accionario, todos con el <strong>mismo peso</strong>:<br><br>• Momento del Merval respecto de su historia<br>• Cuántas acciones suben frente a las que bajan<br>• Volatilidad<br>• Apetito por bonos en dólares<br>• Riesgo país<br>• Brecha cambiaria<br><br>Cada uno se lleva a una escala de 0 a 100 y el índice es el <strong>promedio simple</strong> de los seis.</p>
+      </details>
+    </div>
+
+    <div class="faq-block-title" data-i18n="faq.group.macro">Índice de Solidez Macroeconómica</div>
+    <div class="faq-grid">
+      <details class="faq-item">
+        <summary data-i18n="faq.q4">¿Qué es el Índice de Solidez Macroeconómica?</summary>
+        <p data-i18n-html="faq.a4">Mide qué tan firme está la economía argentina en un número de <strong>0 a 100</strong>. A diferencia del de Miedo y Codicia (que capta el humor del mercado), este se enfoca en los <strong>fundamentos</strong>: inflación, reservas, actividad, cuentas públicas y deuda.<br><br>• <strong>Cerca de 0:</strong> situación crítica<br>• <strong>50:</strong> economía estable<br>• <strong>Cerca de 100:</strong> economía robusta</p>
       </details>
       <details class="faq-item">
-        <summary data-i18n="faq.q4">¿RadARG sirve para invertir?</summary>
-        <p data-i18n="faq.a4">RadARG es una herramienta de contexto, no una recomendación de inversión. Históricamente, las zonas de Miedo Extremo ofrecieron oportunidades a inversores contrarian, mientras que la Codicia Extrema puede señalar un mercado sobrecomprado. Sirve para entender el clima del mercado argentino, no como señal de compra o venta.</p>
+        <summary data-i18n="faq.q5">¿Cómo se calcula?</summary>
+        <p data-i18n-html="faq.a5">Es el <strong>promedio ponderado</strong> de cinco dimensiones:<br><br>• Inflación y Política Monetaria — <strong>25%</strong><br>• Tipo de Cambio y Reservas — <strong>25%</strong><br>• Mercados y Expectativas — <strong>20%</strong><br>• Actividad Real y Bienestar — <strong>15%</strong><br>• Fiscal y Deuda Soberana — <strong>15%</strong><br><br>Cada dimensión reúne decenas de indicadores reales, normalizados a una escala común de 0 a 100.</p>
       </details>
       <details class="faq-item">
-        <summary data-i18n="faq.q5">¿Es gratis?</summary>
-        <p data-i18n="faq.a5">Sí. El índice RadARG es de acceso libre y gratuito, sin publicidad ni paywalls. Hay niveles de acceso opcionales (Tiers) con funciones avanzadas como alertas, newsletter y API, pero el índice principal es siempre gratuito.</p>
+        <summary data-i18n="faq.q6">¿De dónde salen los datos?</summary>
+        <p data-i18n-html="faq.a6">De <strong>fuentes públicas verificadas</strong>: INDEC, BCRA, ArgentinaDatos, Open BYMA Data, el EMBI de JP Morgan, Yahoo Finance y la Universidad Torcuato Di Tella.<br><br>Ambos índices se recalculan y publican <strong>todos los días a las 12:00</strong> del mediodía, hora de Argentina.</p>
+      </details>
+      <details class="faq-item">
+        <summary data-i18n="faq.q9">¿Qué incluye cada dimensión?</summary>
+        <p data-i18n-html="faq.a9">• <strong>Inflación y Política Monetaria:</strong> IPC del INDEC, tasa real y expectativas de inflación del REM.<br>• <strong>Tipo de Cambio y Reservas:</strong> brecha cambiaria, reservas netas del BCRA y un proxy de liquidación del agro.<br>• <strong>Mercados y Expectativas:</strong> riesgo país, Merval en dólares, rendimiento de bonos, amplitud del panel y clima político.<br>• <strong>Actividad Real y Bienestar:</strong> EMAE, salario real, consumo, confianza, desempleo y patentamientos.<br>• <strong>Fiscal y Deuda Soberana:</strong> resultado primario, refinanciamiento de deuda y calificación crediticia.<br><br>Es un índice de contexto, no predictivo: los datos de 2007 a 2015 usan estimaciones privadas de inflación.</p>
+      </details>
+    </div>
+
+    <div class="faq-block-title" data-i18n="faq.group.general">General</div>
+    <div class="faq-grid">
+      <details class="faq-item">
+        <summary data-i18n="faq.q7">¿RadARG sirve para invertir?</summary>
+        <p data-i18n-html="faq.a7">RadARG es una <strong>herramienta de contexto</strong>, no una recomendación de compra o venta.<br><br>Ayuda a entender en qué clima está el mercado y la economía, pero la decisión de invertir depende de tu estrategia, tu horizonte y tu tolerancia al riesgo.<br><br>Usalo como <strong>un termómetro más</strong>, no como una señal automática.</p>
+      </details>
+      <details class="faq-item">
+        <summary data-i18n="faq.q8">¿Es gratis?</summary>
+        <p data-i18n-html="faq.a8"><strong>Sí.</strong> Ambos índices son de acceso libre y gratuito, sin publicidad ni muros de pago.<br><br>Hay niveles opcionales con funciones avanzadas (alertas, newsletter, acceso por API), pero los <strong>índices principales son siempre gratuitos</strong>.</p>
       </details>
     </div>
   </section>
@@ -3516,17 +3530,28 @@ const T = {
     'footer.sources':'Fuentes de datos',
     'footer.rights':'© 2026 RadARG · Todos los derechos reservados',
     'faq.kicker':'Preguntas frecuentes',
-    'faq.title':'Qué es RadARG y cómo funciona',
+    'faq.title':'Preguntas Frecuentes',
+    'faq.group.fear':'Índice de Miedo y Codicia',
+    'faq.group.macro':'Índice de Solidez Macroeconómica',
+    'faq.group.general':'General',
     'faq.q1':'¿Qué es el Índice de Miedo y Codicia argentino?',
-    'faq.a1':'RadARG es un índice que mide el sentimiento del mercado financiero argentino con un único número de 0 a 100. Cerca de 0 indica miedo extremo: los inversores venden y desconfían. Cerca de 100 indica codicia extrema: hay optimismo generalizado. El punto medio (50) es zona neutral. Es el equivalente argentino del Fear & Greed Index de CNN, pero adaptado a la macroeconomía local.',
-    'faq.q2':'¿Cómo se calcula el índice?',
-    'faq.a2':'El puntaje final es el promedio ponderado de cinco dimensiones: Inflación y Política Monetaria (25%), Tipo de Cambio y Reservas (25%), Mercados y Expectativas (20%), Actividad Real y Bienestar (15%) y Fiscal y Deuda Soberana (15%). Cada dimensión combina más de 30 indicadores económicos reales —inflación, riesgo país, brecha cambiaria, reservas del BCRA, el Merval en dólares y más— normalizados a una escala de 0 a 100.',
-    'faq.q3':'¿De dónde salen los datos?',
-    'faq.a3':'Los datos provienen de fuentes públicas verificadas: INDEC, BCRA, ArgentinaDatos, Open BYMA Data, JP Morgan EMBI+, Yahoo Finance/CBOT y la Universidad Torcuato Di Tella (UTDT). El índice se recalcula y publica todos los días a las 12:00, hora de Argentina.',
-    'faq.q4':'¿RadARG sirve para invertir?',
-    'faq.a4':'RadARG es una herramienta de contexto, no una recomendación de inversión. Históricamente, las zonas de Miedo Extremo ofrecieron oportunidades a inversores contrarian, mientras que la Codicia Extrema puede señalar un mercado sobrecomprado. Sirve para entender el clima del mercado argentino, no como señal de compra o venta.',
-    'faq.q5':'¿Es gratis?',
-    'faq.a5':'Sí. El índice RadARG es de acceso libre y gratuito, sin publicidad ni paywalls. Hay niveles de acceso opcionales (Tiers) con funciones avanzadas como alertas, newsletter y API, pero el índice principal es siempre gratuito.',
+    'faq.a1':'Resume el ánimo del mercado de acciones argentino en <strong>un solo número de 0 a 100</strong>.<br><br><strong>Valores bajos = miedo:</strong> los inversores venden, predomina la cautela y los precios suelen quedar deprimidos.<br><strong>Valores altos = codicia:</strong> hay entusiasmo, apetito por el riesgo y los precios tienden a estirarse.<br><strong>50 = zona neutral.</strong><br><br>Mide el <strong>clima emocional</strong> del mercado, no la salud de la economía.',
+    'faq.q2':'¿Cómo interpreto el miedo y la codicia?',
+    'faq.a2':'El miedo y la codicia no son buenos ni malos en sí mismos: son <strong>pistas sobre cómo está valorado el mercado</strong>.<br><br>• <strong>Miedo</strong> puede indicar acciones <strong>baratas</strong> respecto de su valor real, porque el pesimismo empuja los precios por debajo de lo razonable.<br>• <strong>Codicia</strong> puede señalar lo contrario: <strong>precios inflados</strong> por el optimismo, donde el mercado paga de más.<br><br>Por eso muchos inversores de perfil contrario miran el miedo como posible oportunidad y la codicia como señal de prudencia.',
+    'faq.q3':'¿Con qué se calcula?',
+    'faq.a3':'Combina <strong>seis componentes</strong> del mercado accionario, todos con el <strong>mismo peso</strong>:<br><br>• Momento del Merval respecto de su historia<br>• Cuántas acciones suben frente a las que bajan<br>• Volatilidad<br>• Apetito por bonos en dólares<br>• Riesgo país<br>• Brecha cambiaria<br><br>Cada uno se lleva a una escala de 0 a 100 y el índice es el <strong>promedio simple</strong> de los seis.',
+    'faq.q4':'¿Qué es el Índice de Solidez Macroeconómica?',
+    'faq.a4':'Mide qué tan firme está la economía argentina en un número de <strong>0 a 100</strong>. A diferencia del de Miedo y Codicia (que capta el humor del mercado), este se enfoca en los <strong>fundamentos</strong>: inflación, reservas, actividad, cuentas públicas y deuda.<br><br>• <strong>Cerca de 0:</strong> situación crítica<br>• <strong>50:</strong> economía estable<br>• <strong>Cerca de 100:</strong> economía robusta',
+    'faq.q5':'¿Cómo se calcula?',
+    'faq.a5':'Es el <strong>promedio ponderado</strong> de cinco dimensiones:<br><br>• Inflación y Política Monetaria — <strong>25%</strong><br>• Tipo de Cambio y Reservas — <strong>25%</strong><br>• Mercados y Expectativas — <strong>20%</strong><br>• Actividad Real y Bienestar — <strong>15%</strong><br>• Fiscal y Deuda Soberana — <strong>15%</strong><br><br>Cada dimensión reúne decenas de indicadores reales, normalizados a una escala común de 0 a 100.',
+    'faq.q6':'¿De dónde salen los datos?',
+    'faq.a6':'De <strong>fuentes públicas verificadas</strong>: INDEC, BCRA, ArgentinaDatos, Open BYMA Data, el EMBI de JP Morgan, Yahoo Finance y la Universidad Torcuato Di Tella.<br><br>Ambos índices se recalculan y publican <strong>todos los días a las 12:00</strong> del mediodía, hora de Argentina.',
+    'faq.q7':'¿RadARG sirve para invertir?',
+    'faq.a7':'RadARG es una <strong>herramienta de contexto</strong>, no una recomendación de compra o venta.<br><br>Ayuda a entender en qué clima está el mercado y la economía, pero la decisión de invertir depende de tu estrategia, tu horizonte y tu tolerancia al riesgo.<br><br>Usalo como <strong>un termómetro más</strong>, no como una señal automática.',
+    'faq.q8':'¿Es gratis?',
+    'faq.a8':'<strong>Sí.</strong> Ambos índices son de acceso libre y gratuito, sin publicidad ni muros de pago.<br><br>Hay niveles opcionales con funciones avanzadas (alertas, newsletter, acceso por API), pero los <strong>índices principales son siempre gratuitos</strong>.',
+    'faq.q9':'¿Qué incluye cada dimensión?',
+    'faq.a9':'• <strong>Inflación y Política Monetaria:</strong> IPC del INDEC, tasa real y expectativas de inflación del REM.<br>• <strong>Tipo de Cambio y Reservas:</strong> brecha cambiaria, reservas netas del BCRA y un proxy de liquidación del agro.<br>• <strong>Mercados y Expectativas:</strong> riesgo país, Merval en dólares, rendimiento de bonos, amplitud del panel y clima político.<br>• <strong>Actividad Real y Bienestar:</strong> EMAE, salario real, consumo, confianza, desempleo y patentamientos.<br>• <strong>Fiscal y Deuda Soberana:</strong> resultado primario, refinanciamiento de deuda y calificación crediticia.<br><br>Es un índice de contexto, no predictivo: los datos de 2007 a 2015 usan estimaciones privadas de inflación.',
     // ── Metodología: simple (nuevas) ──
     'meth.g.q5':'¿Cada cuánto se actualiza?',
     'meth.g.a5':'El índice se recalcula y publica todos los días a las 12:00. Los datos de mercado como el dólar y el Merval se refrescan dentro de la página a lo largo del día.',
@@ -3817,17 +3842,28 @@ const T = {
     'footer.sources':'Data sources',
     'footer.rights':'© 2026 RadARG · All rights reserved',
     'faq.kicker':'Frequently asked questions',
-    'faq.title':'What RadARG is and how it works',
+    'faq.title':'Frequently Asked Questions',
+    'faq.group.fear':'Fear & Greed Index',
+    'faq.group.macro':'Macroeconomic Strength Index',
+    'faq.group.general':'General',
     'faq.q1':'What is the Argentine Fear & Greed Index?',
-    'faq.a1':"RadARG is an index that measures Argentine financial-market sentiment with a single number from 0 to 100. Near 0 means extreme fear: investors sell and stay on the sidelines. Near 100 means extreme greed: optimism is everywhere. The midpoint (50) is neutral ground. It's the Argentine take on CNN's Fear & Greed Index, built for the local economy.",
-    'faq.q2':'How is the index calculated?',
-    'faq.a2':'The final score is the weighted average of five dimensions: Inflation & Monetary Policy (25%), FX & Reserves (25%), Markets & Expectations (20%), Real Activity & Welfare (15%) and Fiscal & Sovereign Debt (15%). Each dimension blends 30+ real economic indicators —inflation, country risk, the FX gap, BCRA reserves, the Merval in dollars and more— normalized to a 0–100 scale.',
-    'faq.q3':'Where does the data come from?',
-    'faq.a3':'The data comes from verified public sources: INDEC, BCRA, ArgentinaDatos, Open BYMA Data, JP Morgan EMBI+, Yahoo Finance/CBOT and Universidad Torcuato Di Tella (UTDT). The index is recalculated and published every day at 12:00, Argentina time.',
-    'faq.q4':'Is RadARG useful for investing?',
-    'faq.a4':'RadARG is a context tool, not investment advice. Historically, Extreme Fear zones have offered openings for contrarian investors, while Extreme Greed can flag an overheated market. Use it to read the mood of the Argentine market, not as a buy or sell signal.',
-    'faq.q5':'Is it free?',
-    'faq.a5':'Yes. The RadARG index is free and open, with no ads or paywalls. There are optional access tiers with advanced features like alerts, a newsletter and an API, but the core index is always free.',
+    'faq.a1':"Sums up the mood of the Argentine stock market in <strong>a single number from 0 to 100</strong>.<br><br><strong>Low readings = fear:</strong> investors sell, caution takes over and prices tend to stay depressed.<br><strong>High readings = greed:</strong> there's enthusiasm, appetite for risk and prices tend to stretch.<br><strong>50 = neutral ground.</strong><br><br>It captures the <strong>emotional climate</strong> of the market, not the health of the economy.",
+    'faq.q2':'How do I read fear and greed?',
+    'faq.a2':"Fear and greed aren't good or bad in themselves: they're <strong>clues about how the market is priced</strong>.<br><br>• <strong>Fear</strong> can mean stocks have become <strong>cheap</strong> relative to their real worth, as pessimism pushes prices below what's reasonable.<br>• <strong>Greed</strong> can mean the opposite: <strong>prices inflated</strong> by optimism, where the market is overpaying.<br><br>That's why many contrarian investors treat fear as a possible opportunity and greed as a cue for caution.",
+    'faq.q3':'What goes into it?',
+    'faq.a3':"Blends <strong>six stock-market components</strong>, all <strong>equally weighted</strong>:<br><br>• The Merval's standing versus its own history<br>• How many stocks are rising versus falling<br>• Volatility<br>• Appetite for dollar bonds<br>• Country risk<br>• The FX gap<br><br>Each is mapped to a 0–100 scale and the index is the <strong>simple average</strong> of the six.",
+    'faq.q4':'What is the Macroeconomic Strength Index?',
+    'faq.a4':"Measures how solid the Argentine economy is, on a <strong>0 to 100</strong> scale. Unlike the Fear & Greed Index (which captures market mood), this one focuses on <strong>fundamentals</strong>: inflation, reserves, activity, public accounts and debt.<br><br>• <strong>Near 0:</strong> critical situation<br>• <strong>50:</strong> stable economy<br>• <strong>Near 100:</strong> robust economy",
+    'faq.q5':'How is it calculated?',
+    'faq.a5':'A <strong>weighted average</strong> of five dimensions:<br><br>• Inflation & Monetary Policy — <strong>25%</strong><br>• FX & Reserves — <strong>25%</strong><br>• Markets & Expectations — <strong>20%</strong><br>• Real Activity & Welfare — <strong>15%</strong><br>• Fiscal & Sovereign Debt — <strong>15%</strong><br><br>Each dimension gathers dozens of real indicators, normalized to a common 0–100 scale.',
+    'faq.q6':'Where does the data come from?',
+    'faq.a6':'From <strong>verified public sources</strong>: INDEC, BCRA, ArgentinaDatos, Open BYMA Data, the JP Morgan EMBI, Yahoo Finance and Universidad Torcuato Di Tella.<br><br>Both indices are recalculated and published <strong>every day at noon</strong>, Argentina time.',
+    'faq.q7':'Is RadARG useful for investing?',
+    'faq.a7':'RadARG is a <strong>context tool</strong>, not a buy or sell recommendation.<br><br>It helps you read the mood of the market and the economy, but the decision to invest depends on your strategy, your horizon and your risk tolerance.<br><br>Treat it as <strong>one more thermometer</strong>, not an automatic signal.',
+    'faq.q8':'Is it free?',
+    'faq.a8':'<strong>Yes.</strong> Both indices are free and open, with no ads or paywalls.<br><br>There are optional tiers with advanced features (alerts, newsletter, API access), but the <strong>main indices are always free</strong>.',
+    'faq.q9':'What does each dimension include?',
+    'faq.a9':'• <strong>Inflation & Monetary Policy:</strong> INDEC inflation, the real interest rate and inflation expectations from the central bank survey.<br>• <strong>FX & Reserves:</strong> the FX gap, BCRA net reserves and an agro-exports proxy.<br>• <strong>Markets & Expectations:</strong> country risk, the Merval in dollars, bond yields, market breadth and the political climate.<br>• <strong>Real Activity & Welfare:</strong> economic activity, real wages, consumption, confidence, unemployment and car registrations.<br>• <strong>Fiscal & Sovereign Debt:</strong> the primary balance, debt rollover and credit rating.<br><br>It is a context index, not a predictive one: 2007 to 2015 data uses private inflation estimates.',
     // ── Methodology: simple (new) ──
     'meth.g.q5':'How often is it updated?',
     'meth.g.a5':'The index is recalculated and published daily at 12:00. Market data like the dollar and the Merval refresh on the page throughout the day.',
@@ -3857,6 +3893,12 @@ function setLang(l) {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const k = el.dataset.i18n;
     if (T[l][k]) el.textContent = T[l][k];
+  });
+  // Elementos cuyo contenido permite formato (negritas, listas, saltos): se insertan como HTML.
+  // Solo usar con strings de confianza definidos en el diccionario T (nunca con datos externos).
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const k = el.dataset.i18nHtml;
+    if (T[l][k]) el.innerHTML = T[l][k];
   });
   // Translate placeholder attributes
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
@@ -4778,7 +4820,7 @@ function computeTotal(bs) {
    directo. Si no, se recalcula con los mismos pesos sobre los sub-scores
    de mercado de alta frecuencia. NO mezcla macro lenta (IPC, EMAE, fiscal). */
 /* ════════════════════════════════════════════════════════════════
-   FEAR & GREED ARGENTINA — fiel a CNN
+   ÍNDICE DE MIEDO Y CODICIA ARGENTINO
    Mide UNA cosa: si las acciones argentinas (Merval) están caras o
    baratas respecto de su comportamiento normal. Todo es mercado
    accionario; nada de macro directa. 6 componentes (sin put/call,
@@ -5524,7 +5566,7 @@ function drawGauge(score){
     const fs=active?Math.round(lfs*1.15):lfs, lh=fs+3;
     ctx.font=`600 ${fs}px "Inter",sans-serif`;
     // Etiquetas del arco según el índice activo:
-    //  - fear  → Miedo/Codicia (escala CNN)
+    //  - fear  → Miedo/Codicia
     //  - macro → Crítico/Frágil/Estable/Sólido/Robusto (Solidez Macroeconómica)
     const zLabels={fe:['MIEDO','EXTREMO'],f:['MIEDO'],n:['NEUTRAL'],g:['CODICIA'],ge:['CODICIA','EXTREMA']};
     const enLabels={fe:['EXTREME','FEAR'],f:['FEAR'],n:['NEUTRAL'],g:['GREED'],ge:['EXTREME','GREED']};
