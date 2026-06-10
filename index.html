@@ -5693,25 +5693,45 @@ function renderGauge(score){
     const nextEl = $('gRefreshNext');
     if(nextEl) nextEl.style.display='none';
   }
-  // Historical refs — calculated from MONTHLY data (not hardcoded)
-  // MONTHLY.scores is monthly, so: 1w≈current, 1m=1 month ago, 3m=3, 1y=12
+  // Historical refs — dependen del índice activo:
+  //  - macro: serie mensual MONTHLY (1w≈mes actual, 1m=1 mes atrás, 3m=3, 1y=12)
+  //  - fear:  serie diaria LIVE._fgHist del data.json (7/30/91/365 días atrás).
+  //           Si aún no hay dato para ese período, muestra "–" (honesto: el
+  //           histórico del F&G se acumula desde que el GAS empezó a guardarlo).
   const totalM = window.MONTHLY.scores.length;
   function getHistRef(monthsAgo) {
     const idx = totalM - 1 - monthsAgo;
     return idx >= 0 ? window.MONTHLY.scores[idx] : null;
   }
+  function getFgRef(daysAgo) {
+    const h = LIVE._fgHist;
+    if (!h || !h.fechas || !h.fechas.length) return null;
+    const target = Date.now() - daysAgo * 86400000;
+    let best = null, bestDiff = Infinity;
+    for (let i = h.fechas.length - 1; i >= 0; i--) {
+      const t = new Date(h.fechas[i] + 'T12:00:00').getTime();
+      const diff = Math.abs(t - target);
+      if (diff < bestDiff) { bestDiff = diff; best = h.scores[i]; }
+    }
+    // Tolerancia: el registro más cercano debe estar a 5 días o menos del objetivo
+    return bestDiff <= 5 * 86400000 ? best : null;
+  }
   const refDefs = [
-    {id:'1w', months:0, label:t('score.1w')},   // same month last reading
-    {id:'1m', months:1, label:t('score.1m')},
-    {id:'3m', months:3, label:t('score.3m')},
-    {id:'1y', months:12, label:t('score.1y')},
+    {id:'1w', months:0,  days:7,   label:t('score.1w')},   // same month last reading
+    {id:'1m', months:1,  days:30,  label:t('score.1m')},
+    {id:'3m', months:3,  days:91,  label:t('score.3m')},
+    {id:'1y', months:12, days:365, label:t('score.1y')},
   ];
   refDefs.forEach(r=>{
-    const refScore = getHistRef(r.months);
+    const refScore = (ACTIVE_INDEX==='fear') ? getFgRef(r.days) : getHistRef(r.months);
     const b=$('tl-badge-'+r.id), l=$('tl-lbl-'+r.id);
     if(refScore !== null){
       if(b){b.textContent=refScore; b.style.background=scoreColor(refScore); b.style.color='#fff';}
       if(l) l.textContent=scoreLabel(refScore);
+    } else {
+      // Sin dato para este período (serie del F&G aún en construcción)
+      if(b){b.textContent='–'; b.style.background='rgba(255,255,255,.08)'; b.style.color='var(--text3)';}
+      if(l) l.textContent = LANG==='en' ? 'No data yet' : 'Sin datos aún';
     }
   });
 
@@ -7428,6 +7448,13 @@ async function loadDataJSON() {
       console.log('[data.json] Histórico vacío — conservando datos hardcodeados (' + window.MONTHLY.labels.length + ' meses)');
     }
 
+    // Serie diaria del Índice de Miedo y Codicia (para referencias 1 semana/1 mes/3 meses/1 año)
+    if(d._fg_historico && d._fg_historico.fechas && d._fg_historico.fechas.length > 0
+       && d._fg_historico.scores && d._fg_historico.scores.length > 0) {
+      LIVE._fgHist = { fechas: d._fg_historico.fechas, scores: d._fg_historico.scores };
+      console.log('[data.json] FG histórico:', d._fg_historico.fechas.length, 'días');
+    }
+
     // Apply ranking de apoyos (mensual + histórico, con fallback al _ranking viejo)
     if(d._ranking_mensual && Array.isArray(d._ranking_mensual)) {
       window._ranking_mensual = d._ranking_mensual;
@@ -7520,6 +7547,11 @@ function applyInjectedData() {
   if(_f('amplitud_fl')!==null)           LIVE._amplitudFl = _f('amplitud_fl');
   if(_f('amplitud_total')!==null)        LIVE._amplitudTotal = _f('amplitud_total');
   if(_f('rem_1m')!==null)                { LIVE.tasaReal.rem1m = _f('rem_1m'); LIVE.tasaReal._sheetREM1 = _f('rem_1m'); }
+  // Serie diaria del F&G si viniera embebida en INJECTED_DATA
+  if(_d._fg_historico && _d._fg_historico.fechas && _d._fg_historico.fechas.length > 0
+     && _d._fg_historico.scores && _d._fg_historico.scores.length > 0) {
+    LIVE._fgHist = { fechas: _d._fg_historico.fechas, scores: _d._fg_historico.scores };
+  }
   console.log('[INJECTED_DATA] Applied', Object.keys(_d).length, 'fields ✅');
 }
 
