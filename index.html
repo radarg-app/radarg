@@ -4891,61 +4891,100 @@ function mervalSeries() {
 
 /* 1. Momentum del Merval: posición del valor actual en su rango histórico.
    Dato crudo: Merval en USD. Score: mín hist→1, máx hist→100 (autoajuste). */
+/* ═══════════════════════════════════════════════════════════════
+   ÍNDICE DE MIEDO Y CODICIA — metodología por DESVÍOS (estilo CNN).
+   Cada componente mide cuánto se aparta el dato de su promedio reciente,
+   no su nivel absoluto. Así el índice fluctúa con el mercado.
+   Los valores crudos (desvíos/ratios) los calcula el GAS y viajan en
+   data.json (LIVE._fg*). Factores de mapeo idénticos a la simulación.
+═══════════════════════════════════════════════════════════════ */
+const FG_K = { MOM:2.67, VOL:100, CRE:8, RIE:4, FX:6 };
+
+/* 1. Momentum: Merval USD vs su media móvil de 125 ruedas (desvío %). */
 function fgMomentum() {
   const es = LANG !== 'en';
-  const s0 = mervalSeries();
-  const cur = LIVE.merval && LIVE.merval.usd > 0 ? LIVE.merval.usd : (s0.length ? s0[s0.length-1] : 0);
-  if (!cur || !s0.length) return { score:50, raw:'s/d', value:null };
-  const max = Math.max(...s0, cur), min = Math.min(...s0, cur);
-  const score = (max<=min) ? 50 : Math.min(100, Math.max(1, Math.round(1 + (cur-min)/(max-min)*99)));
-  const usd = Math.round(cur).toLocaleString('es-AR');
-  return { score, value:cur, raw: es ? `Merval en USD ${usd}` : `Merval at USD ${usd}` };
+  const dev = LIVE._momDev;
+  if (dev == null || isNaN(dev)) return { score:50, raw:'s/d', value:null };
+  const score = intScore(50 + dev * FG_K.MOM);
+  const a = Math.abs(dev).toFixed(1);
+  const raw = (dev >= 0.3)
+    ? (es ? `Merval ${a}% sobre su tendencia` : `Merval ${a}% above its trend`)
+    : (dev <= -0.3)
+      ? (es ? `Merval ${a}% bajo su tendencia` : `Merval ${a}% below its trend`)
+      : (es ? `Merval en su tendencia` : `Merval at its trend`);
+  return { score, value:dev, raw };
 }
 
-/* 2. Amplitud del panel: acciones que subieron vs bajaron en 30 días. */
+/* 2. Amplitud: % de acciones del panel por encima de su media de 20 ruedas. */
 function fgAmplitud() {
   const es = LANG !== 'en';
-  const up = Number(LIVE._amplitudUp), dn = Number(LIVE._amplitudDn);
-  const tot = Number(LIVE._amplitudTotal||0);
-  if (!(tot > 0) || (isNaN(up) && isNaN(dn))) return { score:50, raw:'s/d', value:null };
-  const moved = up + dn;
-  const score = moved>0 ? Math.min(100, Math.max(0, Math.round(up/moved*100))) : 50;
-  const pctUp = Math.round(up/tot*100);
-  return { score, value:pctUp, raw: es ? `${up} de ${tot} acciones suben en 30 días` : `${up} of ${tot} stocks rising in 30 days` };
+  const arriba = Number(LIVE._ampArriba), tot = Number(LIVE._ampTotal || 0);
+  if (!(tot > 0) || isNaN(arriba)) return { score:50, raw:'s/d', value:null };
+  const score = intScore(arriba / tot * 100);
+  return { score, value:score, raw: es ? `${arriba} de ${tot} acciones sobre su tendencia` : `${arriba} of ${tot} stocks above their trend` };
 }
 
-/* 3. Volatilidad del Merval (% anualizada). Más vol = más miedo (score invertido). */
+/* 3. Volatilidad: ratio vol 10 ruedas / vol 30 ruedas. Subiendo = más miedo. */
 function fgVolatility() {
   const es = LANG !== 'en';
-  const v = LIVE._mervalVol;
-  if (v == null || isNaN(v) || v <= 0) return { score:50, raw:'s/d', value:null };
-  return { score: volScore(v), value:v, raw: es ? `Volatilidad anual del ${v.toFixed(0)}%` : `Annual volatility of ${v.toFixed(0)}%` };
+  const ratio = LIVE._volRatio;
+  if (ratio == null || isNaN(ratio) || ratio <= 0) return { score:50, raw:'s/d', value:null };
+  const score = intScore(50 - (ratio - 1) * FG_K.VOL);
+  const chg = (ratio - 1) * 100;
+  const a = Math.abs(chg).toFixed(0);
+  const raw = (chg >= 4)
+    ? (es ? `Volatilidad subiendo (+${a}% vs el mes)` : `Volatility rising (+${a}% vs the month)`)
+    : (chg <= -4)
+      ? (es ? `Volatilidad bajando (-${a}% vs el mes)` : `Volatility falling (-${a}% vs the month)`)
+      : (es ? `Volatilidad estable` : `Volatility steady`);
+  return { score, value:ratio, raw };
 }
 
-/* 4. Apetito de riesgo crediticio: yield del GD35 (bono USD). Mayor yield = más miedo. */
+/* 4. Apetito crediticio: precio del GD35 (USD) vs su media de 20 ruedas. */
 function fgCreditAppetite() {
   const es = LANG !== 'en';
-  const y = LIVE._gd35Yield;
-  if (y == null || isNaN(y)) return { score:50, raw:'s/d', value:null };
-  return { score: gd35YieldScore(y), value:y, raw: es ? `Bono en USD rinde ${y.toFixed(1)}%` : `USD bond yields ${y.toFixed(1)}%` };
+  const dev = LIVE._gd35Dev;
+  if (dev == null || isNaN(dev)) return { score:50, raw:'s/d', value:null };
+  const score = intScore(50 + dev * FG_K.CRE);
+  const a = Math.abs(dev).toFixed(1);
+  const raw = (dev >= 0.2)
+    ? (es ? `Bono GD35 ${a}% sobre su tendencia` : `GD35 bond ${a}% above its trend`)
+    : (dev <= -0.2)
+      ? (es ? `Bono GD35 ${a}% bajo su tendencia` : `GD35 bond ${a}% below its trend`)
+      : (es ? `Bono GD35 en su tendencia` : `GD35 bond at its trend`);
+  return { score, value:dev, raw };
 }
 
-/* 5. Riesgo país (EMBI, en bps). Mayor riesgo = más miedo. */
+/* 5. Riesgo país: EMBI vs su media de 30 días (desvío %). Subiendo = más miedo. */
 function fgRiesgoPais() {
   const es = LANG !== 'en';
-  const bps = LIVE.embi && LIVE.embi.bps != null ? LIVE.embi.bps : null;
-  if (bps == null || isNaN(bps)) return { score:50, raw:'s/d', value:null };
-  return { score: embiToScore(bps), value:bps, raw: es ? `Riesgo país en ${Math.round(bps)} puntos` : `Country risk at ${Math.round(bps)} bps` };
+  const dev = LIVE._embiDev;
+  const bps = LIVE.embi && LIVE.embi.bps != null ? Math.round(LIVE.embi.bps) : null;
+  if (dev == null || isNaN(dev)) return { score:50, raw:'s/d', value:null };
+  const score = intScore(50 - dev * FG_K.RIE);
+  const tag = bps != null ? (es ? `Riesgo país en ${bps} puntos` : `Country risk at ${bps} bps`) : '';
+  const a = Math.abs(dev).toFixed(1);
+  const dir = (dev >= 1)
+    ? (es ? `, subiendo ${a}%` : `, up ${a}%`)
+    : (dev <= -1)
+      ? (es ? `, bajando ${a}%` : `, down ${a}%`)
+      : (es ? `, estable` : `, steady`);
+  return { score, value:dev, raw: (tag + dir) || (es?'s/d':'n/a') };
 }
 
-/* 6. Brecha cambiaria (%). Mayor brecha = más miedo. */
+/* 6. Presión cambiaria: variación del dólar CCL en las últimas 10 ruedas. */
 function fgBrecha() {
   const es = LANG !== 'en';
-  const b = S.brecha;
-  if (b == null || isNaN(b)) return { score:50, raw:'s/d', value:null };
-  const bAbs = Math.abs(b).toFixed(1);
-  if (b < 0.5 && b > -0.5) return { score: brechaToScore(b), value:b, raw: es ? `Dólar oficial y libre alineados` : `Official and free dollar aligned` };
-  return { score: brechaToScore(b), value:b, raw: es ? `Brecha cambiaria del ${bAbs}%` : `FX gap of ${bAbs}%` };
+  const v = LIVE._cclVar10;
+  if (v == null || isNaN(v)) return { score:50, raw:'s/d', value:null };
+  const score = intScore(50 - v * FG_K.FX);
+  const a = Math.abs(v).toFixed(1);
+  const raw = (v >= 1)
+    ? (es ? `Dólar CCL subió ${a}% en 10 ruedas` : `CCL dollar up ${a}% in 10 sessions`)
+    : (v <= -1)
+      ? (es ? `Dólar CCL bajó ${a}% en 10 ruedas` : `CCL dollar down ${a}% in 10 sessions`)
+      : (es ? `Dólar CCL estable` : `CCL dollar steady`);
+  return { score, value:v, raw };
 }
 
 /* Lista canónica de los 6 componentes del F&G (mismo orden y pesos en GAS y HTML). */
@@ -5773,54 +5812,54 @@ function renderFearComponents() {
   const meta = {
     momentum: { icon:'📈', color:'#ec4899',
       name: es?'Momentum del Merval':'Merval Momentum',
-      q: es?'¿El Merval está caro o barato respecto de su historia?':'Is the Merval cheap or expensive vs its history?',
-      desc: es?'Posición del Merval (en USD) dentro de su rango histórico completo. Cerca de máximos indica codicia; cerca de mínimos, miedo. Es el corazón del índice.'
-              :'Position of the Merval (in USD) within its full historical range. Near highs signals greed; near lows, fear. The core of the index.',
-      scoring: es?'Se ubica el <strong>valor actual del Merval en USD</strong> dentro de todo su rango histórico:<br><br>• El <strong>mínimo</strong> de la serie equivale a un puntaje de <strong>1</strong><br>• El <strong>máximo</strong>, a <strong>100</strong><br>• El valor de hoy se posiciona linealmente entre esos extremos<br><br>Si el Merval está en la mitad de su rango histórico, el puntaje ronda <strong>50</strong>. Cuanto más cerca de máximos, más alto (codicia); cuanto más cerca de mínimos, más bajo (miedo).'
-              :'The <strong>current Merval value in USD</strong> is placed within its full historical range:<br><br>• The series <strong>low</strong> maps to a score of <strong>1</strong><br>• The <strong>high</strong>, to <strong>100</strong><br>• Today\'s value sits linearly between those extremes<br><br>If the Merval is halfway through its historical range, the score is around <strong>50</strong>. Closer to highs means a higher score (greed); closer to lows, a lower one (fear).' },
+      q: es?'¿El Merval está por encima o por debajo de su tendencia?':'Is the Merval above or below its trend?',
+      desc: es?'Compara el Merval (en USD) con su promedio de las últimas 125 ruedas. Por encima de su tendencia indica codicia; por debajo, miedo. Es el corazón del índice.'
+              :'Compares the Merval (in USD) with its average of the last 125 sessions. Above its trend signals greed; below, fear. The core of the index.',
+      scoring: es?'Se mide cuánto se <strong>aparta el Merval en USD de su media móvil de 125 ruedas</strong> (su tendencia de mediano plazo):<br><br>• <strong>En su tendencia</strong> (desvío 0%) → score <strong>50</strong><br>• <strong>+15%</strong> sobre la tendencia → cerca de <strong>90</strong> (codicia)<br>• <strong>−15%</strong> bajo la tendencia → cerca de <strong>10</strong> (miedo)<br><br>Cada movimiento diario del Merval cambia el desvío, así que el puntaje fluctúa todos los días en lugar de quedar fijo.'
+              :'It measures how far the <strong>Merval in USD strays from its 125-session moving average</strong> (its medium-term trend):<br><br>• <strong>At its trend</strong> (0% deviation) → score <strong>50</strong><br>• <strong>+15%</strong> above trend → near <strong>90</strong> (greed)<br>• <strong>−15%</strong> below trend → near <strong>10</strong> (fear)<br><br>Each daily move of the Merval changes the deviation, so the score fluctuates day to day instead of staying fixed.' },
     amplitud: { icon:'📊', color:'#0ea5e9',
       name: es?'Amplitud del panel':'Market Breadth',
-      q: es?'¿Suben más acciones de las que bajan?':'Are more stocks rising than falling?',
-      desc: es?'Acciones del panel líder que subieron frente a las que bajaron en los últimos 30 días corridos. Un avance generalizado confirma un rally genuino.'
-              :'Leading-panel stocks that rose versus fell over the last 30 calendar days. A broad advance confirms a genuine rally.',
-      scoring: es?'El puntaje es directamente el <strong>porcentaje de acciones que suben</strong> sobre el total de las que se movieron.<br><br>Ejemplo: si de 20 acciones <strong>14 subieron</strong> y 6 bajaron, el puntaje es <strong>70</strong> (14 de 20).<br><br>• <strong>50</strong> = suben tantas como bajan<br>• <strong>Por encima</strong> = predomina el verde (codicia)<br>• <strong>Por debajo</strong> = predomina el rojo (miedo)'
-              :'The score is simply the <strong>share of rising stocks</strong> among those that moved.<br><br>Example: if <strong>14 of 20</strong> stocks rose and 6 fell, the score is <strong>70</strong> (14 of 20).<br><br>• <strong>50</strong> = as many rise as fall<br>• <strong>Above</strong> = green prevails (greed)<br>• <strong>Below</strong> = red prevails (fear)' },
+      q: es?'¿Cuántas acciones están sobre su tendencia?':'How many stocks are above their trend?',
+      desc: es?'Porcentaje de acciones del panel líder que cotizan por encima de su propio promedio de 20 ruedas. Mayoría por encima confirma un avance amplio del mercado.'
+              :'Share of leading-panel stocks trading above their own 20-session average. A majority above confirms a broad market advance.',
+      scoring: es?'El puntaje es directamente el <strong>porcentaje de acciones del panel que cotizan sobre su media de 20 ruedas</strong>.<br><br>Ejemplo: si <strong>14 de 20</strong> acciones están por encima de su tendencia, el puntaje es <strong>70</strong>.<br><br>• <strong>50</strong> = la mitad sobre su tendencia<br>• <strong>Por encima</strong> = avance amplio (codicia)<br>• <strong>Por debajo</strong> = mercado débil (miedo)<br><br>A medida que cada acción cruza su media, el puntaje se mueve.'
+              :'The score is directly the <strong>percentage of panel stocks trading above their 20-session average</strong>.<br><br>Example: if <strong>14 of 20</strong> stocks are above their trend, the score is <strong>70</strong>.<br><br>• <strong>50</strong> = half above their trend<br>• <strong>Above</strong> = broad advance (greed)<br>• <strong>Below</strong> = weak market (fear)<br><br>As each stock crosses its average, the score moves.' },
     volatilidad: { icon:'🌡️', color:'#f59e0b',
       name: es?'Volatilidad':'Volatility',
-      q: es?'¿Qué tan nervioso está el mercado?':'How nervous is the market?',
-      desc: es?'Volatilidad anualizada del Merval. Alta volatilidad es el mejor proxy de miedo (equivale al VIX); baja volatilidad acompaña la calma.'
-              :'Annualized Merval volatility. High volatility is the best fear proxy (the VIX equivalent); low volatility accompanies calm.',
-      scoring: es?'El puntaje está <strong>invertido</strong>: más volatilidad equivale a más miedo, así que baja el score.<br><br>• Menos de <strong>25%</strong> anual → <strong>90</strong> (calma)<br>• <strong>25% a 40%</strong> → baja de 90 a 70<br>• <strong>40% a 60%</strong> → baja de 70 a 45 (nervios)<br>• <strong>60% a 85%</strong> → baja de 45 a 15 (miedo)<br>• Más de <strong>85%</strong> → cae hasta un mínimo de 3 (pánico)'
-              :'The score is <strong>inverted</strong>: more volatility means more fear, so it lowers the score.<br><br>• Below <strong>25%</strong> annualized → <strong>90</strong> (calm)<br>• <strong>25% to 40%</strong> → drops from 90 to 70<br>• <strong>40% to 60%</strong> → drops from 70 to 45 (nervous)<br>• <strong>60% to 85%</strong> → drops from 45 to 15 (fear)<br>• Above <strong>85%</strong> → falls to a floor of 3 (panic)' },
+      q: es?'¿La volatilidad está subiendo o bajando?':'Is volatility rising or falling?',
+      desc: es?'Compara la volatilidad reciente del Merval (10 ruedas) con la del último mes (30 ruedas). Volatilidad en aumento es señal de miedo; en baja, de calma. Es el equivalente local del VIX.'
+              :'Compares the Merval\'s recent volatility (10 sessions) with the last month (30 sessions). Rising volatility signals fear; falling, calm. The local VIX equivalent.',
+      scoring: es?'Se compara la <strong>volatilidad de 10 ruedas contra la de 30 ruedas</strong> (un ratio). No importa el nivel absoluto, sino si la volatilidad se está <strong>acelerando o calmando</strong>:<br><br>• <strong>Mismo nivel</strong> que el mes → score <strong>50</strong><br>• Volatilidad reciente <strong>un 40% mayor</strong> → cerca de <strong>10</strong> (miedo)<br>• Volatilidad reciente <strong>40% menor</strong> → cerca de <strong>90</strong> (calma)<br><br>Capta los cambios de nerviosismo del mercado en tiempo real.'
+              :'It compares <strong>10-session volatility against 30-session volatility</strong> (a ratio). What matters is not the absolute level but whether volatility is <strong>accelerating or calming</strong>:<br><br>• <strong>Same level</strong> as the month → score <strong>50</strong><br>• Recent volatility <strong>40% higher</strong> → near <strong>10</strong> (fear)<br>• Recent volatility <strong>40% lower</strong> → near <strong>90</strong> (calm)<br><br>It captures shifts in market nervousness in real time.' },
     credito: { icon:'💵', color:'#a855f7',
       name: es?'Apetito de riesgo crediticio':'Credit Risk Appetite',
-      q: es?'¿Hay apetito por tomar riesgo en bonos?':'Is there appetite for taking bond risk?',
-      desc: es?'Rendimiento del bono argentino en dólares (GD35). Un yield que baja muestra ganas de tomar riesgo (codicia); uno que sube refleja huida del riesgo (miedo).'
-              :'Yield on the Argentine USD bond (GD35). A falling yield shows risk appetite (greed); a rising one reflects flight from risk (fear).',
-      scoring: es?'El puntaje está <strong>invertido</strong>: a menor rendimiento exigido al bono, mayor confianza (codicia). Por tramos del yield anual:<br><br>• Menos de <strong>6%</strong> → 85<br>• <strong>6% a 9%</strong> → 70<br>• <strong>9% a 12%</strong> → 55<br>• <strong>12% a 16%</strong> → 40<br>• <strong>16% a 22%</strong> → 25<br>• Más de <strong>22%</strong> → 15<br><br>Un yield alto significa que el mercado exige mucho para prestarle al país: señal de miedo.'
-              :'The score is <strong>inverted</strong>: the lower the yield demanded, the higher the confidence (greed). By annual-yield bands:<br><br>• Under <strong>6%</strong> → 85<br>• <strong>6% to 9%</strong> → 70<br>• <strong>9% to 12%</strong> → 55<br>• <strong>12% to 16%</strong> → 40<br>• <strong>16% to 22%</strong> → 25<br>• Over <strong>22%</strong> → 15<br><br>A high yield means the market demands a lot to lend to the country: a sign of fear.' },
+      q: es?'¿El bono en dólares está sobre o bajo su tendencia?':'Is the USD bond above or below its trend?',
+      desc: es?'Compara el precio del bono argentino en dólares (GD35) con su promedio de 20 ruedas. Un precio que sube sobre su tendencia muestra apetito por el riesgo (codicia); que cae, huida del riesgo (miedo).'
+              :'Compares the price of the Argentine USD bond (GD35) with its 20-session average. A price rising above its trend shows risk appetite (greed); falling, flight from risk (fear).',
+      scoring: es?'Se mide cuánto se <strong>aparta el precio del GD35 en USD de su media de 20 ruedas</strong>. Cuando el bono sube, el mercado tiene apetito por el riesgo argentino:<br><br>• <strong>En su tendencia</strong> → score <strong>50</strong><br>• <strong>+5%</strong> sobre la tendencia → cerca de <strong>90</strong> (codicia)<br>• <strong>−5%</strong> bajo la tendencia → cerca de <strong>10</strong> (miedo)<br><br>Reemplaza al viejo cálculo por tramos de yield, que casi no se movía.'
+              :'It measures how far the <strong>GD35 price in USD strays from its 20-session average</strong>. When the bond rises, the market has appetite for Argentine risk:<br><br>• <strong>At its trend</strong> → score <strong>50</strong><br>• <strong>+5%</strong> above trend → near <strong>90</strong> (greed)<br>• <strong>−5%</strong> below trend → near <strong>10</strong> (fear)<br><br>It replaces the old yield-band calculation, which barely moved.' },
     riesgo: { icon:'🌎', color:'#ef4444',
       name: es?'Riesgo país (EMBI)':'Country Risk (EMBI)',
-      q: es?'¿Cuánto desconfía el mundo de la deuda argentina?':'How much does the world distrust Argentine debt?',
-      desc: es?'Spread de la deuda soberana sobre los Treasuries de EEUU. Es el termómetro de crédito más seguido: más bps = más miedo.'
-              :'Sovereign debt spread over US Treasuries. The most-watched credit thermometer: more bps = more fear.',
-      scoring: es?'El puntaje está <strong>invertido</strong>: a más puntos de riesgo país, más miedo.<br><br>• Menos de <strong>200</strong> puntos → cerca de 90<br>• <strong>200 a 500</strong> → baja de 85 a 55<br>• <strong>500 a 900</strong> → baja de 55 a 25<br>• <strong>900 a 1500</strong> → baja de 25 a 10<br>• Más de <strong>1500</strong> → mínimos (cerca de 2)<br><br>Mide cuánto extra exige el mundo para prestarle a la Argentina frente a EEUU.'
-              :'The score is <strong>inverted</strong>: the higher the country risk, the more fear.<br><br>• Below <strong>200</strong> points → near 90<br>• <strong>200 to 500</strong> → drops from 85 to 55<br>• <strong>500 to 900</strong> → drops from 55 to 25<br>• <strong>900 to 1500</strong> → drops from 25 to 10<br>• Above <strong>1500</strong> → bottoms out (near 2)<br><br>It measures the extra return the world demands to lend to Argentina versus the US.' },
+      q: es?'¿El riesgo país está subiendo o comprimiendo?':'Is country risk rising or compressing?',
+      desc: es?'Compara el riesgo país con su promedio de los últimos 30 días. Si comprime por debajo de su tendencia, hay confianza (codicia); si escala, desconfianza (miedo).'
+              :'Compares country risk with its 30-day average. Compressing below its trend means confidence (greed); climbing means distrust (fear).',
+      scoring: es?'Se mide cuánto se <strong>aparta el riesgo país (EMBI) de su media de 30 días</strong>. Importa la dirección, no solo el nivel:<br><br>• <strong>En su tendencia</strong> → score <strong>50</strong><br>• <strong>+10%</strong> sobre la media (escalando) → cerca de <strong>10</strong> (miedo)<br>• <strong>−10%</strong> bajo la media (comprimiendo) → cerca de <strong>90</strong> (codicia)<br><br>Así un salto del riesgo país se refleja al instante, aunque el nivel siga siendo alto.'
+              :'It measures how far <strong>country risk (EMBI) strays from its 30-day average</strong>. Direction matters, not just the level:<br><br>• <strong>At its trend</strong> → score <strong>50</strong><br>• <strong>+10%</strong> above the average (climbing) → near <strong>10</strong> (fear)<br>• <strong>−10%</strong> below the average (compressing) → near <strong>90</strong> (greed)<br><br>This way a jump in country risk shows up instantly, even if the level is still high.' },
     brecha: { icon:'💱', color:'#22c55e',
-      name: es?'Brecha cambiaria':'FX Gap',
-      q: es?'¿Cuánta presión hay sobre el dólar?':'How much pressure is on the dollar?',
-      desc: es?'Diferencia entre el dólar paralelo y el oficial. Una brecha amplia refleja desconfianza y miedo; una brecha baja, calma cambiaria.'
-              :'Gap between parallel and official dollar. A wide gap reflects distrust and fear; a narrow gap, FX calm.',
-      scoring: es?'El puntaje está <strong>invertido</strong>: a mayor brecha, más miedo.<br><br>• Brecha <strong>negativa o nula</strong> → máximo (cerca de 90, inédito)<br>• Hasta <strong>5%</strong> → baja muy poco<br>• <strong>5% a 15%</strong> → de 83 a 72<br>• <strong>15% a 40%</strong> → de 72 a 50<br>• <strong>40% a 80%</strong> → de 50 a 26<br>• <strong>80% a 130%</strong> → de 26 a 5<br>• Más de <strong>130%</strong> → 5<br><br>Mide cuánto se aparta el dólar libre del oficial.'
-              :'The score is <strong>inverted</strong>: the wider the gap, the more fear.<br><br>• <strong>Negative or zero</strong> gap → top score (near 90, unprecedented)<br>• Up to <strong>5%</strong> → barely moves<br>• <strong>5% to 15%</strong> → from 83 to 72<br>• <strong>15% to 40%</strong> → from 72 to 50<br>• <strong>40% to 80%</strong> → from 50 to 26<br>• <strong>80% to 130%</strong> → from 26 to 5<br>• Above <strong>130%</strong> → 5<br><br>It measures how far the free dollar drifts from the official one.' },
+      name: es?'Presión cambiaria':'FX Pressure',
+      q: es?'¿El dólar libre está presionando?':'Is the free dollar under pressure?',
+      desc: es?'Mide la variación del dólar CCL en las últimas 10 ruedas. Un CCL que salta refleja presión y miedo; estable o en baja, calma cambiaria. Reemplaza a la brecha, que quedaba clavada.'
+              :'Tracks the CCL dollar\'s change over the last 10 sessions. A jumping CCL reflects pressure and fear; steady or falling, FX calm. It replaces the gap, which stayed stuck.',
+      scoring: es?'Se mide la <strong>variación del dólar CCL en las últimas 10 ruedas</strong>. Captura la presión cambiaria reciente, no la brecha (que con el dólar casi unificado quedaba fija):<br><br>• <strong>Sin cambios</strong> → score <strong>50</strong><br>• CCL <strong>+5%</strong> en 10 ruedas → cerca de <strong>20</strong> (presión, miedo)<br>• CCL <strong>−5%</strong> en 10 ruedas → cerca de <strong>80</strong> (calma, codicia)<br><br>Reacciona a cada movimiento del dólar libre.'
+              :'It tracks the <strong>CCL dollar\'s change over the last 10 sessions</strong>. It captures recent FX pressure, not the gap (which stayed fixed with an almost-unified dollar):<br><br>• <strong>No change</strong> → score <strong>50</strong><br>• CCL <strong>+5%</strong> in 10 sessions → near <strong>20</strong> (pressure, fear)<br>• CCL <strong>−5%</strong> in 10 sessions → near <strong>80</strong> (calm, greed)<br><br>It reacts to every move of the free dollar.' },
   };
 
   // Fuente de cada componente (para la línea inferior con el puntito ⚡)
   const meta2 = {
-    momentum:    { src:'IOL/Yahoo', live:true },
-    amplitud:    { src:'IOL',        live:true },
-    volatilidad: { src:'IOL',        live:true },
-    credito:     { src:'IOL',        live:true },
+    momentum:    { src:'Yahoo/ArgentinaDatos', live:true },
+    amplitud:    { src:'IOL',                   live:true },
+    volatilidad: { src:'Yahoo/ArgentinaDatos',  live:true },
+    credito:     { src:'Yahoo/ArgentinaDatos',  live:true },
     riesgo:      { src:'ArgentinaDatos', live:true },
     brecha:      { src:'ArgentinaDatos', live:true },
   };
@@ -7373,6 +7412,14 @@ async function loadDataJSON() {
     if(f('sentimiento_noticias')!==null)  LIVE._sentimiento_noticias = f('sentimiento_noticias');
     if(f('fear_greed')!==null)            LIVE._fearGreed = f('fear_greed');
     if(f('score_macro')!==null)           LIVE._scoreMacro = f('score_macro');
+    // Índice de Miedo y Codicia rediseñado (por desvíos)
+    if(f('fg_mom_dev')!==null)            LIVE._momDev = f('fg_mom_dev');
+    if(f('fg_amp_arriba')!==null)         LIVE._ampArriba = f('fg_amp_arriba');
+    if(f('fg_amp_total')!==null)          LIVE._ampTotal = f('fg_amp_total');
+    if(f('fg_vol_ratio')!==null)          LIVE._volRatio = f('fg_vol_ratio');
+    if(f('fg_gd35_dev')!==null)           LIVE._gd35Dev = f('fg_gd35_dev');
+    if(f('fg_embi_dev')!==null)           LIVE._embiDev = f('fg_embi_dev');
+    if(f('fg_ccl_var10')!==null)          LIVE._cclVar10 = f('fg_ccl_var10');
     if(f('ai_analisis_es')!==null)        LIVE._ai_analisis_es = String(f('ai_analisis_es'));
     if(f('ai_analisis_en')!==null)        LIVE._ai_analisis_en = String(f('ai_analisis_en'));
     if(f('ai_seg_inflacion_es')!==null) LIVE._ai_seg_inflacion_es = String(f('ai_seg_inflacion_es'));
@@ -7523,6 +7570,14 @@ function applyInjectedData() {
   if(_f('sentimiento_noticias')!==null)  LIVE._sentimiento_noticias = _f('sentimiento_noticias');
   if(_f('fear_greed')!==null)            LIVE._fearGreed = _f('fear_greed');
   if(_f('score_macro')!==null)           LIVE._scoreMacro = _f('score_macro');
+  // Índice de Miedo y Codicia rediseñado (por desvíos)
+  if(_f('fg_mom_dev')!==null)            LIVE._momDev = _f('fg_mom_dev');
+  if(_f('fg_amp_arriba')!==null)         LIVE._ampArriba = _f('fg_amp_arriba');
+  if(_f('fg_amp_total')!==null)          LIVE._ampTotal = _f('fg_amp_total');
+  if(_f('fg_vol_ratio')!==null)          LIVE._volRatio = _f('fg_vol_ratio');
+  if(_f('fg_gd35_dev')!==null)           LIVE._gd35Dev = _f('fg_gd35_dev');
+  if(_f('fg_embi_dev')!==null)           LIVE._embiDev = _f('fg_embi_dev');
+  if(_f('fg_ccl_var10')!==null)          LIVE._cclVar10 = _f('fg_ccl_var10');
   if(_f('ai_analisis_es')!==null)        LIVE._ai_analisis_es = String(_f('ai_analisis_es'));
   if(_f('ai_analisis_en')!==null)        LIVE._ai_analisis_en = String(_f('ai_analisis_en'));
   if(_f('ai_seg_inflacion_es')!==null) LIVE._ai_seg_inflacion_es = String(_f('ai_seg_inflacion_es'));
