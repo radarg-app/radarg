@@ -473,6 +473,20 @@ main { position:relative; z-index:1; max-width:1440px; margin:0 auto; padding:2r
   color:#fff; font-family:'JetBrains Mono',monospace;
 }
 .sc-refresh { font-size:9.5px; color:var(--text3); font-family:'JetBrains Mono',monospace; margin-top:.875rem; display:flex; flex-direction:column; gap:3px; padding-top:.75rem; border-top:1px solid var(--border); }
+/* Botón "Seguinos en X" (estilo de la red, lleva a la sección de X) */
+.sc-x-follow {
+  display:flex; align-items:center; justify-content:center; gap:.5rem;
+  margin-top:1rem; padding:.7rem 1rem; border-radius:10px; cursor:pointer;
+  text-decoration:none; background:#000; border:1px solid #2f3336;
+  color:#fff; font-family:'Inter',sans-serif; font-size:12.5px; font-weight:700;
+  letter-spacing:.01em; transition:transform .18s ease, background .18s ease, border-color .18s ease;
+}
+body.lm .sc-x-follow { background:#0f1419; border-color:#0f1419; color:#fff; }
+.sc-x-follow:hover { transform:translateY(-1px); background:#16181c; border-color:#536471; }
+body.lm .sc-x-follow:hover { background:#000; }
+.sc-x-follow-logo { width:16px; height:16px; fill:#fff; flex-shrink:0; }
+.sc-x-follow-arrow { font-size:13px; opacity:.7; transition:transform .18s ease; }
+.sc-x-follow:hover .sc-x-follow-arrow { transform:translateY(2px); }
 .sc-refresh-row { white-space:nowrap; }
 .sc-refresh-row { display:flex; align-items:center; gap:5px; }
 .sc-refresh-next { display:flex; align-items:center; gap:5px; color:var(--ac); font-size:9.5px; }
@@ -2548,6 +2562,11 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
           <span>↻</span><span id="gRefreshNextTxt"></span>
         </div>
       </div>
+      <a class="sc-x-follow" href="#x-social" onclick="var t=document.getElementById('x-social');if(t){event.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'});}">
+        <svg class="sc-x-follow-logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        <span data-i18n="score.xfollow">Seguinos en X</span>
+        <span class="sc-x-follow-arrow">↓</span>
+      </a>
     </div>
 
     <!-- Gauge -->
@@ -3391,7 +3410,7 @@ const T = {
     'idx.macro':'Solidez Macro','idx.macro.sub':'Situación del país','idx.fear':'Miedo y Codicia','idx.fear.sub':'Mercado / volátil',
     'gauge.title.macro':'Índice de Solidez Macroeconómica','gauge.title.fear':'Índice de Miedo y Codicia',
     'gauge.scale.macro':'0 = crítico · 50 = estable · 100 = robusto','gauge.scale.fear':'0 = miedo extremo · 50 = neutral · 100 = codicia extrema',
-    'score.3m':'Hace 3 meses','score.1y':'Hace 1 año','score.updating':'Actualizando…',
+    'score.3m':'Hace 3 meses','score.1y':'Hace 1 año','score.updating':'Actualizando…','score.xfollow':'Seguinos en X',
     'ai.title':'Interpretación IA','ai.sub':'Análisis automático en tiempo real',
     'ai.economic':'Situación Económica','ai.political':'Situación Política',
     'ai.sub.political':'Basado en ICG UTDT y noticias de las últimas 48hs',
@@ -3722,7 +3741,7 @@ const T = {
     'idx.macro':'Macro Strength','idx.macro.sub':'Country health','idx.fear':'Fear & Greed','idx.fear.sub':'Market / volatile',
     'gauge.title.macro':'Macroeconomic Strength Index','gauge.title.fear':'Fear & Greed Argentina',
     'gauge.scale.macro':'0 = critical · 50 = stable · 100 = robust','gauge.scale.fear':'0 = extreme fear · 50 = neutral · 100 = extreme greed',
-    'score.3m':'3 months ago','score.1y':'1 year ago','score.updating':'Updating…',
+    'score.3m':'3 months ago','score.1y':'1 year ago','score.updating':'Updating…','score.xfollow':'Follow us on X',
     'ai.title':'AI Read','ai.sub':'Live analysis, updated automatically',
     'ai.economic':'Economic Situation','ai.political':'Political Situation',
     'ai.sub.political':'Based on UTDT confidence data and the last 48h of news',
