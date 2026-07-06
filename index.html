@@ -476,17 +476,36 @@ main { position:relative; z-index:1; max-width:1440px; margin:0 auto; padding:2r
 /* Botón "Seguinos en X" (estilo de la red, lleva a la sección de X) */
 .sc-x-follow {
   display:flex; align-items:center; justify-content:center; gap:.5rem;
-  margin-top:1rem; padding:.7rem 1rem; border-radius:10px; cursor:pointer;
-  text-decoration:none; background:#000; border:1px solid #2f3336;
-  color:#fff; font-family:'Inter',sans-serif; font-size:12.5px; font-weight:700;
-  letter-spacing:.01em; transition:transform .18s ease, background .18s ease, border-color .18s ease;
+  margin-top:1rem; padding:.7rem 1rem; border-radius:12px; cursor:pointer;
+  text-decoration:none; background:#000;
+  border:2.5px solid #fff; color:#fff;
+  font-family:'Inter',sans-serif; font-size:12.5px; font-weight:700;
+  letter-spacing:.01em; box-shadow:0 0 0 1px rgba(0,0,0,.6), 0 4px 16px rgba(0,0,0,.45);
+  transition:transform .18s ease, background .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
-body.lm .sc-x-follow { background:#0f1419; border-color:#0f1419; color:#fff; }
-.sc-x-follow:hover { transform:translateY(-1px); background:#16181c; border-color:#536471; }
-body.lm .sc-x-follow:hover { background:#000; }
+body.lm .sc-x-follow {
+  background:#0f1419; border-color:#0f1419; color:#fff;
+  box-shadow:0 4px 16px rgba(0,0,0,.25);
+}
+.sc-x-follow:hover { transform:translateY(-1px); background:#16181c; box-shadow:0 0 0 1px rgba(0,0,0,.6), 0 6px 22px rgba(255,255,255,.18); }
+body.lm .sc-x-follow:hover { background:#000; border-color:#000; box-shadow:0 6px 22px rgba(0,0,0,.35); }
 .sc-x-follow-logo { width:16px; height:16px; fill:#fff; flex-shrink:0; }
 .sc-x-follow-arrow { font-size:13px; opacity:.7; transition:transform .18s ease; }
 .sc-x-follow:hover .sc-x-follow-arrow { transform:translateY(2px); }
+/* Botón de donación en el panel: mismo estilo que el de la sección de donaciones */
+.sc-donate-btn {
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  width:100%; margin-top:.5rem; padding:.75rem 1rem;
+  border-radius:10px; border:none; cursor:pointer;
+  font-family:'Inter',sans-serif; font-size:12.5px; font-weight:700; color:#fff;
+  background:linear-gradient(90deg, #f97316, #eab308, #22c55e, #3b82f6, #a855f7, #f97316);
+  background-size:300% 100%; animation:supportRainbow 5s linear infinite;
+  box-shadow:0 3px 14px rgba(168,85,247,.28);
+  text-shadow:0 1px 3px rgba(0,0,0,.25);
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.sc-donate-btn:hover { transform:translateY(-1px); box-shadow:0 5px 20px rgba(168,85,247,.45); }
+.sc-donate-heart { font-size:14px; line-height:1; }
 .sc-refresh-row { white-space:nowrap; }
 .sc-refresh-row { display:flex; align-items:center; gap:5px; }
 .sc-refresh-next { display:flex; align-items:center; gap:5px; color:var(--ac); font-size:9.5px; }
@@ -2377,6 +2396,29 @@ body.lm .x-card-cta { background:#0f1419; color:#fff; }
 .x-card:hover .x-card-cta { gap:.7rem; }
 .x-card-arrow { transition:transform .18s ease; }
 .x-card:hover .x-card-arrow { transform:translateX(2px); }
+.faq-card-explainer { padding:0 0 1.15rem; animation:faqReveal .25s ease; }
+.faq-explainer-intro { font-size:.96rem; line-height:1.6; color:var(--text2); margin:0 0 1rem; }
+.faq-example-wrap {
+  max-width:420px; margin:0 0 1.25rem;
+  padding:1.1rem; border-radius:14px;
+  background:var(--bg4); border:1px dashed var(--border2);
+}
+body.lm .faq-example-wrap { background:#f4f5f8; }
+.faq-example-card { pointer-events:none; margin:0; }
+.var-card-badge-month {
+  font-size:9.5px; font-weight:800; letter-spacing:.07em; text-transform:uppercase;
+  padding:3px 9px; border-radius:6px; background:rgba(245,158,11,.16); color:#f59e0b; flex-shrink:0;
+}
+.faq-legend { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.7rem; }
+.faq-legend li {
+  font-size:.92rem; line-height:1.55; color:var(--text2);
+  padding-left:1.1rem; position:relative;
+}
+.faq-legend li::before {
+  content:'▸'; position:absolute; left:0; top:0; color:var(--ac2); font-size:.8rem;
+}
+.faq-legend strong { color:var(--text); font-weight:700; }
+body.lm .faq-legend strong { color:#0a0a14; }
 .faq-section { max-width:880px; margin:3.5rem auto 0; }
 .faq-h2 { font-size:1.6rem; font-weight:800; letter-spacing:-.5px; margin:0 0 1.75rem; color:var(--text); }
 .faq-block-title {
@@ -2567,6 +2609,10 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
         <span data-i18n="score.xfollow">Seguinos en X</span>
         <span class="sc-x-follow-arrow">↓</span>
       </a>
+      <button class="sc-donate-btn" type="button" onclick="openModal()">
+        <span class="sc-donate-heart">♥</span>
+        <span data-i18n="score.donate">Apoyá el proyecto</span>
+      </button>
     </div>
 
     <!-- Gauge -->
@@ -2711,52 +2757,42 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
 
   <!-- HISTORICAL CHART -->
   <!-- APOYAR / SUPPORT -->
-  <section id="apoyar" class="support-section">
-    <div class="support-grid">
-
-      <!-- Tarjeta de apoyo -->
-      <div class="support-card-outer">
-        <div class="support-card">
-          <div class="support-heart-wrap">
-            <span class="support-heart">♥</span>
-            <span class="support-heart-ring"></span>
-          </div>
-          <h2 class="support-title" data-i18n="support.title">RadARG es gratis y lo queremos mantener así</h2>
-          <p class="support-sub" data-i18n="support.sub">Mantener el índice online tiene costos reales: el modelo de IA que analiza datos y genera los resúmenes, el servidor, las APIs de datos y las herramientas del proyecto. Si te resulta útil, cualquier colaboración ayuda mucho.</p>
-
-          <div class="support-reason-box">
-            <div class="support-reason"><span class="support-reason-ico">✦</span><span data-i18n="support.r1">Tokens de IA para análisis y resúmenes</span></div>
-            <div class="support-reason"><span class="support-reason-ico">📡</span><span data-i18n="support.r2">APIs de datos del mercado en tiempo real</span></div>
-            <div class="support-reason"><span class="support-reason-ico">⚡</span><span data-i18n="support.r3">Hosteo del servidor y herramientas</span></div>
-            <div class="support-reason"><span class="support-reason-ico">🔓</span><span data-i18n="support.r4">El índice siempre libre, sin publicidad ni paywalls</span></div>
-          </div>
-
-          <button class="btn-support-main" onclick="openModal()">
-            ♥ <span data-i18n="support.cta.main">Apoyar el proyecto</span>
-          </button>
-          <p class="support-disclaimer" data-i18n="support.disclaimer">100% voluntario · Cualquier monto suma</p>
+  <!-- ═══ X (Twitter) — cuentas oficiales ══════════════════════ -->
+  <section id="x-social">
+    <div class="sec-hdr">
+      <span class="sec-ttl" data-i18n="sec.xsocial">Seguinos en X</span>
+      <div class="sec-line"></div>
+    </div>
+    <div class="x-band">
+      <div class="x-band-intro">
+        <svg class="x-band-logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        <div class="x-band-texts">
+          <div class="x-band-title" data-i18n="x.title">Seguí a RadARG en X</div>
+          <div class="x-band-sub" data-i18n="x.sub">Datos del mercado en vivo, análisis y una dosis de humor financiero argentino. Elegí la cuenta que va con vos.</div>
         </div>
       </div>
-
-      <!-- Ranking de apoyos -->
-      <div class="ranking-card">
-        <div class="ranking-header">
-          <div class="ranking-title"><span class="ranking-title-ico">🏆</span> <span data-i18n="ranking.title">Top apoyos</span></div>
-        </div>
-        <div class="ranking-sub" data-i18n="ranking.sub">Quienes hacen posible RadARG</div>
-        <div class="ranking-tabs" role="tablist">
-          <button class="ranking-tab active" id="rankingTabMensual" role="tab" onclick="setRankingTab('mensual')" data-i18n="ranking.tab.monthly">Este mes</button>
-          <button class="ranking-tab" id="rankingTabHistorico" role="tab" onclick="setRankingTab('historico')" data-i18n="ranking.tab.alltime">Histórico</button>
-        </div>
-        <div class="ranking-list" id="rankingList">
-          <div class="ranking-empty">Todavía no hay apoyos cargados.<br>¡Podés ser el primero!</div>
-        </div>
-        <div class="ranking-footer">
-          <span class="ranking-live-dot"></span>
-          <span data-i18n="ranking.footer">El ranking se actualiza todos los días</span>
-        </div>
+      <div class="x-cards">
+        <a class="x-card" href="https://x.com/radargapp" target="_blank" rel="noopener" aria-label="RadARG en X">
+          <div class="x-card-top">
+            <svg class="x-card-logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            <span class="x-card-badge" data-i18n="x.badge.official">Oficial</span>
+          </div>
+          <div class="x-card-handle">@radargapp</div>
+          <div class="x-card-name" data-i18n="x.acc1.name">RadARG</div>
+          <div class="x-card-desc" data-i18n="x.acc1.desc">La cuenta principal: índices en vivo, datos del mercado argentino, gráficos y análisis serio del día a día.</div>
+          <span class="x-card-cta"><span data-i18n="x.follow">Seguir</span> <span class="x-card-arrow">→</span></span>
+        </a>
+        <a class="x-card x-card-memes" href="https://x.com/radargmemes" target="_blank" rel="noopener" aria-label="RadARG Memes en X">
+          <div class="x-card-top">
+            <svg class="x-card-logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            <span class="x-card-badge" data-i18n="x.badge.memes">Humor</span>
+          </div>
+          <div class="x-card-handle">@radargmemes</div>
+          <div class="x-card-name" data-i18n="x.acc2.name">RadARG Memes</div>
+          <div class="x-card-desc" data-i18n="x.acc2.desc">El costado divertido: memes, chistes de mercado y la economía argentina contada sin filtro.</div>
+          <span class="x-card-cta"><span data-i18n="x.follow">Seguir</span> <span class="x-card-arrow">→</span></span>
+        </a>
       </div>
-
     </div>
   </section>
 
@@ -3191,42 +3227,52 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
     </div>
   </section>
 
-  <!-- ═══ X (Twitter) — cuentas oficiales ══════════════════════ -->
-  <section id="x-social">
-    <div class="sec-hdr">
-      <span class="sec-ttl" data-i18n="sec.xsocial">Seguinos en X</span>
-      <div class="sec-line"></div>
-    </div>
-    <div class="x-band">
-      <div class="x-band-intro">
-        <svg class="x-band-logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-        <div class="x-band-texts">
-          <div class="x-band-title" data-i18n="x.title">Seguí a RadARG en X</div>
-          <div class="x-band-sub" data-i18n="x.sub">Datos del mercado en vivo, análisis y una dosis de humor financiero argentino. Elegí la cuenta que va con vos.</div>
+  <section id="apoyar" class="support-section">
+    <div class="support-grid">
+
+      <!-- Tarjeta de apoyo -->
+      <div class="support-card-outer">
+        <div class="support-card">
+          <div class="support-heart-wrap">
+            <span class="support-heart">♥</span>
+            <span class="support-heart-ring"></span>
+          </div>
+          <h2 class="support-title" data-i18n="support.title">RadARG es gratis y lo queremos mantener así</h2>
+          <p class="support-sub" data-i18n="support.sub">Mantener el índice online tiene costos reales: el modelo de IA que analiza datos y genera los resúmenes, el servidor, las APIs de datos y las herramientas del proyecto. Si te resulta útil, cualquier colaboración ayuda mucho.</p>
+
+          <div class="support-reason-box">
+            <div class="support-reason"><span class="support-reason-ico">✦</span><span data-i18n="support.r1">Tokens de IA para análisis y resúmenes</span></div>
+            <div class="support-reason"><span class="support-reason-ico">📡</span><span data-i18n="support.r2">APIs de datos del mercado en tiempo real</span></div>
+            <div class="support-reason"><span class="support-reason-ico">⚡</span><span data-i18n="support.r3">Hosteo del servidor y herramientas</span></div>
+            <div class="support-reason"><span class="support-reason-ico">🔓</span><span data-i18n="support.r4">El índice siempre libre, sin publicidad ni paywalls</span></div>
+          </div>
+
+          <button class="btn-support-main" onclick="openModal()">
+            ♥ <span data-i18n="support.cta.main">Apoyar el proyecto</span>
+          </button>
+          <p class="support-disclaimer" data-i18n="support.disclaimer">100% voluntario · Cualquier monto suma</p>
         </div>
       </div>
-      <div class="x-cards">
-        <a class="x-card" href="https://x.com/radargapp" target="_blank" rel="noopener" aria-label="RadARG en X">
-          <div class="x-card-top">
-            <svg class="x-card-logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-            <span class="x-card-badge" data-i18n="x.badge.official">Oficial</span>
-          </div>
-          <div class="x-card-handle">@radargapp</div>
-          <div class="x-card-name" data-i18n="x.acc1.name">RadARG</div>
-          <div class="x-card-desc" data-i18n="x.acc1.desc">La cuenta principal: índices en vivo, datos del mercado argentino, gráficos y análisis serio del día a día.</div>
-          <span class="x-card-cta"><span data-i18n="x.follow">Seguir</span> <span class="x-card-arrow">→</span></span>
-        </a>
-        <a class="x-card x-card-memes" href="https://x.com/radargmemes" target="_blank" rel="noopener" aria-label="RadARG Memes en X">
-          <div class="x-card-top">
-            <svg class="x-card-logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-            <span class="x-card-badge" data-i18n="x.badge.memes">Humor</span>
-          </div>
-          <div class="x-card-handle">@radargmemes</div>
-          <div class="x-card-name" data-i18n="x.acc2.name">RadARG Memes</div>
-          <div class="x-card-desc" data-i18n="x.acc2.desc">El costado divertido: memes, chistes de mercado y la economía argentina contada sin filtro.</div>
-          <span class="x-card-cta"><span data-i18n="x.follow">Seguir</span> <span class="x-card-arrow">→</span></span>
-        </a>
+
+      <!-- Ranking de apoyos -->
+      <div class="ranking-card">
+        <div class="ranking-header">
+          <div class="ranking-title"><span class="ranking-title-ico">🏆</span> <span data-i18n="ranking.title">Top apoyos</span></div>
+        </div>
+        <div class="ranking-sub" data-i18n="ranking.sub">Quienes hacen posible RadARG</div>
+        <div class="ranking-tabs" role="tablist">
+          <button class="ranking-tab active" id="rankingTabMensual" role="tab" onclick="setRankingTab('mensual')" data-i18n="ranking.tab.monthly">Este mes</button>
+          <button class="ranking-tab" id="rankingTabHistorico" role="tab" onclick="setRankingTab('historico')" data-i18n="ranking.tab.alltime">Histórico</button>
+        </div>
+        <div class="ranking-list" id="rankingList">
+          <div class="ranking-empty">Todavía no hay apoyos cargados.<br>¡Podés ser el primero!</div>
+        </div>
+        <div class="ranking-footer">
+          <span class="ranking-live-dot"></span>
+          <span data-i18n="ranking.footer">El ranking se actualiza todos los días</span>
+        </div>
       </div>
+
     </div>
   </section>
 
@@ -3276,6 +3322,38 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
 
     <div class="faq-block-title" data-i18n="faq.group.general">General</div>
     <div class="faq-grid">
+      <details class="faq-item">
+        <summary data-i18n="faq.q10">¿Cómo leo una tarjeta de dato?</summary>
+        <div class="faq-card-explainer">
+          <p class="faq-explainer-intro" data-i18n-html="faq.a10.intro">Cada indicador se muestra en una <strong>tarjeta</strong> como esta. Así se lee cada parte:</p>
+          <div class="faq-example-wrap">
+            <div class="var-card faq-example-card">
+              <div class="var-card-top">
+                <span class="var-card-name">Salario real (RIPTE)</span>
+                <span class="var-card-badge-month" data-i18n="faq.example.freq">MENSUAL</span>
+              </div>
+              <div class="var-card-value" style="color:#22c55e" data-i18n="faq.example.value">Variación real: +3.5%</div>
+              <div class="var-card-desc" data-i18n="faq.example.desc">Variación real del salario promedio registrado (RIPTE) frente a la inflación, medida año a año.</div>
+              <div class="var-card-score-block">
+                <span class="var-card-score-pill" style="background:rgba(34,197,94,.14);color:#22c55e">
+                  <span class="var-card-score-num">70</span>
+                  <span class="var-card-score-lbl" data-i18n="faq.example.label">Codicia Moderada</span>
+                </span>
+              </div>
+              <div class="var-card-bar"><div class="var-card-bar-fill" style="background:#22c55e;width:70%"></div></div>
+              <div class="var-card-src"><span class="ind-source-dot" style="background:var(--g)"></span>⚡ datos.gob.ar</div>
+            </div>
+          </div>
+          <ul class="faq-legend" data-i18n-html="faq.a10.legend">
+            <li><strong>Nombre e insignia de frecuencia:</strong> qué mide el dato y cada cuánto se actualiza (mensual, diario, etc.).</li>
+            <li><strong>Valor:</strong> el número real del indicador, en su unidad original. Es el dato crudo tal cual lo publica la fuente.</li>
+            <li><strong>Descripción:</strong> una explicación breve de qué representa ese dato y por qué importa.</li>
+            <li><strong>Puntaje y etiqueta:</strong> el valor llevado a la escala común de 0 a 100, con su interpretación (Miedo, Neutral, Codicia, etc.). Esto permite comparar indicadores muy distintos entre sí.</li>
+            <li><strong>Barra de color:</strong> muestra visualmente ese puntaje. Rojo es miedo o situación crítica; verde es codicia o solidez.</li>
+            <li><strong>Fuente:</strong> de dónde sale el dato. El punto con el rayo ⚡ indica que se actualiza en vivo.</li>
+          </ul>
+        </div>
+      </details>
       <details class="faq-item">
         <summary data-i18n="faq.q7">¿RadARG sirve para invertir?</summary>
         <p data-i18n-html="faq.a7">RadARG es una <strong>herramienta de contexto</strong>, no una recomendación de compra o venta.<br><br>Ayuda a entender en qué clima está el mercado y la economía, pero la decisión de invertir depende de tu estrategia, tu horizonte y tu tolerancia al riesgo.<br><br>Usalo como <strong>un termómetro más</strong>, no como una señal automática.</p>
@@ -3410,7 +3488,7 @@ const T = {
     'idx.macro':'Solidez Macro','idx.macro.sub':'Situación del país','idx.fear':'Miedo y Codicia','idx.fear.sub':'Mercado / volátil',
     'gauge.title.macro':'Índice de Solidez Macroeconómica','gauge.title.fear':'Índice de Miedo y Codicia',
     'gauge.scale.macro':'0 = crítico · 50 = estable · 100 = robusto','gauge.scale.fear':'0 = miedo extremo · 50 = neutral · 100 = codicia extrema',
-    'score.3m':'Hace 3 meses','score.1y':'Hace 1 año','score.updating':'Actualizando…','score.xfollow':'Seguinos en X',
+    'score.3m':'Hace 3 meses','score.1y':'Hace 1 año','score.updating':'Actualizando…','score.xfollow':'Seguinos en X','score.donate':'Apoyá el proyecto',
     'ai.title':'Interpretación IA','ai.sub':'Análisis automático en tiempo real',
     'ai.economic':'Situación Económica','ai.political':'Situación Política',
     'ai.sub.political':'Basado en ICG UTDT y noticias de las últimas 48hs',
@@ -3697,6 +3775,13 @@ const T = {
     'faq.a8':'<strong>Sí.</strong> Ambos índices son de acceso libre y gratuito, sin publicidad ni muros de pago.<br><br>Hay niveles opcionales con funciones avanzadas (alertas, newsletter, acceso por API), pero los <strong>índices principales son siempre gratuitos</strong>.',
     'faq.q9':'¿Qué incluye cada dimensión?',
     'faq.a9':'• <strong>Inflación y Política Monetaria:</strong> IPC del INDEC, tasa real y expectativas de inflación del REM.<br>• <strong>Tipo de Cambio y Reservas:</strong> brecha cambiaria, reservas netas del BCRA y un proxy de liquidación del agro.<br>• <strong>Mercados y Expectativas:</strong> riesgo país, Merval en dólares, rendimiento de bonos, amplitud del panel y clima político.<br>• <strong>Actividad Real y Bienestar:</strong> EMAE, salario real, consumo, confianza, desempleo y patentamientos.<br>• <strong>Fiscal y Deuda Soberana:</strong> resultado primario, refinanciamiento de deuda y calificación crediticia.<br><br>Es un índice de contexto, no predictivo: los datos de 2007 a 2015 usan estimaciones privadas de inflación.',
+    'faq.q10':'¿Cómo leo una tarjeta de dato?',
+    'faq.a10.intro':'Cada indicador se muestra en una <strong>tarjeta</strong> como esta. Así se lee cada parte:',
+    'faq.example.freq':'MENSUAL',
+    'faq.example.value':'Variación real: +3.5%',
+    'faq.example.desc':'Variación real del salario promedio registrado (RIPTE) frente a la inflación, medida año a año.',
+    'faq.example.label':'Codicia Moderada',
+    'faq.a10.legend':'<li><strong>Nombre e insignia de frecuencia:</strong> qué mide el dato y cada cuánto se actualiza (mensual, diario, etc.).</li><li><strong>Valor:</strong> el número real del indicador, en su unidad original. Es el dato crudo tal cual lo publica la fuente.</li><li><strong>Descripción:</strong> una explicación breve de qué representa ese dato y por qué importa.</li><li><strong>Puntaje y etiqueta:</strong> el valor llevado a la escala común de 0 a 100, con su interpretación (Miedo, Neutral, Codicia, etc.). Esto permite comparar indicadores muy distintos entre sí.</li><li><strong>Barra de color:</strong> muestra visualmente ese puntaje. Rojo es miedo o situación crítica; verde es codicia o solidez.</li><li><strong>Fuente:</strong> de dónde sale el dato. El punto con el rayo ⚡ indica que se actualiza en vivo.</li>',
     // ── Metodología: simple (nuevas) ──
     'meth.g.q5':'¿Cada cuánto se actualiza?',
     'meth.g.a5':'El índice se recalcula y publica todos los días a las 12:00. Los datos de mercado como el dólar y el Merval se refrescan dentro de la página a lo largo del día.',
@@ -3741,7 +3826,7 @@ const T = {
     'idx.macro':'Macro Strength','idx.macro.sub':'Country health','idx.fear':'Fear & Greed','idx.fear.sub':'Market / volatile',
     'gauge.title.macro':'Macroeconomic Strength Index','gauge.title.fear':'Fear & Greed Argentina',
     'gauge.scale.macro':'0 = critical · 50 = stable · 100 = robust','gauge.scale.fear':'0 = extreme fear · 50 = neutral · 100 = extreme greed',
-    'score.3m':'3 months ago','score.1y':'1 year ago','score.updating':'Updating…','score.xfollow':'Follow us on X',
+    'score.3m':'3 months ago','score.1y':'1 year ago','score.updating':'Updating…','score.xfollow':'Follow us on X','score.donate':'Support the project',
     'ai.title':'AI Read','ai.sub':'Live analysis, updated automatically',
     'ai.economic':'Economic Situation','ai.political':'Political Situation',
     'ai.sub.political':'Based on UTDT confidence data and the last 48h of news',
@@ -4019,6 +4104,13 @@ const T = {
     'faq.a8':'<strong>Yes.</strong> Both indices are free and open, with no ads or paywalls.<br><br>There are optional tiers with advanced features (alerts, newsletter, API access), but the <strong>main indices are always free</strong>.',
     'faq.q9':'What does each dimension include?',
     'faq.a9':'• <strong>Inflation & Monetary Policy:</strong> INDEC inflation, the real interest rate and inflation expectations from the central bank survey.<br>• <strong>FX & Reserves:</strong> the FX gap, BCRA net reserves and an agro-exports proxy.<br>• <strong>Markets & Expectations:</strong> country risk, the Merval in dollars, bond yields, market breadth and the political climate.<br>• <strong>Real Activity & Welfare:</strong> economic activity, real wages, consumption, confidence, unemployment and car registrations.<br>• <strong>Fiscal & Sovereign Debt:</strong> the primary balance, debt rollover and credit rating.<br><br>It is a context index, not a predictive one: 2007 to 2015 data uses private inflation estimates.',
+    'faq.q10':'How do I read a data card?',
+    'faq.a10.intro':'Each indicator is shown in a <strong>card</strong> like this one. Here is how to read each part:',
+    'faq.example.freq':'MONTHLY',
+    'faq.example.value':'Real change: +3.5%',
+    'faq.example.desc':'Real change in the average registered wage (RIPTE) against inflation, measured year over year.',
+    'faq.example.label':'Moderate Greed',
+    'faq.a10.legend':'<li><strong>Name and frequency badge:</strong> what the data measures and how often it updates (monthly, daily, etc.).</li><li><strong>Value:</strong> the indicator\'s actual number, in its original unit. This is the raw figure exactly as the source publishes it.</li><li><strong>Description:</strong> a short explanation of what the data represents and why it matters.</li><li><strong>Score and label:</strong> the value mapped to the common 0-to-100 scale, with its reading (Fear, Neutral, Greed, etc.). This lets you compare very different indicators.</li><li><strong>Color bar:</strong> shows that score visually. Red is fear or a critical situation; green is greed or strength.</li><li><strong>Source:</strong> where the data comes from. The dot with the ⚡ bolt means it updates live.</li>',
     // ── Methodology: simple (new) ──
     'meth.g.q5':'How often is it updated?',
     'meth.g.a5':'The index is recalculated and published daily at 12:00. Market data like the dollar and the Merval refresh on the page throughout the day.',
