@@ -4975,7 +4975,7 @@ function computeSubIndices(bs) {
       w:7, score: califV!=null ? calificacionScore(califV) : 50,
       src: califV!=null ? 'Fitch/S&P/Moody\'s' : NA,
       live: califV!=null, unavailable: califV==null,
-      raw: califV!=null ? (es?'Fitch B- · S&P CCC+ · Moody\'s Caa1' : 'Fitch B- · S&P CCC+ · Moody\'s Caa1') : '',
+      raw: califV!=null ? (es?'Fitch B- · S&P B- · Moody\'s Caa1' : 'Fitch B- · S&P B- · Moody\'s Caa1') : '',
       unavailNote: califV==null ? (es?'Señal puntual Fitch/S&P/Moody\'s. Se actualiza con cada revisión. En desarrollo.' : 'Spot signal from Fitch/S&P/Moody\'s. Updated with each review. In development.') : '',
       desc: es?'Calificación crediticia soberana de las tres grandes agencias. Cambios de outlook o de calificación impactan directamente en el costo de financiamiento.'
              :'Sovereign credit rating from the three major agencies. Outlook or rating changes directly impact borrowing costs.' },
