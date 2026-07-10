@@ -2360,7 +2360,22 @@ body.lm .x-band-title { color:#0f1419; }
 .x-band-sub { font-size:1rem; line-height:1.55; color:#8b98a5; max-width:72ch; }
 body.lm .x-band-sub { color:#536471; }
 .x-cards { display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; }
-@media(max-width:760px){ .x-cards { grid-template-columns:1fr; } .x-band { padding:1.5rem; } .x-band-intro { flex-direction:column; align-items:flex-start; text-align:left; } }
+.x-layout { display:grid; grid-template-columns:1fr 1.35fr; gap:1.25rem; align-items:stretch; }
+@media(max-width:760px){ .x-cards { grid-template-columns:1fr; } .x-layout { grid-template-columns:1fr; } .x-band { padding:1.5rem; } .x-band-intro { flex-direction:column; align-items:flex-start; text-align:left; } }
+/* Bloque "¿Qué vas a encontrar?" */
+.x-detail {
+  display:flex; flex-direction:column; justify-content:center;
+  background:#16181c; border:1px solid #2f3336; border-radius:18px; padding:1.6rem 1.9rem;
+}
+body.lm .x-detail { background:#f7f9f9; border-color:#eff3f4; }
+.x-detail-title { font-size:1.15rem; font-weight:800; color:#fff; margin-bottom:1.1rem; letter-spacing:-.2px; }
+body.lm .x-detail-title { color:#0f1419; }
+.x-detail-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.95rem; }
+.x-detail-list li { display:flex; align-items:flex-start; gap:.75rem; font-size:.97rem; line-height:1.5; color:#8b98a5; }
+body.lm .x-detail-list li { color:#536471; }
+.x-detail-list strong { color:#e7e9ea; font-weight:700; }
+body.lm .x-detail-list strong { color:#0f1419; }
+.x-detail-ico { font-size:1.15rem; line-height:1.4; flex-shrink:0; }
 .x-card {
   display:flex; flex-direction:column; text-decoration:none;
   background:#16181c; border:1px solid #2f3336; border-radius:18px;
@@ -2369,10 +2384,6 @@ body.lm .x-band-sub { color:#536471; }
 body.lm .x-card { background:#f7f9f9; border-color:#eff3f4; }
 .x-card:hover { transform:translateY(-3px); border-color:#536471; background:#1c1f23; }
 body.lm .x-card:hover { background:#fff; border-color:#cfd9de; box-shadow:0 6px 20px rgba(0,0,0,.08); }
-.x-card-memes { background:#1a1016; border-color:#3a2230; }
-body.lm .x-card-memes { background:#fef6fb; border-color:#f3d9ea; }
-.x-card-memes:hover { border-color:#c9377d; background:#211118; }
-body.lm .x-card-memes:hover { border-color:#e6519b; }
 .x-card-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem; }
 .x-card-logo { width:26px; height:26px; fill:#fff; }
 body.lm .x-card-logo { fill:#000; }
@@ -2381,7 +2392,6 @@ body.lm .x-card-logo { fill:#000; }
   padding:4px 11px; border-radius:999px; background:#2f3336; color:#e7e9ea;
 }
 body.lm .x-card-badge { background:#e8eef0; color:#0f1419; }
-.x-card-memes .x-card-badge { background:#c9377d; color:#fff; }
 .x-card-handle { font-size:1.3rem; font-weight:800; color:#fff; letter-spacing:-.3px; }
 body.lm .x-card-handle { color:#0f1419; }
 .x-card-name { font-size:.85rem; font-weight:600; color:#8b98a5; margin-bottom:.7rem; }
@@ -2394,7 +2404,6 @@ body.lm .x-card-desc { color:#536471; }
   background:#fff; color:#000; transition:gap .18s ease;
 }
 body.lm .x-card-cta { background:#0f1419; color:#fff; }
-.x-card-memes .x-card-cta { background:#c9377d; color:#fff; }
 .x-card:hover .x-card-cta { gap:.7rem; }
 .x-card-arrow { transition:transform .18s ease; }
 .x-card:hover .x-card-arrow { transform:translateX(2px); }
@@ -2531,7 +2540,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
     <li><a href="#apoyar"      data-i18n="nav.support">Apoyar</a></li>
     <li><a href="#historico"   data-i18n="nav.historic">Histórico</a></li>
     <li><a href="#sugerencias" data-i18n="nav.suggest">Sugerencias</a></li>
-    <li><a href="#x-social" data-i18n="nav.xsocial">X</a></li>
+    <li><a href="#x-social" data-i18n="nav.xsocial">Redes Sociales</a></li>
     <!-- Tiers oculto temporalmente. Reactivar agregando: <li><a href="#tiers" data-i18n="nav.tiers">Tiers</a></li> -->
   </ul></nav>
   <div class="h-right">
@@ -2770,10 +2779,10 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
         <svg class="x-band-logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
         <div class="x-band-texts">
           <div class="x-band-title" data-i18n="x.title">Seguí a RadARG en X</div>
-          <div class="x-band-sub" data-i18n="x.sub">Datos del mercado en vivo, análisis y una dosis de humor financiero argentino. Elegí la cuenta que va con vos.</div>
+          <div class="x-band-sub" data-i18n="x.sub">Toda la actualidad económica argentina, todos los días, en un solo lugar.</div>
         </div>
       </div>
-      <div class="x-cards">
+      <div class="x-layout">
         <a class="x-card" href="https://x.com/radargapp" target="_blank" rel="noopener" aria-label="RadARG en X">
           <div class="x-card-top">
             <svg class="x-card-logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
@@ -2781,19 +2790,18 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
           </div>
           <div class="x-card-handle">@radargapp</div>
           <div class="x-card-name" data-i18n="x.acc1.name">RadARG</div>
-          <div class="x-card-desc" data-i18n="x.acc1.desc">La cuenta principal: índices en vivo, datos del mercado argentino, gráficos y análisis serio del día a día.</div>
+          <div class="x-card-desc" data-i18n="x.acc1.desc">La cuenta oficial de RadARG. Datos claros del mercado argentino, todos los días.</div>
           <span class="x-card-cta"><span data-i18n="x.follow">Seguir</span> <span class="x-card-arrow">→</span></span>
         </a>
-        <a class="x-card x-card-memes" href="https://x.com/radargmemes" target="_blank" rel="noopener" aria-label="RadARG Memes en X">
-          <div class="x-card-top">
-            <svg class="x-card-logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-            <span class="x-card-badge" data-i18n="x.badge.memes">Humor</span>
-          </div>
-          <div class="x-card-handle">@radargmemes</div>
-          <div class="x-card-name" data-i18n="x.acc2.name">RadARG Memes</div>
-          <div class="x-card-desc" data-i18n="x.acc2.desc">El costado divertido: memes, chistes de mercado y la economía argentina contada sin filtro.</div>
-          <span class="x-card-cta"><span data-i18n="x.follow">Seguir</span> <span class="x-card-arrow">→</span></span>
-        </a>
+        <div class="x-detail">
+          <div class="x-detail-title" data-i18n="x.detail.title">¿Qué vas a encontrar?</div>
+          <ul class="x-detail-list">
+            <li><span class="x-detail-ico">📊</span><span data-i18n="x.detail.1">La <strong>actualización diaria</strong> del Índice de Miedo y Codicia y del Índice de Solidez Macroeconómica.</span></li>
+            <li><span class="x-detail-ico">📈</span><span data-i18n="x.detail.2">Los <strong>datos económicos más relevantes</strong> del país apenas se publican.</span></li>
+            <li><span class="x-detail-ico">💵</span><span data-i18n="x.detail.3">El <strong>tipo de cambio</strong> y su evolución, sin vueltas.</span></li>
+            <li><span class="x-detail-ico">📰</span><span data-i18n="x.detail.4">Las <strong>noticias más importantes</strong> para entender la economía argentina.</span></li>
+          </ul>
+        </div>
       </div>
     </div>
   </section>
@@ -3407,10 +3415,7 @@ footer { border-top:1px solid var(--border); padding:2rem 1.75rem; position:rela
     <h3 data-i18n="donate.modal.title">☕ Apoyar RadARG</h3>
     <p class="modal-sub" data-i18n="donate.modal.sub">Si este índice te ayuda, cualquier colaboración ayuda a mantenerlo activo y gratuito.</p>
     <div class="modal-opts">
-      <a class="modal-opt" href="https://cafecito.app" target="_blank" rel="noopener"><span class="modal-opt-ico">☕</span><div><div class="modal-opt-name">Cafecito</div><div class="modal-opt-desc">Plataforma argentina · cafecito.app</div></div></a>
-      <a class="modal-opt" href="https://mpago.la/donate" target="_blank" rel="noopener"><span class="modal-opt-ico">💳</span><div><div class="modal-opt-name">Mercado Pago</div><div class="modal-opt-desc">Pesos o dólares · pagos locales</div></div></a>
-      <a class="modal-opt" href="https://paypal.me/radarg" target="_blank" rel="noopener"><span class="modal-opt-ico">🅿️</span><div><div class="modal-opt-name">PayPal</div><div class="modal-opt-desc">Internacional · USD, EUR y más</div></div></a>
-      <a class="modal-opt" href="https://ko-fi.com" target="_blank" rel="noopener"><span class="modal-opt-ico">🌐</span><div><div class="modal-opt-name">Ko-fi</div><div class="modal-opt-desc">Internacional · USD</div></div></a>
+      <a class="modal-opt" href="https://cafecito.app/radargapp" target="_blank" rel="noopener"><span class="modal-opt-ico">☕</span><div><div class="modal-opt-name">Cafecito</div><div class="modal-opt-desc">Plataforma argentina · cafecito.app/radargapp</div></div></a>
     </div>
   </div>
 </div>
@@ -3504,13 +3509,15 @@ const T = {
     'sec.suggest':'Sugerencias',
     'sec.xsocial':'Seguinos en X',
     'x.title':'Seguí a RadARG en X',
-    'x.sub':'Datos del mercado en vivo, análisis y una dosis de humor financiero argentino. Elegí la cuenta que va con vos.',
+    'x.sub':'Toda la actualidad económica argentina, todos los días, en un solo lugar.',
     'x.badge.official':'Oficial',
-    'x.badge.memes':'Humor',
     'x.acc1.name':'RadARG',
-    'x.acc1.desc':'La cuenta principal: índices en vivo, datos del mercado argentino, gráficos y análisis serio del día a día.',
-    'x.acc2.name':'RadARG Memes',
-    'x.acc2.desc':'El costado divertido: memes, chistes de mercado y la economía argentina contada sin filtro.',
+    'x.acc1.desc':'La cuenta oficial de RadARG. Datos claros del mercado argentino, todos los días.',
+    'x.detail.title':'¿Qué vas a encontrar?',
+    'x.detail.1':'La <strong>actualización diaria</strong> del Índice de Miedo y Codicia y del Índice de Solidez Macroeconómica.',
+    'x.detail.2':'Los <strong>datos económicos más relevantes</strong> del país apenas se publican.',
+    'x.detail.3':'El <strong>tipo de cambio</strong> y su evolución, sin vueltas.',
+    'x.detail.4':'Las <strong>noticias más importantes</strong> para entender la economía argentina.',
     'x.follow':'Seguir',
     'suggest.eyebrow':'Comunidad RadARG',
     'suggest.heading':'Tu idea puede estar en el índice',
@@ -3720,7 +3727,7 @@ const T = {
     // Ticker timestamp
     'ticker.act':'Act.',
     // ── Nav / navegación ──
-    'nav.support':'Apoyar','nav.suggest':'Sugerencias','nav.xsocial':'X',
+    'nav.support':'Apoyar','nav.suggest':'Sugerencias','nav.xsocial':'Redes Sociales',
     // ── Sección Apoyar ──
     'support.title':'RadARG es gratis y lo queremos mantener así',
     'support.sub':'Mantener el índice online tiene costos reales: el modelo de IA que analiza datos y genera los resúmenes, el servidor, las APIs de datos y las herramientas del proyecto. Si te resulta útil, cualquier colaboración ayuda mucho.',
@@ -3842,13 +3849,15 @@ const T = {
     'sec.suggest':'Suggestions',
     'sec.xsocial':'Follow us on X',
     'x.title':'Follow RadARG on X',
-    'x.sub':'Live market data, analysis and a dose of Argentine financial humor. Pick the account that fits you.',
+    'x.sub':'All of Argentina\'s economic news, every day, in one place.',
     'x.badge.official':'Official',
-    'x.badge.memes':'Humor',
     'x.acc1.name':'RadARG',
-    'x.acc1.desc':'The main account: live indices, Argentine market data, charts and serious day-to-day analysis.',
-    'x.acc2.name':'RadARG Memes',
-    'x.acc2.desc':'The fun side: memes, market jokes and the Argentine economy told with no filter.',
+    'x.acc1.desc':'The official RadARG account. Clear Argentine market data, every day.',
+    'x.detail.title':'What will you find?',
+    'x.detail.1':'The <strong>daily update</strong> of the Fear & Greed Index and the Macroeconomic Strength Index.',
+    'x.detail.2':'The <strong>most relevant economic data</strong> as soon as it is released.',
+    'x.detail.3':'The <strong>exchange rate</strong> and its evolution, straight up.',
+    'x.detail.4':'The <strong>most important news</strong> to understand Argentina\'s economy.',
     'x.follow':'Follow',
     'suggest.eyebrow':'RadARG Community',
     'suggest.heading':'Your idea could shape the index',
@@ -4049,7 +4058,7 @@ const T = {
     // Ticker timestamp
     'ticker.act':'Upd.',
     // ── Nav ──
-    'nav.support':'Support','nav.suggest':'Suggestions','nav.xsocial':'X',
+    'nav.support':'Support','nav.suggest':'Suggestions','nav.xsocial':'Social Media',
     // ── Support section ──
     'support.title':'RadARG is free and we want to keep it that way',
     'support.sub':'Keeping the index live costs real money — the AI that crunches the data and writes the summaries, the server, the data APIs, the tooling. If it\'s useful to you, anything you chip in goes a long way.',
